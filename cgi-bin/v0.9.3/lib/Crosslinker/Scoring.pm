@@ -108,7 +108,23 @@ sub print_results_text {
     my $finish_division = ",";
     my $is_it_xlink     = 0;
 
-    print "$new_line#" . $finish_division . $new_division . "Score" . $finish_division . $new_division . "PPM" . $finish_division . $new_division . "+" . $finish_division . $new_division . "Frac" . $finish_division . $new_division . "Scan  (L)" . $finish_division . $new_division . "Scan (H)" . $finish_division . $new_division . "Protein (A)" . $finish_division . $new_division . "Protein (B)" . $finish_division . $new_division . "Sequence (A)" . $finish_division . $new_division . "Sequence (B)" . $finish_division . $new_division . "Mod" . $finish_division . $finish_line;
+# Chain 1	Chain 2	Position1	Position2	Fragment and Position	Score	Charge	Mass	PPM	Mod
+
+    print "$new_line#" . $finish_division .
+	   $new_division . "Protein (A)" . $finish_division . 
+	   $new_division . "Protein (B)" . $finish_division .  
+	   $new_division . "Position (A)" . $finish_division . 
+	   $new_division . "Position (B)" . $finish_division .   
+	   $new_division . "Sequence (A)" . $finish_division . 	   
+	   $new_division . "Sequence (B)" . $finish_division . 
+	   $new_division . "Score" . $finish_division .
+	   $new_division . "+" . $finish_division . 
+	   $new_division . "PPM" . $finish_division . 	   
+	   $new_division . "Frac" . $finish_division . 
+	   $new_division . "Scan  (L)" . $finish_division . 
+	   $new_division . "Scan (H)" . $finish_division . 	   
+	   $new_division . "Mod" . $finish_division . 
+	   $finish_line;
     while ( ( my $top_hits_results = $top_hits->fetchrow_hashref ) ) {
 
         if ( ( !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far ) && !( grep $_ eq $top_hits_results->{'mz'}, @mz_so_far ) && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far ) && $repeats == 0 ) || $repeats == 1 ) {
@@ -120,15 +136,27 @@ sub print_results_text {
             my @fragments            = split( '-', $top_hits_results->{'fragment'} );
             my @unmodified_fragments = split( '-', $top_hits_results->{'unmodified_fragment'} );
             if ( $top_hits_results->{'fragment'} =~ '-' ) {
-                print "$new_line$new_division", $printed_hits + 1, "$finish_division$new_division";
-                print "$top_hits_results->{'score'}$finish_division$new_division$rounded$finish_division";
-                print "$new_division$top_hits_results->{'charge'}$finish_division";
-                print "$new_division$top_hits_results->{'fraction'}$finish_division";
-                print "$new_division$top_hits_results->{'scan'}$finish_division $new_division $top_hits_results->{'d2_scan'}$finish_division";
-                print "$new_division", substr( $top_hits_results->{'sequence1_name'}, 1 ), $finish_division;
-                print "$new_division", substr( $top_hits_results->{'sequence2_name'}, 1 ), $finish_division;
-                print $new_division, ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $top_hits_results->{'best_x'} + 1 ) . "." . $unmodified_fragments[0];
-                print $finish_division. $new_division . ( ( residue_position $unmodified_fragments[1], $protien_sequences ) + $top_hits_results->{'best_y'} + 1 ) . "." . $unmodified_fragments[1] . "$finish_division";
+		print "$new_line$new_division", $printed_hits + 1, "$finish_division$new_division";
+		if (substr( $top_hits_results->{'sequence1_name'}, 1 ) lt substr( $top_hits_results->{'sequence2_name'}, 1 ) ) {
+		    print "$new_division", substr( $top_hits_results->{'sequence1_name'}, 1 ), $finish_division;
+		    print "$new_division", substr( $top_hits_results->{'sequence2_name'}, 1 ), $finish_division;
+		    print $new_division, ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $top_hits_results->{'best_x'} + 1 ) , $finish_division; 
+		    print $new_division . ( ( residue_position $unmodified_fragments[1], $protien_sequences ) + $top_hits_results->{'best_y'} + 1 ) , $finish_division; 
+		    print $new_division . $unmodified_fragments[0]. $finish_division;	        
+		    print $new_division . $unmodified_fragments[1] . "$finish_division";                
+	        }
+		else {
+		    print "$new_division", substr( $top_hits_results->{'sequence2_name'}, 1 ), $finish_division;
+		    print "$new_division", substr( $top_hits_results->{'sequence1_name'}, 1 ), $finish_division;		    		    
+		    print $new_division . ( ( residue_position $unmodified_fragments[1], $protien_sequences ) + $top_hits_results->{'best_y'} + 1 ) , $finish_division; 
+		    print $new_division, ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $top_hits_results->{'best_x'} + 1 ) , $finish_division; 		    
+		    print $new_division . $unmodified_fragments[1] . "$finish_division";
+		    print $new_division . $unmodified_fragments[0]. $finish_division;	           
+		}
+                print "$top_hits_results->{'score'}$finish_division$new_division$rounded$finish_division";                
+		print "$new_division$top_hits_results->{'charge'}$finish_division";
+                print "$new_division$top_hits_results->{'fraction'}$finish_division";	        
+                print "$new_division$top_hits_results->{'scan'}$finish_division $new_division $top_hits_results->{'d2_scan'}$finish_division";                                          
                 print $new_division;
 
                 if ( $top_hits_results->{'no_of_mods'} > 1 ) {
@@ -138,14 +166,16 @@ sub print_results_text {
                 print " $modifications{$top_hits_results->{'modification'}}{Name}";
             } else {
                 print "$new_line$new_division", $printed_hits + 1, "$finish_division$new_division";
-
-                print "$top_hits_results->{'score'}$finish_division$new_division$rounded$finish_division";
-                print "$new_division$top_hits_results->{'charge'}$finish_division";
-                print "$new_division$top_hits_results->{'fraction'}$finish_division";
-                print "$new_division$top_hits_results->{'scan'}$finish_division $new_division $top_hits_results->{'d2_scan'}$finish_division";
-                print "$new_division", substr( $top_hits_results->{'sequence1_name'}, 1 ), $finish_division;
+		print "$new_division", substr( $top_hits_results->{'sequence1_name'}, 1 ), $finish_division;
                 print "$new_division", "N/A", $finish_division;
-                print $new_division, ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $top_hits_results->{'best_x'} + 1 ) . "." . $unmodified_fragments[0] . $finish_division . $new_division . "N/A" . $finish_division;
+		print $new_division, ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $top_hits_results->{'best_x'} + 1 ) , $finish_division; 
+	        print "$new_division", "N/A", $finish_division;
+	        print $new_division . $unmodified_fragments[0]. $finish_division;	        
+		print "$new_division", "N/A", $finish_division;
+                print "$top_hits_results->{'score'}$finish_division$new_division$rounded$finish_division";                
+		print "$new_division$top_hits_results->{'charge'}$finish_division";
+                print "$new_division$top_hits_results->{'fraction'}$finish_division";	        
+                print "$new_division$top_hits_results->{'scan'}$finish_division $new_division $top_hits_results->{'d2_scan'}$finish_division";                                          
                 print $new_division;
 
                 if ( $top_hits_results->{'no_of_mods'} > 1 ) {
@@ -475,7 +505,7 @@ sub calc_score {
     use Time::HiRes 'gettimeofday', 'tv_interval';
     use Math::BigRat;
 
-    my ( $protein_residuemass_ref, $MSn_string, $d2_MSn_string, $sequence, $modifications_ref, $no_of_mods, $modification, $mass_of_hydrogen, $xlinker_mass, $mono_mass_diff, $seperation, $reactive_site, $parent_charge, $ms2_error, $ms2_fragmentation_ref ) = @_;
+    my ( $protein_residuemass_ref, $MSn_string, $d2_MSn_string, $sequence, $modifications_ref, $no_of_mods, $modification, $mass_of_hydrogen, $xlinker_mass, $mono_mass_diff, $seperation, $reactive_site, $parent_charge, $ms2_error, $ms2_fragmentation_ref, $threshold  ) = @_;
     my %residuemass       = %{$protein_residuemass_ref};
     my $data              = $MSn_string;
     my $data2             = $d2_MSn_string;
@@ -488,6 +518,7 @@ sub calc_score {
     my @d2_masses = split "\n", $data2;
     my %ms2_masses;
     my $max_abundance = 0;
+    my $max_abundance_d2 = 0;
     my $total_ion_current_corrected;
     my $terminalmass  = 1.0078250 * 2 + 15.9949146 * 1;
     my $water         = 1.0078250 * 2 + 15.9949146 * 1;
@@ -528,7 +559,7 @@ sub calc_score {
     foreach my $mass_abundance (@d2_masses) {
         $no_of_ms2_peaks = $no_of_ms2_peaks + 1;
         my ( $mass, $abundance ) = split " ", $mass_abundance;
-        if ( $abundance > $max_abundance ) { $max_abundance = $abundance }
+        if ( $abundance > $max_abundance_d2 ) { $max_abundance_d2 = $abundance }
         $ms2_masses{$mass} = $abundance;
         $newline->execute( $mass, $abundance, 1 );
     }
@@ -742,9 +773,9 @@ sub calc_score {
                                 # 			    warn "n:$n i:$i +:$charge x:$xlink_position[0] y:$xlink_position[1] $fragment_residues  ", "\n";
 #                                 warn $mz, " Y $i $residue_no";
                                 $new_theoretical->execute( $mz, 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '' );    #need to calc position not needed atm.
-                                warn "Y $i", $mz; 
+#                                 warn "Y $i", $mz; 
 				$new_theoretical->execute( $mz + ($seperation_mz), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '' );    #need to calc position not needed atm.
-				warn  "Y(H) $i", $mz+$seperation_mz ;
+# 				warn  "Y(H) $i", $mz+$seperation_mz ;
                                 if ( $fragment_residues =~ /[STED]/ && $ms2_fragmentation{'waterloss'} ) {                                                                                   #WATER loss
                                     $new_theoretical->execute( $mz - ( $water / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]' );    #need to calc position not needed atm.
                                     $new_theoretical->execute( $mz + ($seperation_mz) - ( $water / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]' );    #need to calc position not needed atm.
@@ -941,16 +972,16 @@ sub calc_score {
 
                     for ( my $q = 1 ; $q <= $q_max ; $q++ ) {
 
-                        my $count = $dbh->prepare("SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.heavy_light = 0 ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0'");
-                        $count->execute( $interval, $interval + $interval_range, $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
+                        my $count = $dbh->prepare("SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 0 ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0'");
+                        $count->execute( $interval, $interval + $interval_range, ($max_abundance*$threshold/100),$q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
                         my $k = $count->fetchrow_array;
 
                         # my $count = $dbh->prepare("SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select * from ms2 WHERE mass > ? AND mass <= ? AND ms2.heavy_light = 1 ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1'");
                         # $count = $dbh->prepare("select COUNT(mass) from ms2 WHERE mass > ? AND mass <= ? AND ms2.heavy_light = 1 ORDER BY ms2.abundance+0 ");
-                        $count = $dbh->prepare("SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.heavy_light = 1 ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1'");
+                        $count = $dbh->prepare("SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 1 ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1'");
 
                         # $count->execute ( $interval,$interval+$interval_range,$q, $ms2_error,$ms2_error, $xlink_position[0],$xlink_position[1],$sequence, $interval,$interval+$interval_range);
-                        $count->execute( $interval, $interval + $interval_range, $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
+                        $count->execute( $interval, $interval + $interval_range, ($max_abundance_d2*$threshold/100),$q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
                         my $d2_k = $count->fetchrow_array;
 
                         # warn "d2_k,n = $d2_k, $d2_n k,n = $k,$n";
@@ -1007,8 +1038,8 @@ sub calc_score {
         }
     }
 
-    my $matchlist = $dbh->prepare("SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '0' and theoretical.heavy_light = '0'  ORDER by abundance DESC");
-    $matchlist->execute( $ms2_error, $ms2_error, $best_x, $best_y, $best_sequence );
+    my $matchlist = $dbh->prepare("SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ? ) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '0' and theoretical.heavy_light = '0' AND abundance > ? ORDER by abundance DESC");
+    $matchlist->execute( $ms2_error, $ms2_error, $best_x, $best_y, $best_sequence,($max_abundance*$threshold/100) );
     my $chain;
     my $top_10;
     while ( my $peaks = $matchlist->fetchrow_hashref ) {
@@ -1020,8 +1051,8 @@ sub calc_score {
         $top_10 = $top_10 . "$chain$peaks->{ion_type}$peaks->{mod}<sub>$peaks->{position}</sub><sup>$peaks->{charge}+</sup> = $peaks->{mass}<br/>\n";
     }
 
-    $matchlist = $dbh->prepare("SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '1' and theoretical.heavy_light = '1'  ORDER by abundance DESC");
-    $matchlist->execute( $ms2_error, $ms2_error, $best_x, $best_y, $best_sequence );
+    $matchlist = $dbh->prepare("SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '1' and theoretical.heavy_light = '1' AND abundance > ? ORDER by abundance DESC");
+    $matchlist->execute( $ms2_error, $ms2_error, $best_x, $best_y, $best_sequence,($max_abundance_d2*$threshold/100) );
 
     my $d2_top_10 = '';
     while ( my $peaks = $matchlist->fetchrow_hashref ) {

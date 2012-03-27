@@ -138,7 +138,9 @@ sub is_ready {
 						      decoy,
 						      ms2_da,
 						      ms1_ppm,
-						      finished					     ``
+						      finished,
+						      isotoptic_shift,
+						      threshold
 						) "
     );
 
@@ -158,7 +160,7 @@ sub is_ready {
 
 sub save_settings {
 
-    my ( $settings_dbh, $results_table, $cut_residues, $protien_sequences, $reactive_site, $mono_mass_diff, $xlinker_mass, $state, $desc, $decoy, $ms2_da, $ms1_ppm, $mass_seperation, $dynamic_mods_ref, $fixed_mods_ref ) = @_;
+    my ( $settings_dbh, $results_table, $cut_residues, $protien_sequences, $reactive_site, $mono_mass_diff, $xlinker_mass, $state, $desc, $decoy, $ms2_da, $ms1_ppm, $mass_seperation, $dynamic_mods_ref, $fixed_mods_ref, $threshold ) = @_;
 
     if ( defined $fixed_mods_ref ) {
         my $conf_dbh = connect_conf_db;
@@ -241,7 +243,8 @@ sub save_settings {
 						      ms2_da,
 						      ms1_ppm,
 						      finished,
-						      isotoptic_shift	     
+						      isotoptic_shift,
+						      threshold			
 						) "
     );
 
@@ -259,11 +262,12 @@ sub save_settings {
 						      ms2_da,
 						      ms1_ppm,
 						      finished,
-						      isotoptic_shift	     
-						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+						      isotoptic_shift,	     
+						      threshold
+						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
     );
 
-    $settings_sql->execute( $results_table, $desc, $cut_residues, $protien_sequences, $reactive_site, $mono_mass_diff, $xlinker_mass, $decoy, $ms2_da, $ms1_ppm, $state, $mass_seperation );
+    $settings_sql->execute( $results_table, $desc, $cut_residues, $protien_sequences, $reactive_site, $mono_mass_diff, $xlinker_mass, $decoy, $ms2_da, $ms1_ppm, $state, $mass_seperation, $threshold );
     
     return;
 }
@@ -330,6 +334,7 @@ sub import_cgi_query {
     my $reactive_site  = $query->param('reactive_site');
     my $isotope        = $query->param("isotope");
     my $linkspacing    = $query->param('seperation');
+    my $threshold      = $query->param('threshold');
 
     my %ms2_fragmentation;
     if   ( defined $query->param('aions') ) { $ms2_fragmentation{'aions'} = '1' }
@@ -365,7 +370,7 @@ sub import_cgi_query {
     }
 
     $conf_dbh->disconnect();
-    return ( $protien_sequences, \@sequence_names, $missed_clevages, \@upload_filehandle, \@csv_filehandle, $reactive_site, $cut_residues, $nocut_residues, $fasta, $desc, $decoy, $match_ppm, $ms2_error, $mass_seperation, $isotope, $linkspacing, $mono_mass_diff, $xlinker_mass, \@dynamic_mods, \@fixed_mods, \%ms2_fragmentation );
+    return ( $protien_sequences, \@sequence_names, $missed_clevages, \@upload_filehandle, \@csv_filehandle, $reactive_site, $cut_residues, $nocut_residues, $fasta, $desc, $decoy, $match_ppm, $ms2_error, $mass_seperation, $isotope, $linkspacing, $mono_mass_diff, $xlinker_mass, \@dynamic_mods, \@fixed_mods, \%ms2_fragmentation, $threshold );
 }
 
 sub find_free_tablename {
@@ -384,7 +389,8 @@ sub find_free_tablename {
 						      ms2_da,
 						      ms1_ppm,
 						      finished,
-						      isotoptic_shift	     
+						      isotoptic_shift,
+						      threshold
 						) "
     );
 
@@ -403,7 +409,7 @@ sub find_free_tablename {
 }
 
 sub matchpeaks {
-    my ( $peaklist_ref, $fragment_masses_ref, $fragment_sources_ref, $protien_sequences, $match_ppm, $dbh, $results_dbh, $settings_dbh, $results_table, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $nocut_residues, $sequence_names_ref, $mono_mass_diff, $xlinker_mass, $linkspacing, $isotope, $reactive_site, $modifications_ref, $ms2_error, $protein_residuemass_ref, $ms2_fragmentation_ref ) = @_;
+    my ( $peaklist_ref, $fragment_masses_ref, $fragment_sources_ref, $protien_sequences, $match_ppm, $dbh, $results_dbh, $settings_dbh, $results_table, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $nocut_residues, $sequence_names_ref, $mono_mass_diff, $xlinker_mass, $linkspacing, $isotope, $reactive_site, $modifications_ref, $ms2_error, $protein_residuemass_ref, $ms2_fragmentation_ref, $threshold ) = @_;
     my %fragment_masses     = %{$fragment_masses_ref};
     my %fragment_sources    = %{$fragment_sources_ref};
     my %modifications       = %{$modifications_ref};
@@ -428,7 +434,7 @@ sub matchpeaks {
     foreach my $fragment ( keys %fragment_masses ) {
         $fragment_score{$fragment} = 0;
     }
-
+   
     my $ms2 = $dbh->prepare("SELECT MSn_string, scan_num FROM msdata WHERE mz between ? +0.00005 and ? -0.00005 and scan_num between ? - 20 and ? + 20 and fraction = ? and msorder = 2 LIMIT 0,1");
 
     my $peak_no = 0;
@@ -561,7 +567,7 @@ sub matchpeaks {
                                 #                                 warn $fragment, $modifications{$modification}{Name}, "\n";
                                 # 				if ( $modifications{$modification}{Name} eq "loop link" ) { warn "loop link ";	}
 
-                                my ( $ms2_score, $modified_fragment, $best_x, $best_y, $top_10, $d2_top_10 ) = calc_score( \%protein_residuemass, $MSn_string, $d2_MSn_string, $fragment, \%modifications, $n, $modification, $mass_of_hydrogen, $xlinker_mass, $mono_mass_diff, $seperation, $reactive_site, $peak->{'charge'}, $ms2_error, \%ms2_fragmentation );
+                                my ( $ms2_score, $modified_fragment, $best_x, $best_y, $top_10, $d2_top_10 ) = calc_score( \%protein_residuemass, $MSn_string, $d2_MSn_string, $fragment, \%modifications, $n, $modification, $mass_of_hydrogen, $xlinker_mass, $mono_mass_diff, $seperation, $reactive_site, $peak->{'charge'}, $ms2_error, \%ms2_fragmentation, $threshold );
 
                                 # 		       my ($d2_ms2_score,$d2_modified_fragment,$d2_best_x,$d2_best_y, $d2_top_10) = calc_score($d2_MSn_string,$d2_MSn_string,$fragment, \%modifications, $n,$modification, $mass_of_hydrogen,$xlinker_mass+$seperation,$mono_mass_diff,  $seperation, $reactive_site,$peak->{'charge'}, $best_x, $best_y);
 

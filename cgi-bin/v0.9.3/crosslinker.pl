@@ -59,7 +59,7 @@ if ($child) {
     # Connect to databases
     my ( $dbh, $results_dbh, $settings_dbh ) = connect_db;
 
-    my ( $protien_sequences, $sequence_names_ref, $missed_clevages, $upload_filehandle_ref, $csv_filehandle_ref, $reactive_site, $cut_residues, $nocut_residues, $fasta, $desc, $decoy, $match_ppm, $ms2_error, $mass_seperation, $isotope, $seperation, $mono_mass_diff, $xlinker_mass, $dynamic_mods_ref, $fixed_mods_ref, $ms2_fragmentation_ref ) = import_cgi_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
+    my ( $protien_sequences, $sequence_names_ref, $missed_clevages, $upload_filehandle_ref, $csv_filehandle_ref, $reactive_site, $cut_residues, $nocut_residues, $fasta, $desc, $decoy, $match_ppm, $ms2_error, $mass_seperation, $isotope, $seperation, $mono_mass_diff, $xlinker_mass, $dynamic_mods_ref, $fixed_mods_ref, $ms2_fragmentation_ref, $threshold ) = import_cgi_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
     my @sequence_names    = @{$sequence_names_ref};
     my @upload_filehandle = @{$upload_filehandle_ref};
     my @csv_filehandle    = @{$csv_filehandle_ref};
@@ -72,7 +72,7 @@ if ($child) {
 
     # Save Settings
     my $state = is_ready($settings_dbh);
-    save_settings( $settings_dbh, $results_table, $cut_residues, $fasta, $reactive_site, $mono_mass_diff, $xlinker_mass, $state, $desc, $decoy, $ms2_error, $match_ppm, $mass_seperation, \@dynamic_mods, \@fixed_mods );
+    save_settings( $settings_dbh, $results_table, $cut_residues, $fasta, $reactive_site, $mono_mass_diff, $xlinker_mass, $state, $desc, $decoy, $ms2_error, $match_ppm, $mass_seperation, \@dynamic_mods, \@fixed_mods, $threshold );
 
     # Setup Modifications
 
@@ -81,7 +81,7 @@ if ($child) {
 
     #Output page
 
-    $state = generate_page( $protien_sequences, $dbh, $results_dbh, $settings_dbh, $results_table, $no_of_fractions, \@upload_filehandle, \@csv_filehandle, $missed_clevages, $cut_residues, $nocut_residues, \%protein_residuemass, $reactive_site, $scan_width, \@sequence_names, $match_ppm, $min_peptide_length, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, \%modifications, $query, $mono_mass_diff, $xlinker_mass, $isotope, $seperation, $ms2_error, $state, \%ms2_fragmentation );
+    $state = generate_page( $protien_sequences, $dbh, $results_dbh, $settings_dbh, $results_table, $no_of_fractions, \@upload_filehandle, \@csv_filehandle, $missed_clevages, $cut_residues, $nocut_residues, \%protein_residuemass, $reactive_site, $scan_width, \@sequence_names, $match_ppm, $min_peptide_length, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, \%modifications, $query, $mono_mass_diff, $xlinker_mass, $isotope, $seperation, $ms2_error, $state, \%ms2_fragmentation, $threshold );
 
     #Tidy up
     if ( $state == -1 ) { set_finished( $results_table, $settings_dbh ) }

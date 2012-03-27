@@ -17,7 +17,7 @@ our @EXPORT = ( 'generate_page', 'print_heading', 'print_subheading', 'print_pag
 
 sub generate_page {
 
-    my ( $protien_sequences, $dbh, $results_dbh, $settings_dbh, $results_table, $no_of_fractions, $upload_filehandle_ref, $csv_filehandle_ref, $missed_clevages, $cut_residues, $nocut_residues, $protein_residuemass_ref, $reactive_site, $scan_width, $sequence_names_ref, $match_ppm, $min_peptide_length, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $modifications_ref, $query, $mono_mass_diff, $xlinker_mass, $isotope, $seperation, $ms2_error, $state, $ms2_fragmentation_ref ) = @_;
+    my ( $protien_sequences, $dbh, $results_dbh, $settings_dbh, $results_table, $no_of_fractions, $upload_filehandle_ref, $csv_filehandle_ref, $missed_clevages, $cut_residues, $nocut_residues, $protein_residuemass_ref, $reactive_site, $scan_width, $sequence_names_ref, $match_ppm, $min_peptide_length, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $modifications_ref, $query, $mono_mass_diff, $xlinker_mass, $isotope, $seperation, $ms2_error, $state, $ms2_fragmentation_ref, $threshold) = @_;
 
     while ( $state == -2 ) {
         sleep(10);
@@ -77,7 +77,7 @@ sub generate_page {
     my @peaklist = loaddoubletlist_db( $query->param('ms_ppm'), $seperation, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, );
 
     warn "Starting Peak Matches...\n";
-    my %fragment_score = matchpeaks( \@peaklist, \%xlink_fragment_masses, \%xlink_fragment_sources, $protien_sequences, $match_ppm, $dbh, $results_dbh, $settings_dbh, $results_table, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $nocut_residues, \@sequence_names, $mono_mass_diff, $xlinker_mass, $seperation, $isotope, $reactive_site, \%modifications, $ms2_error, \%protein_residuemass, \%ms2_fragmentation );
+    my %fragment_score = matchpeaks( \@peaklist, \%xlink_fragment_masses, \%xlink_fragment_sources, $protien_sequences, $match_ppm, $dbh, $results_dbh, $settings_dbh, $results_table, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $nocut_residues, \@sequence_names, $mono_mass_diff, $xlinker_mass, $seperation, $isotope, $reactive_site, \%modifications, $ms2_error, \%protein_residuemass, \%ms2_fragmentation, $threshold );
 
     give_permission($settings_dbh);
     if ( check_state( $settings_dbh, $results_table ) == -4 ) {

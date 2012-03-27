@@ -55,7 +55,8 @@ print <<ENDHTML;
     </select><br/>
     
         MS2 accurracy (Da) <input type="text" name="ms2_da" size="2" maxlength="3" value="0.5"/><br/>
-     Doublet Spacing Tollerance (ppm) <input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/><br/>     
+     Doublet Spacing Tollerance (ppm) <input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/><br/>
+     Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/>          
     </td>
   <td class="half"  >
     Max. Missed Cleavages    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="2"/><br/>
