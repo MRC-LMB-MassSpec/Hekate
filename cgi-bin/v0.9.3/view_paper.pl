@@ -92,8 +92,8 @@ sub print_results_paper {
     }
 
     while ( ( my $top_hits_results = $top_hits->fetchrow_hashref ) && ( $max_hits == 0 || $printed_hits < $max_hits ) ) {
-	if ($top_hits_results->{'fragment'} =~ '-')
-	{
+# 	if ($top_hits_results->{'fragment'} =~ '-')
+#  	{
         if (    ( !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far ) && !( grep $_ eq $top_hits_results->{'mz'}, @mz_so_far ) && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far ) && $repeats == 0 )
              || ( $repeats == 1 && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far ) && $scan_repeats == 0 )
              || ( $repeats == 1 && $scan_repeats == 1 ) )
@@ -129,7 +129,7 @@ sub print_results_paper {
 		  $flip_order = 0;
 		}
             } else {
-		print "<td>", substr( $top_hits_results->{'sequence1_name'}, 1 );
+# 				print "<td>", substr( $top_hits_results->{'sequence1_name'}, 1 );
 	    }
             print "</td>";
 
@@ -176,7 +176,7 @@ sub print_results_paper {
             print "</td></tr>";
         }
 	}
-    }
+#     }
     print '</table>';
 
 }
@@ -190,8 +190,8 @@ sub print_results_paper {
 #                      #
 ########################
 
-print_page_top('All Results');
-
+print_page_top_fancy('All Results');
+print_heading('Sorted Crosslink Data');
 
 my $sequences = $results_dbh->prepare("SELECT DISTINCT seq FROM (Select distinct sequence1_name as seq, name from results where name=? union select distinct sequence2_name, name as seq from results WHERE name=?)");
 $sequences->execute( $table, $table );
@@ -290,11 +290,17 @@ $sequences->finish();
 
 if ( $is_finished != '-1' ) { print '<div style="text-align:center"><h2 style="color:red;">Warning: Data analysis not finished</h2></div>'; }
 
-my $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND SCORE > 0 ORDER BY score+0 DESC");    
+my $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND fragment LIKE '%-%' AND SCORE > 0 ORDER BY score+0 DESC");    
 $top_hits->execute($table);
 print_results_paper ( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, 0, 0 , \%error, \%names);
 
-print_page_bottom;
+
+# my $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND fragment NOT LIKE '%-%' AND SCORE > 0 ORDER BY score+0 DESC");    
+# $top_hits->execute($table);
+# print_results_paper ( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, 0, 0 , \%error, \%names);
+
+
+print_page_bottom_fancy;
 $top_hits->finish();
 $results_dbh->disconnect();
 exit;
