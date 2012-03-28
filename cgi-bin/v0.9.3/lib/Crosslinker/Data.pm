@@ -7,7 +7,7 @@ use Crosslinker::Scoring;
 use Crosslinker::Links;
 use Crosslinker::Config;
 
-our @EXPORT = ( 'connect_db', 'check_state', 'give_permission', 'is_ready', 'disconnect_db', 'set_finished', 'save_settings', 'update_state', 'import_cgi_query', 'find_free_tablename', 'matchpeaks', 'create_table', 'import_mgf', 'import_csv', 'loaddoubletlist_db', 'generate_decoy' );
+our @EXPORT = ( 'connect_db', 'check_state', 'give_permission', 'is_ready', 'disconnect_db', 'set_finished', 'save_settings', 'update_state', 'import_cgi_query', 'find_free_tablename', 'matchpeaks', 'create_table', 'import_mgf', 'import_csv', 'loaddoubletlist_db', 'generate_decoy', 'set_doublets_found' );
 ######
 #
 # Data import functions
@@ -61,7 +61,11 @@ sub connect_db {
 						      unmodified_fragment,
 						      ppm,
 						      top_10,
-						      d2_top_10) "
+						      d2_top_10,
+						      matched_abundance,
+						      d2_matched_abundance,
+						      total_abundance,
+						      d2_total_abundance) "
     );
 
     return ( $dbh, $results_dbh, $settings_dbh );
@@ -80,6 +84,15 @@ sub set_finished {
 
     my $settings_sql = $settings_dbh->prepare("UPDATE settings SET finished = -1 WHERE  name = ?;");
     $settings_sql->execute($results_table);
+
+    return;
+}
+
+sub set_doublets_found {
+    my ( $results_table, $settings_dbh, $doublets_found) = @_;
+
+    my $settings_sql = $settings_dbh->prepare("UPDATE settings SET doublets_found = ? WHERE  name = ?;");
+    $settings_sql->execute($doublets_found, $results_table);
 
     return;
 }
@@ -140,7 +153,8 @@ sub is_ready {
 						      ms1_ppm,
 						      finished,
 						      isotoptic_shift,
-						      threshold
+						      threshold,
+						      doublets_found
 						) "
     );
 
@@ -244,7 +258,8 @@ sub save_settings {
 						      ms1_ppm,
 						      finished,
 						      isotoptic_shift,
-						      threshold			
+						      threshold,
+						      doublets_found			
 						) "
     );
 
@@ -390,7 +405,8 @@ sub find_free_tablename {
 						      ms1_ppm,
 						      finished,
 						      isotoptic_shift,
-						      threshold
+						      threshold,
+						      doublets_found
 						) "
     );
 
@@ -468,7 +484,11 @@ sub matchpeaks {
 						      unmodified_fragment,
 						      ppm,
 						      top_10,
-  						      d2_top_10) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+  						      d2_top_10,
+						      matched_abundance,
+						      d2_matched_abundance,
+						      total_abundance,
+						      d2_total_abundance) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
     );
 
 #######
@@ -567,13 +587,13 @@ sub matchpeaks {
                                 #                                 warn $fragment, $modifications{$modification}{Name}, "\n";
                                 # 				if ( $modifications{$modification}{Name} eq "loop link" ) { warn "loop link ";	}
 
-                                my ( $ms2_score, $modified_fragment, $best_x, $best_y, $top_10, $d2_top_10 ) = calc_score( \%protein_residuemass, $MSn_string, $d2_MSn_string, $fragment, \%modifications, $n, $modification, $mass_of_hydrogen, $xlinker_mass, $mono_mass_diff, $seperation, $reactive_site, $peak->{'charge'}, $ms2_error, \%ms2_fragmentation, $threshold );
+                                my ( $ms2_score, $modified_fragment, $best_x, $best_y, $top_10, $d2_top_10,$matched_abundance,$d2_matched_abundance,$total_abundance,$d2_total_abundance  ) = calc_score( \%protein_residuemass, $MSn_string, $d2_MSn_string, $fragment, \%modifications, $n, $modification, $mass_of_hydrogen, $xlinker_mass, $mono_mass_diff, $seperation, $reactive_site, $peak->{'charge'}, $ms2_error, \%ms2_fragmentation, $threshold );
 
                                 # 		       my ($d2_ms2_score,$d2_modified_fragment,$d2_best_x,$d2_best_y, $d2_top_10) = calc_score($d2_MSn_string,$d2_MSn_string,$fragment, \%modifications, $n,$modification, $mass_of_hydrogen,$xlinker_mass+$seperation,$mono_mass_diff,  $seperation, $reactive_site,$peak->{'charge'}, $best_x, $best_y);
 
                                 my ( $fragment1_source, $fragment2_source ) = split "-", $fragment_sources{$fragment};
                                 if ( $fragment !~ m/[-]/ ) { $fragment2_source = "0" }
-                                $results_sql->execute( $results_table, $MSn_string, $d2_MSn_string, $peak->{'mz'}, $peak->{'charge'}, $modified_fragment, $sequences[$fragment1_source], $sequences[$fragment2_source], $sequence_names[$fragment1_source], $sequence_names[$fragment2_source], $ms2_score, $peak->{'fraction'}, $peak->{'scan_num'}, $peak->{'d2_scan_num'}, $modification, $n, $best_x, $best_y, $fragment, $score, $top_10, $d2_top_10 );
+                                $results_sql->execute( $results_table, $MSn_string, $d2_MSn_string, $peak->{'mz'}, $peak->{'charge'}, $modified_fragment, $sequences[$fragment1_source], $sequences[$fragment2_source], $sequence_names[$fragment1_source], $sequence_names[$fragment2_source], $ms2_score, $peak->{'fraction'}, $peak->{'scan_num'}, $peak->{'d2_scan_num'}, $modification, $n, $best_x, $best_y, $fragment, $score, $top_10, $d2_top_10,$matched_abundance,$d2_matched_abundance,$total_abundance,$d2_total_abundance );
 
                                 # 		       $results_sql->execute($d2_MSn_string,$d2_MSn_string,$peak->{'d2_mz'},$peak->{'d2_charge'},$d2_modified_fragment, @sequences[(substr($fragment_sources{$fragment},0,1)-1)],@sequences[(substr($fragment_sources{$fragment},-1,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},0,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},-1,1)-1)],$d2_ms2_score, $peak->{'fraction'},"d2_".$peak->{'scan_num'},"d2_".$peak->{'d2_scan_num'}, $modification,$n,$d2_best_x,$d2_best_y,$fragment, $d2_score, $d2_top_10);
                             };

@@ -55,7 +55,7 @@ my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { Rais
 
 my $settings = $settings_dbh->prepare("SELECT * FROM settings WHERE name = ?");
 $settings->execute($table);
-my ( $name, $desc, $cut_residues, $protein_sequences, $reactive_site, $mono_mass_diff, $xlinker_mass, $decoy, $ms2_da, $ms1_ppm, $is_finished, $mass_seperation, $threshold ) = $settings->fetchrow_array;
+my ( $name, $desc, $cut_residues, $protein_sequences, $reactive_site, $mono_mass_diff, $xlinker_mass, $decoy, $ms2_da, $ms1_ppm, $is_finished, $mass_seperation, $threshold, $doublets_found ) = $settings->fetchrow_array;
 $settings->finish();
 $settings_dbh->disconnect();
 
@@ -84,7 +84,7 @@ print "<Table>
 <tr><td style='font-weight: bold;'>Cut:</td><td>$cut_residues</td><td style='font-weight: bold;'>Xlink Site</td><td>$reactive_site</td></tr>
 <tr><td style='font-weight: bold;'>Xlinker Mass:</td><td>$xlinker_mass</td><td style='font-weight: bold;'>Monolink</td><td>$mono_mass_diff</td></tr>
 <tr><td style='font-weight: bold;'>MS1 tollerance:</td><td>$ms1_ppm PPM</td><td style='font-weight: bold;'>MS2 tollerance</td><td>$ms2_da Da</td></tr>
-<tr><td style='font-weight: bold;'>Threshold:</td><td>$threshold %</td></tr>
+<tr><td style='font-weight: bold;'>Threshold:</td><td>$threshold %</td><td style='font-weight: bold;'>Doublets Found: </td><td>$doublets_found </td></tr>
 </table>";
 
 print_heading('Dynamic Modifications');

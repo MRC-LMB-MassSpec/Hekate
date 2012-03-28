@@ -76,6 +76,9 @@ sub generate_page {
 
     my @peaklist = loaddoubletlist_db( $query->param('ms_ppm'), $seperation, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, );
 
+    my $doublets_found = @peaklist;
+    set_doublets_found ($results_table, $settings_dbh, $doublets_found);
+
     warn "Starting Peak Matches...\n";
     my %fragment_score = matchpeaks( \@peaklist, \%xlink_fragment_masses, \%xlink_fragment_sources, $protien_sequences, $match_ppm, $dbh, $results_dbh, $settings_dbh, $results_table, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $nocut_residues, \@sequence_names, $mono_mass_diff, $xlinker_mass, $seperation, $isotope, $reactive_site, \%modifications, $ms2_error, \%protein_residuemass, \%ms2_fragmentation, $threshold );
 
