@@ -37,8 +37,7 @@ sub print_ms2_link    #Creates link to ms/2
 
 sub print_xquest_link    #Creates link to Xquest
 {
-    my ( $MSn_string, $d2_MSn_string, $mz, $charge, $sequences, $isotopic_shift, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $xlinker_mass, $mono_mass_diff, $reactive_site, $user_protein_sequence ) = @_;
-
+    my ( $MSn_string, $d2_MSn_string, $mz, $charge, $sequences, $isotopic_shift, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $xlinker_mass, $mono_mass_diff, $reactive_site, $user_protein_sequence, $static_mod_string, $varible_mod_string ) = @_;
     print '
 <form method="post" target="_blank"  action="http://prottools.ethz.ch/orinner/public/cgi-bin/xquest/xquest.cgi" enctype="multipart/form-data">
 <input type="hidden" name="usepastedata" value="1"/>
@@ -48,7 +47,7 @@ sub print_xquest_link    #Creates link to Xquest
 <input type="hidden" name="cp_isotopediff", value="', $isotopic_shift, '" size="8" maxlength="10" />
 <input type="hidden" name="ionisation"  value="ESI">
 <input type="hidden" name="AArequired" value="', $reactive_site, '" size="10" maxlength="10" />
-<input type="hidden" name="AAshift" value="C:57.02146" size="20" maxlength="20" />
+<input type="hidden" name="AAshift" value="',$static_mod_string,'" size="20" maxlength="20" />
 <input type="hidden" name="ms1tolerance" value="10" size="3" maxlength="10" align="left" />
 <input type="hidden" name="tolerancemeasure" value="ppm"  />
 <input type="hidden" name="ms2tolerance" value="1" size="5" maxlength="10" />
@@ -58,7 +57,7 @@ sub print_xquest_link    #Creates link to Xquest
 <input type="hidden" name="maxdigestlength" value="40" size="2" maxlength="3" />
 <input type="hidden" name="missed_cleavages" value="3" size="2" maxlength="3" /> 
 <input type="hidden" name="cutatxlink" value="off" default="0" />
-<input type="hidden" name="variable_mod" value="M:15.994915" size="20" maxlength="20" />
+<input type="hidden" name="variable_mod" value="',$varible_mod_string,'" size="20" maxlength="20" />
 <input type="hidden" name="xlink_ms2tolerance" value="1" size="2" maxlength="10" /> 
 <input type="hidden" name="minionsize" value="200" size="2" maxlength="10" />
 <input type="hidden" name="maxionsize" value="1600" size="2" maxlength="10" />

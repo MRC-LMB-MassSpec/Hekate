@@ -87,21 +87,26 @@ print "<Table>
 <tr><td style='font-weight: bold;'>Threshold:</td><td>$threshold %</td><td style='font-weight: bold;'>Doublets Found: </td><td>$doublets_found </td></tr>
 </table>";
 
+my $varible_mod_string;
+
 print_heading('Dynamic Modifications');
 print "<table>";
 print "<tr><td>ID</td><td>Name</td><td>Mass</td><td>Residue</td></tr>";
 my $dynamic_mods = get_mods( $table, 'dynamic' );
 while ( ( my $dynamic_mod = $dynamic_mods->fetchrow_hashref ) ) {
     print "<tr><td>$dynamic_mod->{'mod_id'}</td><td>$dynamic_mod->{'mod_name'}</td><td>$dynamic_mod->{'mod_mass'}</td><td>$dynamic_mod->{'mod_residue'}</td></tr>";
+    $varible_mod_string = $varible_mod_string . $dynamic_mod->{'mod_residue'}. ":". $dynamic_mod->{'mod_mass'}. ",";
 }
 print "</table>";
 
+my $static_mod_string;
 print_heading('Fixed Modifications');
 print "<table>";
 print "<tr><td>ID</td><td>Name</td><td>Mass</td><td>Residue</td></tr>";
 my $fixed_mods = get_mods( $table, 'fixed' );
 while ( ( my $fixed_mod = $fixed_mods->fetchrow_hashref ) ) {
     print "<tr><td>$fixed_mod->{'mod_id'}</td><td>$fixed_mod->{'mod_name'}</td><td>$fixed_mod->{'mod_mass'}</td><td>$fixed_mod->{'mod_residue'}</td></tr>";
+    $static_mod_string = $static_mod_string . $fixed_mod->{'mod_residue'}. ":". $fixed_mod->{'mod_mass'}. ",";
 }
 print "</table>";
 
@@ -117,7 +122,7 @@ if ( defined $order ) {
     $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND fragment LIKE '%-%' ORDER BY score DESC");                                                            #nice injection problem here, need to sort
 }
 $top_hits->execute($table);
-print_results( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, 0, 0, 0, 50 * $short );
+print_results( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, 0, 0, 0, 50 * $short,0, $static_mod_string,$varible_mod_string );
 
 if ( $short == 1 ) {
     print_heading( 'Top Scoring Monolink Matches <a href="view_summary.pl?table=' . $name . '&more=1">View all</a>' );
@@ -131,7 +136,7 @@ if ( defined $order ) {
 }
 
 $top_hits->execute($table);
-print_results( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, 0, 0, 0, 50 * $short, 1 );
+print_results( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, 0, 0, 0, 50 * $short, 1, $static_mod_string,$varible_mod_string);
 
 print_page_bottom_fancy;
 $top_hits->finish();

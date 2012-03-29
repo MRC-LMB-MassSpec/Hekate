@@ -271,7 +271,7 @@ sub print_results_text {
 
 sub print_results {
 
-    my ( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protien_sequences, $reactive_site, $dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, $repeats, $scan_repeats, $no_tables, $max_hits, $monolink ) = @_;
+    my ( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protien_sequences, $reactive_site, $dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, $repeats, $scan_repeats, $no_tables, $max_hits, $monolink, $static_mod_string, $varible_mod_string ) = @_;
 
     if ( !defined $max_hits ) { $max_hits  = 0 }
     if ( !$repeats )          { $repeats   = 0 }
@@ -337,7 +337,7 @@ sub print_results {
             print "</td><td>";
             print_ms2_link( $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'}, $top_hits_results->{'fragment'}, $top_hits_results->{'modification'}, $top_hits_results->{'best_x'}, $top_hits_results->{'best_y'}, $xlinker_mass, $mono_mass_diff, $top_hits_results->{'top_10'}, $reactive_site, $table );
 
-            print_xquest_link( $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'}, $top_hits_results->{'mz'}, $top_hits_results->{'charge'}, $top_hits_results->{'fragment'}, $mass_seperation, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $xlinker_mass, $mono_mass_diff, $reactive_site, $fasta );
+            print_xquest_link( $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'}, $top_hits_results->{'mz'}, $top_hits_results->{'charge'}, $top_hits_results->{'fragment'}, $mass_seperation, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $xlinker_mass, $mono_mass_diff, $reactive_site, $fasta, $static_mod_string,$varible_mod_string );
 
             print "</td></tr>";
         }
@@ -410,7 +410,19 @@ sub print_results_combined {
             print "</td><td>";
             print_ms2_link( $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'}, $top_hits_results->{'fragment'}, $top_hits_results->{'modification'}, $top_hits_results->{'best_x'}, $top_hits_results->{'best_y'}, $xlinker_mass, $mono_mass_diff, $top_hits_results->{'top_10'}, $reactive_site, $reactive_site, $top_hits_results->{'name'} );
 
-            print_xquest_link( $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'}, $top_hits_results->{'mz'}, $top_hits_results->{'charge'}, $top_hits_results->{'fragment'}, $mass_seperation{ $top_hits_results->{'name'} }, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $xlinker_mass, $mono_mass_diff, $reactive_site, $fasta );
+	    my $varible_mod_string;
+	    my $dynamic_mods = get_mods( $top_hits_results->{'name'}, 'dynamic' );
+	    while ( ( my $dynamic_mod = $dynamic_mods->fetchrow_hashref ) ) {		
+		$varible_mod_string = $varible_mod_string . $dynamic_mod->{'mod_residue'}. ":". $dynamic_mod->{'mod_mass'}. ",";
+	    }	
+	    my $static_mod_string;
+	    my $fixed_mods = get_mods( $top_hits_results->{'name'}, 'fixed' );
+	    while ( ( my $fixed_mod = $fixed_mods->fetchrow_hashref ) ) {
+
+		$static_mod_string = $static_mod_string . $fixed_mod->{'mod_residue'}. ":". $fixed_mod->{'mod_mass'}. ",";
+	    }
+
+            print_xquest_link( $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'}, $top_hits_results->{'mz'}, $top_hits_results->{'charge'}, $top_hits_results->{'fragment'}, $mass_seperation{ $top_hits_results->{'name'} }, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $cut_residues, $xlinker_mass, $mono_mass_diff, $reactive_site, $fasta,$static_mod_string, $varible_mod_string );
 
             print "</td></tr>";
         }
