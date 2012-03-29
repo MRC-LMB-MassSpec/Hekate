@@ -78,6 +78,36 @@ $SQL_query = substr( $SQL_query, 0, -6 );
 $settings = $settings_dbh->prepare($SQL_query);
 $settings->execute(@table);
 
+my %error;
+my %names;
+
+foreach my $table_name (@table)
+{
+my $sequences = $results_dbh->prepare("SELECT DISTINCT seq FROM (Select distinct sequence1_name as seq, name from results where name=? union select distinct sequence2_name, name as seq from results WHERE name=?)");
+$sequences->execute( $table_name, $table_name );
+while ( ( my $sequences_results = $sequences->fetchrow_hashref ) ) {
+my $settings_sql = $settings_dbh->prepare("SELECT value FROM pymol_settings WHERE experiment=? AND setting=?");
+	  $settings_sql->execute( $table_name, substr( $sequences_results->{'seq'}, 1 ) );
+	  my $row = $settings_sql->fetch;
+  
+	  if ( exists $row->[0] ) {
+	      my $error_value = $row->[0];
+	      $error{$table_name}{ substr( $sequences_results->{'seq'}, 1 ) } = $row->[0];
+	  } else {
+	      $error{$table_name}{ substr( $sequences_results->{'seq'}, 1 ) } = 0;
+	  }
+	  my $settings_sql = $settings_dbh->prepare("SELECT value FROM pymol_settings WHERE experiment=? AND setting=?");
+	  $settings_sql->execute( $table_name, substr( $sequences_results->{'seq'}, 1 ) . "_name" );
+	  my $row = $settings_sql->fetch;
+	  if ( exists $row->[0] ) {
+	      my $names_value = $row->[0];
+	      $names{$table_name}{ substr( $sequences_results->{'seq'}, 1 ) } = $row->[0];
+	  } else {
+	      $names{$table_name}{ substr( $sequences_results->{'seq'}, 1 ) } = substr( $sequences_results->{'seq'}, 1 );
+	  }
+}
+}
+
 print_heading('Settings');
 
 my %mass_seperation_hash;
@@ -124,7 +154,7 @@ if ( defined $order ) {
     $top_hits = $results_dbh->prepare( "SELECT * FROM (" . $SQL_query . ") ORDER BY score DESC " );    #nice injection problem here, need to sort
 }
 $top_hits->execute(@table);
-print_pymol( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table', 1, 0, 0 );
+print_pymol( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table',\%error, \%names  );
 
 $SQL_query = "";
 print_heading('Top Scoring Monolink Matches');
@@ -142,7 +172,7 @@ if ( defined $order ) {
     $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY score DESC" );    #nice injection problem here, need to sort
 }
 $top_hits->execute(@table);
-print_pymol( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table', 1, 0, 0 );
+print_pymol( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table' , \%error, \%names );
 
 print_page_bottom_fancy;
 $top_hits->finish();

@@ -13,8 +13,8 @@ sub print_pymol {
 
     my ( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protien_sequences, $reactive_site, $dbh, $xlinker_mass, $mono_mass_diff, $table, $repeats, $error_ref, $names_ref ) = @_;
 
-    my %error         = %{$error_ref};
-    my %names         = %{$names_ref};
+    my  %error         = %{$error_ref};
+    my  %names         = %{$names_ref};
     my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $table );
 
     my $fasta = $protien_sequences;
@@ -51,20 +51,20 @@ sub print_pymol {
                 $printed_hits = $printed_hits + 1;
                 my $protein = substr( $top_hits_results->{'sequence1_name'}, 1 );
                 $protein =~ s/\s+$//g;
-                print "$new_division", $names{$protein};
-                print "///" . ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $error{ substr( $top_hits_results->{'sequence1_name'}, 1 ) } + $top_hits_results->{'best_x'} + 1 ) . "/CA$finish_division";
+                print "$new_division", $names{$top_hits_results->{'name'}}{$protein};
+                print "///" . ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $error{$top_hits_results->{'name'}}{ substr( $top_hits_results->{'sequence1_name'}, 1 ) } + $top_hits_results->{'best_x'} + 1 ) . "/CA$finish_division";
                 $protein = substr( $top_hits_results->{'sequence2_name'}, 1 );
                 $protein =~ s/\s+$//g;
-                print "$new_division", $names{$protein};
-                print "///" . ( ( residue_position $unmodified_fragments[1], $protien_sequences ) + $error{ substr( $top_hits_results->{'sequence2_name'}, 1 ) } + $top_hits_results->{'best_y'} + 1 ) . "/CA&nbsp;";
+                print "$new_division", $names{$top_hits_results->{'name'}}{$protein};
+                print "///" . ( ( residue_position $unmodified_fragments[1], $protien_sequences ) + $error{$top_hits_results->{'name'}}{ substr( $top_hits_results->{'sequence2_name'}, 1 ) } + $top_hits_results->{'best_y'} + 1 ) . "/CA&nbsp;";
 
             } else {
                 print "$new_line$new_division" . "create ml", $printed_hits + 1, "$finish_division$new_division";
                 $printed_hits = $printed_hits + 1;
                 my $protein = substr( $top_hits_results->{'sequence1_name'}, 1 );
                 $protein =~ s/\s+$//g;
-                print "$new_division", $names{$protein};
-                print "///" . ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $error{ substr( $top_hits_results->{'sequence1_name'}, 1 ) } + $top_hits_results->{'best_x'} + 1 ) . "/";
+                print "$new_division", $names{$top_hits_results->{'name'}}{$protein};
+                print "///" . ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $error{$top_hits_results->{'name'}}{ substr( $top_hits_results->{'sequence1_name'}, 1 ) } + $top_hits_results->{'best_x'} + 1 ) . "/";
             }
             print "$finish_line";
         }

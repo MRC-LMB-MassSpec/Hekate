@@ -105,9 +105,10 @@ print "</table>";
 $settings->finish();
 $settings_dbh->disconnect();
 
-print_heading('Download');
+print_heading('Downloads');
 
 print "<p><a href='view_txt_combined.pl?$param'>Download as CSV</a></p>";
+print "<p><a href='view_pymol_combined.pl?$param'>Download as Pymol Scripts</a> - (set each fractions offset/sequence names via their own Pymol page).</p>";
 
 print_heading('Crosslink Matches');
 my $top_hits;

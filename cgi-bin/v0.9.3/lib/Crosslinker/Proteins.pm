@@ -26,7 +26,7 @@ sub modifications {
         LoopLink => {
                       Name     => 'loop link',
                       Location => $reactive_site,
-                      Delta    => 18.0105646,    #Loop links are treated as a modified monolink (look link on an xlink is too complicated, and wierd)
+                      Delta    => -18.0105646,    #Loop links are treated as a modified monolink (look link on an xlink is too complicated, and wierd)
         },
         NoMod => {
                    Name     => ' ',

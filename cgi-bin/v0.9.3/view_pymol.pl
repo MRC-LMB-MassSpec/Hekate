@@ -89,7 +89,7 @@ my %names;
 while ( ( my $sequences_results = $sequences->fetchrow_hashref ) ) {
 
     if ( defined $query->param( substr( $sequences_results->{'seq'}, 1 ) ) ) {
-        $error{ substr( $sequences_results->{'seq'}, 1 ) } = $query->param( substr( $sequences_results->{'seq'}, 1 ) );
+        $error{$name}{ substr( $sequences_results->{'seq'}, 1 ) } = $query->param( substr( $sequences_results->{'seq'}, 1 ) );
         $settings_dbh->do(
             "CREATE TABLE IF NOT EXISTS pymol_settings (
 								experiment,
@@ -103,11 +103,11 @@ while ( ( my $sequences_results = $sequences->fetchrow_hashref ) ) {
 					INSERT OR REPLACE INTO pymol_settings (experiment, setting, value)
 					VALUES (?,?,?)" );
 
-        $settings_sql->execute( $name, substr( $sequences_results->{'seq'}, 1 ), $error{ substr( $sequences_results->{'seq'}, 1 ) } );
+        $settings_sql->execute( $name, substr( $sequences_results->{'seq'}, 1 ), $error{$name}{ substr( $sequences_results->{'seq'}, 1 ) } );
 
     } else {
 
-        $error{ substr( $sequences_results->{'seq'}, 1 ) } = $query->param( substr( $sequences_results->{'seq'}, 1 ) );
+        $error{$name}{ substr( $sequences_results->{'seq'}, 1 ) } = $query->param( substr( $sequences_results->{'seq'}, 1 ) );
         $settings_dbh->do(
             "CREATE TABLE IF NOT EXISTS pymol_settings (
 								experiment,
@@ -123,15 +123,15 @@ while ( ( my $sequences_results = $sequences->fetchrow_hashref ) ) {
 
         if ( exists $row->[0] ) {
             my $error_value = $row->[0];
-            $error{ substr( $sequences_results->{'seq'}, 1 ) } = $row->[0];
+            $error{$name}{ substr( $sequences_results->{'seq'}, 1 ) } = $row->[0];
         } else {
-            $error{ substr( $sequences_results->{'seq'}, 1 ) } = 0;
+            $error{$name}{ substr( $sequences_results->{'seq'}, 1 ) } = 0;
         }
 
     }
 
     if ( defined $query->param( substr( $sequences_results->{'seq'}, 1 ) . "_name" ) ) {
-        $names{ substr( $sequences_results->{'seq'}, 1 ) } = $query->param( substr( $sequences_results->{'seq'}, 1 ) . "_name" );
+        $names{$name}{ substr( $sequences_results->{'seq'}, 1 ) } = $query->param( substr( $sequences_results->{'seq'}, 1 ) . "_name" );
         $settings_dbh->do(
             "CREATE TABLE IF NOT EXISTS pymol_settings (
 								experiment,
@@ -145,20 +145,20 @@ while ( ( my $sequences_results = $sequences->fetchrow_hashref ) ) {
 					INSERT OR REPLACE INTO pymol_settings (experiment, setting, value)
 					VALUES (?,?,?)" );
 
-        $settings_sql->execute( $name, substr( $sequences_results->{'seq'}, 1 ) . "_name", $names{ substr( $sequences_results->{'seq'}, 1 ) } );
+        $settings_sql->execute( $name, substr( $sequences_results->{'seq'}, 1 ) . "_name", $names{$name}{ substr( $sequences_results->{'seq'}, 1 ) } );
     } else {
         my $settings_sql = $settings_dbh->prepare("SELECT value FROM pymol_settings WHERE experiment=? AND setting=?");
         $settings_sql->execute( $name, substr( $sequences_results->{'seq'}, 1 ) . "_name" );
         my $row = $settings_sql->fetch;
         if ( exists $row->[0] ) {
             my $names_value = $row->[0];
-            $names{ substr( $sequences_results->{'seq'}, 1 ) } = $row->[0];
+            $names{$name}{ substr( $sequences_results->{'seq'}, 1 ) } = $row->[0];
         } else {
-            $names{ substr( $sequences_results->{'seq'}, 1 ) } = substr( $sequences_results->{'seq'}, 1 );
+            $names{$name}{ substr( $sequences_results->{'seq'}, 1 ) } = substr( $sequences_results->{'seq'}, 1 );
         }
     }
 
-    print '<tr><td>' . substr( $sequences_results->{'seq'}, 1 ) . '</td><td><input type="text" name="' . substr( $sequences_results->{'seq'}, 1 ) . '_name" value="' . $names{ substr( $sequences_results->{'seq'}, 1 ) } . '"/></td><td><input type="text" name=' . substr( $sequences_results->{'seq'}, 1 ) . ' value="' . $error{ substr( $sequences_results->{'seq'}, 1 ) } . '"/></td></tr>';
+    print '<tr><td>' . substr( $sequences_results->{'seq'}, 1 ) . '</td><td><input type="text" name="' . substr( $sequences_results->{'seq'}, 1 ) . '_name" value="' . $names{$name}{ substr( $sequences_results->{'seq'}, 1 ) } . '"/></td><td><input type="text" name=' . substr( $sequences_results->{'seq'}, 1 ) . ' value="' . $error{$name}{ substr( $sequences_results->{'seq'}, 1 ) } . '"/></td></tr>';
 }
 $settings->finish();
 $settings_dbh->disconnect();
