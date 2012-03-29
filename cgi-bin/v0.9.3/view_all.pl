@@ -70,7 +70,7 @@ if ( $is_finished != '-1' ) { print '<div style="text-align:center"><h2 style="c
 print_heading('All Matches');
 my $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND SCORE > 0 ORDER BY score+0 DESC");    
 $top_hits->execute($table);
-print_results( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, 1, 0 );
+print_results( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, 1, 0 ,0,0,1);
 
 print_page_bottom_fancy;
 $top_hits->finish();

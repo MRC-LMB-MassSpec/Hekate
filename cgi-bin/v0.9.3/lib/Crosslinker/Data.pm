@@ -69,7 +69,8 @@ sub connect_db {
 						      matched_common,
      						      matched_crosslink,
 						      d2_matched_common,
-						      d2_matched_crosslink ) "
+						      d2_matched_crosslink,
+						      monolink_mass) "
     );
 
     return ( $dbh, $results_dbh, $settings_dbh );
@@ -496,8 +497,9 @@ sub matchpeaks {
 						      matched_common,
      						      matched_crosslink,
 						      d2_matched_common,
-						      d2_matched_crosslink 
-						      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+						      d2_matched_crosslink, 
+						      monolink_mass
+						      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
     );
 
 #######
@@ -569,10 +571,19 @@ sub matchpeaks {
 
                 if ( !( $modifications{$modification}{Name} eq "loop link" && $fragment =~ /[-]/ ) && !( $modifications{$modification}{Name} eq "mono link" && $fragment =~ /[-]/ ) )    #crosslink and loop link on the same peptide is a messy option and pretty unlikely, so remove them
                 {
+		    my @monolink_masses;
+  
                     my $mass = $fragment_masses{$fragment};
                     if ( $fragment !~ /[-]/ ) {
-                        $mass = $fragment_masses{$fragment} + $modifications{MonoLink}{Delta};
-                    }
+                        @monolink_masses = split(",", $mono_mass_diff);
+                    } else {
+		      @monolink_masses = ('0');
+		    }
+		    
+
+		    foreach my $monolink_mass(@monolink_masses)
+		    {
+		    $mass = $fragment_masses{$fragment} + $monolink_mass;
 
                     #                     if ( $modifications{$modification}{Name} eq "mono link" ) {
                     #                         $rxn_residues = ( $rxn_residues - ( 2 * @{ [ $fragment =~ /[-]/g ] } ) );
@@ -596,13 +607,13 @@ sub matchpeaks {
                                 #                                 warn $fragment, $modifications{$modification}{Name}, "\n";
                                 # 				if ( $modifications{$modification}{Name} eq "loop link" ) { warn "loop link ";	}
 
-                                my ( $ms2_score, $modified_fragment, $best_x, $best_y, $top_10, $d2_top_10,$matched_abundance,$d2_matched_abundance,$total_abundance,$d2_total_abundance, $matched_common, $matched_crosslink, $d2_matched_common, $d2_matched_crosslink   ) = calc_score( \%protein_residuemass, $MSn_string, $d2_MSn_string, $fragment, \%modifications, $n, $modification, $mass_of_hydrogen, $xlinker_mass, $mono_mass_diff, $seperation, $reactive_site, $peak->{'charge'}, $ms2_error, \%ms2_fragmentation, $threshold );
+                                my ( $ms2_score, $modified_fragment, $best_x, $best_y, $top_10, $d2_top_10,$matched_abundance,$d2_matched_abundance,$total_abundance,$d2_total_abundance, $matched_common, $matched_crosslink, $d2_matched_common, $d2_matched_crosslink   ) = calc_score( \%protein_residuemass, $MSn_string, $d2_MSn_string, $fragment, \%modifications, $n, $modification, $mass_of_hydrogen, $xlinker_mass, $monolink_mass, $seperation, $reactive_site, $peak->{'charge'}, $ms2_error, \%ms2_fragmentation, $threshold );
 
                                 # 		       my ($d2_ms2_score,$d2_modified_fragment,$d2_best_x,$d2_best_y, $d2_top_10) = calc_score($d2_MSn_string,$d2_MSn_string,$fragment, \%modifications, $n,$modification, $mass_of_hydrogen,$xlinker_mass+$seperation,$mono_mass_diff,  $seperation, $reactive_site,$peak->{'charge'}, $best_x, $best_y);
 
                                 my ( $fragment1_source, $fragment2_source ) = split "-", $fragment_sources{$fragment};
                                 if ( $fragment !~ m/[-]/ ) { $fragment2_source = "0" }
-                                $results_sql->execute( $results_table, $MSn_string, $d2_MSn_string, $peak->{'mz'}, $peak->{'charge'}, $modified_fragment, $sequences[$fragment1_source], $sequences[$fragment2_source], $sequence_names[$fragment1_source], $sequence_names[$fragment2_source], $ms2_score, $peak->{'fraction'}, $peak->{'scan_num'}, $peak->{'d2_scan_num'}, $modification, $n, $best_x, $best_y, $fragment, $score, $top_10, $d2_top_10,$matched_abundance,$d2_matched_abundance,$total_abundance,$d2_total_abundance, $matched_common, $matched_crosslink, $d2_matched_common, $d2_matched_crosslink  );
+                                $results_sql->execute( $results_table, $MSn_string, $d2_MSn_string, $peak->{'mz'}, $peak->{'charge'}, $modified_fragment, $sequences[$fragment1_source], $sequences[$fragment2_source], $sequence_names[$fragment1_source], $sequence_names[$fragment2_source], $ms2_score, $peak->{'fraction'}, $peak->{'scan_num'}, $peak->{'d2_scan_num'}, $modification, $n, $best_x, $best_y, $fragment, $score, $top_10, $d2_top_10,$matched_abundance,$d2_matched_abundance,$total_abundance,$d2_total_abundance, $matched_common, $matched_crosslink, $d2_matched_common, $d2_matched_crosslink,$monolink_mass  );
 
                                 # 		       $results_sql->execute($d2_MSn_string,$d2_MSn_string,$peak->{'d2_mz'},$peak->{'d2_charge'},$d2_modified_fragment, @sequences[(substr($fragment_sources{$fragment},0,1)-1)],@sequences[(substr($fragment_sources{$fragment},-1,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},0,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},-1,1)-1)],$d2_ms2_score, $peak->{'fraction'},"d2_".$peak->{'scan_num'},"d2_".$peak->{'d2_scan_num'}, $modification,$n,$d2_best_x,$d2_best_y,$fragment, $d2_score, $d2_top_10);
                             };
@@ -610,6 +621,7 @@ sub matchpeaks {
                         }
 
                     }
+		  }
                 }
             }
         }

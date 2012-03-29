@@ -131,7 +131,7 @@ if ( defined $order ) {
 }
 
 $top_hits->execute($table);
-print_results( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, 0, 0, 0, 50 * $short );
+print_results( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, 0, 0, 0, 50 * $short, 1 );
 
 print_page_bottom_fancy;
 $top_hits->finish();

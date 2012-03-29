@@ -123,7 +123,7 @@ in heavy form: <input type="text"
 name="seperation" size="2" maxlength="5" 
 value="4"/> 
 </td><td>
- Monolink:xlink: <input type="text" name="mono_mass_diff" size="10" maxlength="10" value="114.0316942"/>Da<br/>
+ Monolink:xlink: <input type="text" name="mono_mass_diff" size="10" maxlength="21" value="114.0316942"/>Da<br/>
     Reactive amino acid: <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/><br/>
 </td>
 </tr>

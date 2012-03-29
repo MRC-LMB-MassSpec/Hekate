@@ -7,7 +7,7 @@ use Crosslinker::Proteins;
 use Crosslinker::Constants;
 use Crosslinker::Config;
 use base 'Exporter';
-our @EXPORT = ( 'NextPermute', 'calc_score', 'print_results', 'print_results_combined', 'print_results_text_combined', 'print_report', 'print_pymol', 'print_results_text' );
+our @EXPORT = ( 'NextPermute', 'calc_score', 'print_results', 'print_results_combined', 'print_report', 'print_pymol', 'print_results_text' );
 
 sub print_pymol {
 
@@ -119,7 +119,8 @@ sub print_results_text {
 	   $new_division . "Sequence (B)" . $finish_division . 
 	   $new_division . "Score" . $finish_division .
 	   $new_division . "+" . $finish_division . 
-	   $new_division . "PPM" . $finish_division . 	   
+	   $new_division . "PPM" . $finish_division . 	
+	   $new_division . "Reaction" . $finish_division .    
 	   $new_division . "Frac" . $finish_division . 
 	   $new_division . "Scan  (L)" . $finish_division . 
 	   $new_division . "Scan (H)" . $finish_division . 	   
@@ -167,7 +168,8 @@ sub print_results_text {
 		}
                 print "$top_hits_results->{'score'}$finish_division$new_division$rounded$finish_division";                
 		print "$new_division$top_hits_results->{'charge'}$finish_division";
-                print "$new_division$top_hits_results->{'fraction'}$finish_division";	        
+		print "$new_division$top_hits_results->{'name'}$finish_division";
+                print "$new_division$top_hits_results->{'fraction'}$finish_division";				       
                 print "$new_division$top_hits_results->{'scan'}$finish_division $new_division $top_hits_results->{'d2_scan'}$finish_division";                                          
                 print $new_division;
 
@@ -219,8 +221,9 @@ sub print_results_text {
 		print "$new_division", "N/A", $finish_division;
                 print "$top_hits_results->{'score'}$finish_division$new_division$rounded$finish_division";                
 		print "$new_division$top_hits_results->{'charge'}$finish_division";
+	        print "$new_division$top_hits_results->{'name'}$finish_division";
                 print "$new_division$top_hits_results->{'fraction'}$finish_division";	        
-                print "$new_division$top_hits_results->{'scan'}$finish_division $new_division $top_hits_results->{'d2_scan'}$finish_division";                                          
+                print "$new_division$top_hits_results->{'scan'}$finish_division$new_division$top_hits_results->{'d2_scan'}$finish_division";                                          
                 print $new_division;
 
                 if ( $top_hits_results->{'no_of_mods'} > 1 ) {
@@ -264,89 +267,16 @@ sub print_results_text {
 
 }
 
-sub print_results_text_combined {
 
-    my ( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protien_sequences, $reactive_site, $dbh, $xlinker_mass, $mono_mass_diff, $table, $repeats ) = @_;
-
-    my $fasta = $protien_sequences;
-    $protien_sequences =~ s/^>.*$/>/mg;
-    $protien_sequences =~ s/\n//g;
-    $protien_sequences =~ s/^.//;
-    $protien_sequences =~ s/ //g;
-
-    my @hits_so_far;
-    my @mz_so_far;
-    my @scan_so_far;
-    my $printed_hits = 0;
-
-    my $new_line        = "";
-    my $new_division    = "";
-    my $finish_line     = "\n";
-    my $finish_division = ",";
-    my $is_it_xlink     = 0;
-
-    print "$new_line#" . $finish_division . $new_division . "Score" . $finish_division . $new_division . "PPM" . $finish_division . $new_division . "+" . $finish_division . $new_division . "Frac" . $finish_division . $new_division . "Scan  (L)" . $finish_division . $new_division . "Scan (H)" . $finish_division . $new_division . "Protein (A)" . $finish_division . $new_division . "Protein (B)" . $finish_division . $new_division . "Sequence (A)" . $finish_division . $new_division . "Sequence (B)" . $finish_division . $new_division . "Mod" . $finish_division . $finish_line;
-    while ( ( my $top_hits_results = $top_hits->fetchrow_hashref ) ) {
-
-        if ( ( !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far ) && !( grep $_ eq $top_hits_results->{'mz'}, @mz_so_far ) && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far ) && $repeats == 0 ) || $repeats == 1 ) {
-            push @hits_so_far, $top_hits_results->{'fragment'};
-            push @mz_so_far,   $top_hits_results->{'mz'};
-            push @scan_so_far, $top_hits_results->{'scan'};
-            my $rounded = sprintf( "%.3f", $top_hits_results->{'ppm'} );
-            my @fragments            = split( '-', $top_hits_results->{'fragment'} );
-            my @unmodified_fragments = split( '-', $top_hits_results->{'unmodified_fragment'} );
-            if ( $top_hits_results->{'fragment'} =~ '-' ) {
-                print "$new_line$new_division", $printed_hits + 1, "$finish_division$new_division";
-                print "$top_hits_results->{'score'}$finish_division$new_division$rounded$finish_division";
-                print "$new_division$top_hits_results->{'charge'}$finish_division";
-                print "$new_division$top_hits_results->{'name'}-$top_hits_results->{'fraction'}$finish_division";
-                print "$new_division$top_hits_results->{'scan'}$finish_division $new_division $top_hits_results->{'d2_scan'}$finish_division";
-                print "$new_division", substr( $top_hits_results->{'sequence1_name'}, 1 ), $finish_division;
-                print "$new_division", substr( $top_hits_results->{'sequence2_name'}, 1 ), $finish_division;
-                print $new_division, ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $top_hits_results->{'best_x'} + 1 ) . "." . $unmodified_fragments[0];
-                print $finish_division. $new_division . ( ( residue_position $unmodified_fragments[1], $protien_sequences ) + $top_hits_results->{'best_y'} + 1 ) . "." . $unmodified_fragments[1] . "$finish_division";
-                print $new_division;
-
-                if ( $top_hits_results->{'no_of_mods'} > 1 ) {
-                    print "$top_hits_results->{'no_of_mods'} x";
-
-                }
-                my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $top_hits_results->{'name'} );
-                print " $modifications{$top_hits_results->{'modification'}}{Name}";
-            } else {
-                print "$new_line$new_division", $printed_hits + 1, "$finish_division$new_division";
-
-                print "$top_hits_results->{'score'}$finish_division$new_division$rounded$finish_division";
-                print "$new_division$top_hits_results->{'charge'}$finish_division";
-                print "$new_division$top_hits_results->{'name'}-$top_hits_results->{'fraction'}$finish_division";
-                print "$new_division$top_hits_results->{'scan'}$finish_division $new_division $top_hits_results->{'d2_scan'}$finish_division";
-                print "$new_division", substr( $top_hits_results->{'sequence1_name'}, 1 ), $finish_division;
-                print "$new_division", "N/A", $finish_division;
-                print $new_division, ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $top_hits_results->{'best_x'} + 1 ) . "." . $unmodified_fragments[0] . $finish_division . $new_division . "N/A" . $finish_division;
-                print $new_division;
-
-                if ( $top_hits_results->{'no_of_mods'} > 1 ) {
-                    print "$top_hits_results->{'no_of_mods'} x";
-
-                }
-                my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $top_hits_results->{'name'} );
-                print " $modifications{$top_hits_results->{'modification'}}{Name}";
-            }
-            $printed_hits = $printed_hits + 1;
-            print $finish_line;
-
-        }
-    }
-
-}
 
 sub print_results {
 
-    my ( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protien_sequences, $reactive_site, $dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, $repeats, $scan_repeats, $no_tables, $max_hits ) = @_;
+    my ( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protien_sequences, $reactive_site, $dbh, $xlinker_mass, $mono_mass_diff, $table, $mass_seperation, $repeats, $scan_repeats, $no_tables, $max_hits, $monolink ) = @_;
 
     if ( !defined $max_hits ) { $max_hits  = 0 }
     if ( !$repeats )          { $repeats   = 0 }
     if ( !$no_tables )        { $no_tables = 0 }
+    if ( !defined $monolink)  { $monolink  = 0 }
 
     my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $table );
 
@@ -362,7 +292,9 @@ sub print_results {
     my $printed_hits = 0;
 
     if ( $no_tables == 0 ) {
-        print '<table><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td><td>Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>MS/2</td></tr>';
+        print '<table><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td>';
+	if ($monolink == 1) {print '<td>Monolink Mass</td>';}
+	print '<td>Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>MS/2</td></tr>';
     }
 
     while ( ( my $top_hits_results = $top_hits->fetchrow_hashref ) && ( $max_hits == 0 || $printed_hits < $max_hits ) ) {
@@ -391,6 +323,8 @@ sub print_results {
                 print ".", $fragments[0];
                 print "&nbsp;</td><td>", $top_hits_results->{'best_x'} + 1, "</a></td><td>";
             }
+	    ;
+	    if ($monolink == 1) {if ($top_hits_results->{'monolink_mass'} eq 0) {print 'N/A</td><td>'} else {print "$top_hits_results->{'monolink_mass'}</td><td>"}}
             if ( $top_hits_results->{'no_of_mods'} > 1 ) {
                 print "$top_hits_results->{'no_of_mods'} x";
             }
@@ -577,15 +511,14 @@ sub calc_score {
     use Time::HiRes 'gettimeofday', 'tv_interval';
     use Math::BigRat;
 
-    my ( $protein_residuemass_ref, $MSn_string, $d2_MSn_string, $sequence, $modifications_ref, $no_of_mods, $modification, $mass_of_hydrogen, $xlinker_mass, $mono_mass_diff, $seperation, $reactive_site, $parent_charge, $ms2_error, $ms2_fragmentation_ref, $threshold  ) = @_;
+    my ( $protein_residuemass_ref, $MSn_string, $d2_MSn_string, $sequence, $modifications_ref, $no_of_mods, $modification, $mass_of_hydrogen, $xlinker_mass, $monolink_mass, $seperation, $reactive_site, $parent_charge, $ms2_error, $ms2_fragmentation_ref, $threshold  ) = @_;
     my %residuemass       = %{$protein_residuemass_ref};
     my $data              = $MSn_string;
     my $data2             = $d2_MSn_string;
     my %ms2_fragmentation = %{$ms2_fragmentation_ref};
 
     # my $sequence  = $sequence;
-    my $xlink     = $xlinker_mass;
-    my $monolink  = $mono_mass_diff;
+    my $xlink     = $xlinker_mass;    
     my @masses    = split "\n", $data;
     my @d2_masses = split "\n", $data2;
     my %ms2_masses;
@@ -763,21 +696,22 @@ sub calc_score {
                             $ion_mass   = $ion_mass + $residuemass{$residue};
                             if ( $residue_no == $xlink_position[$i] + 1 && $sequence =~ m/^[^-]*$/ )    #not containing a '-'
                             {
-                                $ion_mass             = $ion_mass + $monolink;
-                                $add_isotope_to_heavy = 1;
+                                $ion_mass             = $ion_mass + $monolink_mass;
+                                $add_isotope_to_heavy = 1;				
                             } elsif ( $residue_no > $xlink_position[$i] && $sequence !~ m/^[^-]*$/ ) {
                                 $n                    = 1;
                                 $add_isotope_to_heavy = 1;
-                            }
+                            }    
+# 			    warn "Mono Link: $add_isotope_to_heavy,$residue_no, $xlink_position[$i] +1";
                             my $mz = ( ( $ion_mass + ( $charge * $mass_of_hydrogen ) + ( $n * ( $xlink + $xlink_half[ abs( $i - 1 ) ] ) ) ) / $charge );
                             my $seperation_mz = ( $add_isotope_to_heavy * ( $seperation / $charge ) );
                             if ( $ms2_fragmentation{'bions'} ) {
-                                $new_theoretical->execute( $mz, 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '',$n );    #need to calc position not needed atm.
-                                $new_theoretical->execute( $mz + ($seperation_mz), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '' ,$n);    #heavy ions
+                                $new_theoretical->execute( $mz, 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '',$add_isotope_to_heavy );    #need to calc position not needed atm.
+                                $new_theoretical->execute( $mz + ($seperation_mz), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '' ,$add_isotope_to_heavy);    #heavy ions
                             }
                             if ( $ms2_fragmentation{'aions'} ) {
-                                $new_theoretical->execute( $mz - ( ( 26.9871 + 1.0078 ) / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '',$n );                    #add A ion too
-                                $new_theoretical->execute( $mz - ( ( $seperation_mz + 26.9871 + 1.0078 ) / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '' ,$n);
+                                $new_theoretical->execute( $mz - ( ( 26.9871 + 1.0078 ) / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '',$add_isotope_to_heavy );                    #add A ion too
+                                $new_theoretical->execute( $mz - ( ( $seperation_mz + 26.9871 + 1.0078 ) / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '' ,$add_isotope_to_heavy);
                             }
                             my $fragment_residues = substr( $peptides[$i], 0, $residue_no );
                             if ( $n == 1 && @peptides > 1 ) { $fragment_residues = $fragment_residues . '-' . $peptides[ abs( $i - 1 ) ] }
@@ -785,22 +719,22 @@ sub calc_score {
                             # 			    warn "n:$n i:$i +:$charge x:$xlink_position[0] y:$xlink_position[1] $fragment_residues  ", "\n";
                             if ( $fragment_residues =~ /[STED]/ && $ms2_fragmentation{'waterloss'} == 1 ) {                                                                                                        #WATER loss
                                 if ( $ms2_fragmentation{'aions'} ) {
-                                    $new_theoretical->execute( $mz - ( $water / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]',$n );
-                                    $new_theoretical->execute( $mz - ( ( 26.9871 + 1.0078 - $water ) / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]' ,$n);
+                                    $new_theoretical->execute( $mz - ( $water / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]',$add_isotope_to_heavy);
+                                    $new_theoretical->execute( $mz - ( ( 26.9871 + 1.0078 - $water ) / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]' ,$add_isotope_to_heavy);
                                 }
                                 if ( $ms2_fragmentation{'bions'} ) {
-                                    $new_theoretical->execute( $mz + ( $seperation_mz - ( $water / $charge ) ), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-H2O]' ,$n);
-                                    $new_theoretical->execute( $mz - ( $seperation_mz + ( +26.9871 + 1.0078 - $water ) / $charge ), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-H2O]' ,$n);
+                                    $new_theoretical->execute( $mz + ( $seperation_mz - ( $water / $charge ) ), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-H2O]' ,$add_isotope_to_heavy);
+                                    $new_theoretical->execute( $mz - ( $seperation_mz + ( +26.9871 + 1.0078 - $water ) / $charge ), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-H2O]' ,$add_isotope_to_heavy);
                                 }
                             }
                             if ( $fragment_residues =~ /[NQKR]/ && $ms2_fragmentation{'ammonialoss'} ) {                                                                                                           #Ammonia loss
                                 if ( $ms2_fragmentation{'aions'} ) {
-                                    $new_theoretical->execute( $mz - ( $ammonia / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-NH3]' ,$n);
-                                    $new_theoretical->execute( $mz - ( ( 26.9871 + 1.0078 - $ammonia ) / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-NH3]',$n );
+                                    $new_theoretical->execute( $mz - ( $ammonia / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-NH3]' ,$add_isotope_to_heavy);
+                                    $new_theoretical->execute( $mz - ( ( 26.9871 + 1.0078 - $ammonia ) / $charge ), 'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-NH3]',$add_isotope_to_heavy);
                                 }
                                 if ( $ms2_fragmentation{'bions'} ) {
-                                    $new_theoretical->execute( $mz + ( $seperation_mz - ( $ammonia / $charge ) ), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]' ,$n);
-                                    $new_theoretical->execute( $mz - ( $seperation_mz + ( +26.9871 + 1.0078 - $ammonia ) / $charge ), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]',$n );
+                                    $new_theoretical->execute( $mz + ( $seperation_mz - ( $ammonia / $charge ) ), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]' ,$add_isotope_to_heavy);
+                                    $new_theoretical->execute( $mz - ( $seperation_mz + ( +26.9871 + 1.0078 - $ammonia ) / $charge ), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]',$add_isotope_to_heavy);
                                 }
                             }
                         }
@@ -820,7 +754,7 @@ sub calc_score {
                             foreach my $residue (@residues) {    #split the peptide in indivual amino acids
                                 $peptide_mass = $peptide_mass + $residuemass{$residue};    #tally the masses of each amino acid one at a time
                             }
-                            if ( $sequence =~ m/^[^-]*$/ ) { $peptide_mass = $peptide_mass + $monolink }
+                            if ( $sequence =~ m/^[^-]*$/ ) { $peptide_mass = $peptide_mass + $monolink_mass }
                             my $ion_mass   = $peptide_mass;
                             my $residue_no = 0;
 
@@ -830,7 +764,7 @@ sub calc_score {
                                 if ( $residue_no == @residues ) { last; }
                                 $ion_mass = $ion_mass - $residuemass{$residue};
                                 if ( $residue_no == $xlink_position[$i] + 1 && $sequence =~ m/^[^-]*$/ ) {
-                                    $ion_mass             = $ion_mass - $monolink;
+                                    $ion_mass             = $ion_mass - $monolink_mass;
                                     $add_isotope_to_heavy = 1;
                                 } elsif ( $residue_no > $xlink_position[$i] && $sequence !~ m/^[^-]*$/ ) {
                                     $n                    = 0;
@@ -844,17 +778,17 @@ sub calc_score {
 
                                 # 			    warn "n:$n i:$i +:$charge x:$xlink_position[0] y:$xlink_position[1] $fragment_residues  ", "\n";
 #                                 warn $mz, " Y $i $residue_no";
-                                $new_theoretical->execute( $mz, 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '',$n );    #need to calc position not needed atm.
+                                $new_theoretical->execute( $mz, 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '',$add_isotope_to_heavy);    #need to calc position not needed atm.
 #                                 warn "Y $i", $mz; 
-				$new_theoretical->execute( $mz + ($seperation_mz), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '',$n );    #need to calc position not needed atm.
+				$new_theoretical->execute( $mz + ($seperation_mz), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '',$add_isotope_to_heavy );    #need to calc position not needed atm.
 # 				warn  "Y(H) $i", $mz+$seperation_mz ;
                                 if ( $fragment_residues =~ /[STED]/ && $ms2_fragmentation{'waterloss'} ) {                                                                                   #WATER loss
-                                    $new_theoretical->execute( $mz - ( $water / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]',$n );    #need to calc position not needed atm.
-                                    $new_theoretical->execute( $mz + ($seperation_mz) - ( $water / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]' ,$n);    #need to calc position not needed atm.
+                                    $new_theoretical->execute( $mz - ( $water / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]',$add_isotope_to_heavy );    #need to calc position not needed atm.
+                                    $new_theoretical->execute( $mz + ($seperation_mz) - ( $water / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]' ,$add_isotope_to_heavy);    #need to calc position not needed atm.
                                 }
                                 if ( $fragment_residues =~ /[NQKR]/ && $ms2_fragmentation{'ammonialoss'} ) {                                                                                                                  #Ammonia loss
-                                    $new_theoretical->execute( $mz - ( $ammonia / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]' ,$n);                     #need to calc position not needed atm.
-                                    $new_theoretical->execute( $mz + ($seperation_mz) - ( $ammonia / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]' ,$n);  #need to calc position not needed atm.
+                                    $new_theoretical->execute( $mz - ( $ammonia / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]' ,$add_isotope_to_heavy);                     #need to calc position not needed atm.
+                                    $new_theoretical->execute( $mz + ($seperation_mz) - ( $ammonia / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]' ,$add_isotope_to_heavy);  #need to calc position not needed atm.
                                 }
                             }
                         }
@@ -1140,7 +1074,7 @@ sub calc_score {
 
     $matchlist = $dbh->prepare("SELECT *  FROM  ms2  WHERE ms2.heavy_light = '0'");
      $matchlist->execute();
-     my $total_abundance;
+     my $total_abundance = 0;
      while ( my $peaks = $matchlist->fetchrow_hashref ) {
  	$total_abundance = $total_abundance +$peaks->{abundance};
      }
@@ -1175,7 +1109,7 @@ sub calc_score {
 
     $matchlist = $dbh->prepare("SELECT *  FROM  ms2  WHERE ms2.heavy_light = '1'");
      $matchlist->execute();
-     my $d2_total_abundance;
+     my $d2_total_abundance = 0;
      while ( my $peaks = $matchlist->fetchrow_hashref ) {
  	$d2_total_abundance = $d2_total_abundance +$peaks->{abundance};
      }

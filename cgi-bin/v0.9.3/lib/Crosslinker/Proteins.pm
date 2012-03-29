@@ -26,7 +26,7 @@ sub modifications {
         LoopLink => {
                       Name     => 'loop link',
                       Location => $reactive_site,
-                      Delta    => $xlinker_mass - $mono_mass_diff,    #Loop links are treated as a modified monolink (look link on an xlink is to complicated)
+                      Delta    => 18.0105646,    #Loop links are treated as a modified monolink (look link on an xlink is too complicated, and wierd)
         },
         NoMod => {
                    Name     => ' ',
@@ -34,6 +34,16 @@ sub modifications {
                    Delta    => 0,
         },
     );
+
+    
+#      my $n= 0;
+#      foreach my $monolink_mass (split(",",$modifications{MonoLink}{Delta})) {
+# 	     $n=$n+1;
+#              $modifications{ "MonoLink".$n }{'Name'}     = 'mono link';
+#              $modifications{ "MonoLink".$n }{'Location'} =  $reactive_site;
+#              $modifications{ "MonoLink".$n }{'Delta'}    = $monolink_mass;
+#          }     
+
 
     if ( defined $table ) {
         my $dynamic_mods = get_mods( $table, 'dynamic' );
