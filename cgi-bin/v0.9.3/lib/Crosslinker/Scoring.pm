@@ -124,6 +124,7 @@ sub print_results_text {
 	   $new_division . "Frac" . $finish_division . 
 	   $new_division . "Scan  (L)" . $finish_division . 
 	   $new_division . "Scan (H)" . $finish_division . 	   
+	   $new_division . "Monolink Mass" . $finish_division . 
 	   $new_division . "Mod" . $finish_division . 
 	   $new_division . "Common Ions" . $finish_division .
 	   $new_division . "Cross-linked Ions" . $finish_division .
@@ -170,8 +171,10 @@ sub print_results_text {
 		print "$new_division$top_hits_results->{'charge'}$finish_division";
 		print "$new_division$top_hits_results->{'name'}$finish_division";
                 print "$new_division$top_hits_results->{'fraction'}$finish_division";				       
-                print "$new_division$top_hits_results->{'scan'}$finish_division $new_division $top_hits_results->{'d2_scan'}$finish_division";                                          
+                print "$new_division$top_hits_results->{'scan'}$finish_division$new_division$top_hits_results->{'d2_scan'}$finish_division";                                          
                 print $new_division;
+		
+		print $new_division,$top_hits_results->{'monolink_mass'},$finish_division;
 
                 if ( $top_hits_results->{'no_of_mods'} > 1 ) {
                     print "$top_hits_results->{'no_of_mods'} x";
@@ -225,6 +228,8 @@ sub print_results_text {
                 print "$new_division$top_hits_results->{'fraction'}$finish_division";	        
                 print "$new_division$top_hits_results->{'scan'}$finish_division$new_division$top_hits_results->{'d2_scan'}$finish_division";                                          
                 print $new_division;
+
+		print $new_division,$top_hits_results->{'monolink_mass'},$finish_division;
 
                 if ( $top_hits_results->{'no_of_mods'} > 1 ) {
                     print "$top_hits_results->{'no_of_mods'} x";
