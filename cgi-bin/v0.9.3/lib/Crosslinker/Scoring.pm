@@ -537,6 +537,7 @@ sub calc_score {
     # my $sequence  = $sequence;
     my $xlink     = $xlinker_mass;    
     my @masses    = split "\n", $data;
+    if (!defined $data2) {$data2 = ''};
     my @d2_masses = split "\n", $data2;
     my %ms2_masses;
     my $max_abundance = 0;
@@ -693,6 +694,7 @@ sub calc_score {
 
                 for ( my $i = 0 ; $i < @peptides ; $i++ ) {
                     my $peptide = $peptides[$i];
+		    my $mod_position = index( $peptide, 'X') ;
 ######
                     #
                     # First Generate B and Y ion list
@@ -719,6 +721,12 @@ sub calc_score {
                                 $n                    = 1;
                                 $add_isotope_to_heavy = 1;
                             }    
+
+			if ($modification ne 'LoopLink' ||
+ 			     (($xlink_position[$i] < $mod_position) && (($residue_no <= $xlink_position[$i]) || ($residue_no >  $mod_position ))) ||
+			     (($xlink_position[$i] > $mod_position) && (($residue_no >  $xlink_position[$i]) || ($residue_no <= $mod_position ))) 
+			    ) {
+# 			    warn "Generating B,$residue_no - $xlink_position[$i], $mod_position";
 # 			    warn "Mono Link: $add_isotope_to_heavy,$residue_no, $xlink_position[$i] +1";
                             my $mz = ( ( $ion_mass + ( $charge * $mass_of_hydrogen ) + ( $n * ( $xlink + $xlink_half[ abs( $i - 1 ) ] ) ) ) / $charge );
                             my $seperation_mz = ( $add_isotope_to_heavy * ( $seperation / $charge ) );
@@ -754,6 +762,8 @@ sub calc_score {
                                     $new_theoretical->execute( $mz - ( $seperation_mz + ( +26.9871 + 1.0078 - $ammonia ) / $charge ), 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]',$add_isotope_to_heavy);
                                 }
                             }
+
+			}
                         }
                     }
 
@@ -788,6 +798,12 @@ sub calc_score {
                                     $add_isotope_to_heavy = 0;
                                 }
 
+				if ($modification ne 'LoopLink' ||
+				      (($xlink_position[$i] < $mod_position) && (($residue_no <= $xlink_position[$i]) || ($residue_no >  $mod_position ))) ||
+				      (($xlink_position[$i] > $mod_position) && (($residue_no >  $xlink_position[$i]) || ($residue_no <= $mod_position ))) 
+				    ) {
+# 				    warn "Generating Y,$residue_no - $xlink_position[$i], $mod_position";
+
                                 my $mz = ( ( $ion_mass + $terminalmass + ( $charge * $mass_of_hydrogen ) + ( $n * ( $xlink + $xlink_half[ abs( $i - 1 ) ] ) ) ) / $charge );
                                 my $seperation_mz = ( $add_isotope_to_heavy * ( $seperation / $charge ) );
                                 my $fragment_residues = substr( $peptides[$i], $residue_no );
@@ -808,6 +824,7 @@ sub calc_score {
                                     $new_theoretical->execute( $mz + ($seperation_mz) - ( $ammonia / $charge ), 'Y', $i, @residues - $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]' ,$add_isotope_to_heavy);  #need to calc position not needed atm.
                                 }
                             }
+			    }
                         }
                     }
                 }

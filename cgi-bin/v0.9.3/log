@@ -1,1 +1,144 @@
-[Thu Mar 29 16:49:20 2012] *** Log Started ***
+[Fri Mar 30 15:02:46 2012] *** Log Started ***
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Started
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: BS3-d4 at lib/Crosslinker/Data.pm line 377.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Fixed mod selected: 24: Carbamidomethyl 
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Dynamic mod selected: 20: Oxidation (M) 
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: No Cut:P
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Sequence 0 = >Rab6 
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Digested peptides size:72 
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: No Cut:P
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Sequence 1 = >BD 
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Digested peptides size:114 
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Exceuting Doublet Search
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Finished Doublet Search
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Starting Peak Matches...
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: 100 % Peak mz = 1076.08752
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Argument "156.0786442,155.0964278" isn't numeric in multiplication (*) at lib/Crosslinker/Data.pm line 596, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,1 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,2 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,3 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,4 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,5 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,6 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,7 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,8 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,10 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,11 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,12 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,13 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,14 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,15 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,16 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,17 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,1 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,2 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,3 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,4 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,5 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,6 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,7 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,8 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,10 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,11 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,12 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,13 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,14 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,15 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,16 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,17 - 8, 9 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,1 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,2 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,3 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,4 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,5 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,6 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,7 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,8 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,10 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,11 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,12 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,13 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,14 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,15 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,16 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,1 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,2 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,3 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,4 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,5 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,6 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,7 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,8 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,10 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,11 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,12 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,13 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,14 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,15 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,16 - 8, 9 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,1 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,2 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,3 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,4 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,5 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,6 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,7 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,8 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,10 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,11 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,12 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,13 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,14 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,15 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,16 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,17 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,1 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,2 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,3 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,4 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,5 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,6 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,7 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,8 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,10 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,11 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,12 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,13 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,14 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,15 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,16 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating B,17 - 9, 8 at lib/Crosslinker/Scoring.pm line 729, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,1 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,2 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,3 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,4 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,5 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,6 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,7 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,8 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,10 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,11 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,12 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,13 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,14 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,15 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,16 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,1 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,2 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,3 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,4 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,5 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,6 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,7 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,8 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,10 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,11 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,12 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,13 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,14 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,15 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Generating Y,16 - 9, 8 at lib/Crosslinker/Scoring.pm line 805, <fh00001ANH_YANG_XLINK_looplink.mgf> line 765.
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: QLEAAEEEKXTLNQLLR - Score: 1739
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Time Taken = 0.265186 secs 
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: Queue empty
+[Fri Mar 30 15:03:32 2012] crosslinker.pl: completed
