@@ -296,10 +296,7 @@ sub import_cgi_query {
     my ( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 ) = @_;
     my $fasta = $query->param('user_protein_sequence');
     my $decoy = $query->param('decoy');
-    if ( defined $query->param('decoy') ) {
-        $fasta = generate_decoy($fasta);
-        warn "Generating Decoy Database....\n";
-    }
+   
 
     my $protien_sequences;
     my $conf_dbh = connect_conf_db;
@@ -312,6 +309,11 @@ sub import_cgi_query {
         $protien_sequences = $sequence->{'setting1'};
         $fasta             = $sequence->{'setting1'};
 	$sequences->finish;
+    }
+
+    if ( defined $query->param('decoy') ) {
+        $protien_sequences = generate_decoy($protien_sequences);	
+        warn "Generating Decoy Database....\n";
     }
 
     $protien_sequences =~ s/\r//g;
@@ -374,7 +376,7 @@ sub import_cgi_query {
         my $crosslinkers = get_conf_value( $conf_dbh, $query->param('crosslinker') );
         my $crosslinker = $crosslinkers->fetchrow_hashref();
 
-        warn $crosslinker->{'name'};
+        warn "Reagent: $crosslinker->{'name'} \n";
         $mono_mass_diff = $crosslinker->{'setting3'};
         $xlinker_mass   = $crosslinker->{'setting2'};
         $reactive_site  = $crosslinker->{'setting1'};
@@ -569,7 +571,7 @@ sub matchpeaks {
                 my $location = $modifications{$modification}{Location};
                 my $rxn_residues = @{ [ $fragment =~ /$location/g ] };
 
-                if ( !( $modifications{$modification}{Name} eq "loop link" && $fragment =~ /[-]/ ) && !( $modifications{$modification}{Name} eq "mono link" && $fragment =~ /[-]/ ) )    #crosslink and loop link on the same peptide is a messy option and pretty unlikely, so remove them
+                if ( !( $modifications{$modification}{Name} eq "loop link" && $fragment =~ /[-]/ ) && !( $modifications{$modification}{Name} eq "mono link")  )  #crosslink and loop link on the same peptide is a messy option and pretty unlikely, so remove them
                 {
 		    my @monolink_masses;
   
