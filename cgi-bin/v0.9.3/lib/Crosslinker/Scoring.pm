@@ -68,6 +68,11 @@ sub print_pymol {
             }
             print "$finish_line";
         }
+	else {
+	    push @hits_so_far, $top_hits_results->{'fragment'};
+            push @mz_so_far,   $top_hits_results->{'mz'};
+            push @scan_so_far, $top_hits_results->{'scan'};
+	}
     }
 
     if ( $is_it_xlink == 1 ) {
@@ -268,6 +273,11 @@ sub print_results_text {
             print $finish_line;
 
         }
+	else {
+	    push @hits_so_far, $top_hits_results->{'fragment'};
+            push @mz_so_far,   $top_hits_results->{'mz'};
+            push @scan_so_far, $top_hits_results->{'scan'};
+	}
     }
 
 }
@@ -346,6 +356,11 @@ sub print_results {
 
             print "</td></tr>";
         }
+	else {
+	    push @hits_so_far, $top_hits_results->{'fragment'};
+            push @mz_so_far,   $top_hits_results->{'mz'};
+            push @scan_so_far, $top_hits_results->{'scan'};
+	}
     }
     print '</table>';
 
@@ -431,6 +446,11 @@ sub print_results_combined {
 
             print "</td></tr>";
         }
+	else {
+	    push @hits_so_far, $top_hits_results->{'fragment'};
+            push @mz_so_far,   $top_hits_results->{'mz'};
+            push @scan_so_far, $top_hits_results->{'scan'};
+	}
     }
     print '</table>';
 
@@ -491,6 +511,11 @@ sub print_report {
 
             print "</div>";
         }
+	else {
+	    push @hits_so_far, $top_hits_results->{'fragment'};
+            push @mz_so_far,   $top_hits_results->{'mz'};
+            push @scan_so_far, $top_hits_results->{'scan'};
+	}
 
     }
 
