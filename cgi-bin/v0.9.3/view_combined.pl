@@ -128,7 +128,7 @@ if ( defined $order ) {
     $top_hits = $results_dbh->prepare( "SELECT * FROM (" . $SQL_query . ") ORDER BY score DESC " );    #nice injection problem here, need to sort
 }
 $top_hits->execute(@table);
-print_results_combined( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table', 1, 0, 0 );
+print_results_combined( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table', 0, 0, 0 );
 
 $SQL_query = "";
 print_heading('Top Scoring Monolink Matches');
@@ -146,7 +146,7 @@ if ( defined $order ) {
     $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY score DESC" );    #nice injection problem here, need to sort
 }
 $top_hits->execute(@table);
-print_results_combined( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table', 1, 0, 0 );
+print_results_combined( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table', 0, 0, 0 );
 
 print_page_bottom_fancy;
 $top_hits->finish();

@@ -98,7 +98,7 @@ for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
 $SQL_query = substr( $SQL_query, 0, -10 );
 $top_hits = $results_dbh->prepare( "SELECT * FROM (" . $SQL_query . ") ORDER BY score DESC " );    #nice injection problem here, need to sort
 $top_hits->execute(@table);
-print_results_text( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, 'table', 1, 0, 0 );
+print_results_text( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, 'table', 0, 0, 0 );
 $top_hits->finish();
 $results_dbh->disconnect();
 exit;

@@ -146,11 +146,11 @@ sub print_results_text {
 	  my @masses = split "\n", $data;
 
 
-        if ( ( !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far ) && !( grep $_ eq $top_hits_results->{'mz'}, @mz_so_far ) && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far ) && $repeats == 0 ) || $repeats == 1 ) {
+        if ( ( !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far ) && !( grep $_ eq $top_hits_results->{'mz'}, @mz_so_far ) && !( grep $_ eq $top_hits_results->{'name'}.$top_hits_results->{'scan'}, @scan_so_far ) && $repeats == 0 ) || $repeats == 1 ) {
 
             push @hits_so_far, $top_hits_results->{'fragment'};
             push @mz_so_far,   $top_hits_results->{'mz'};
-            push @scan_so_far, $top_hits_results->{'scan'};
+            push @scan_so_far, $top_hits_results->{'name'}.$top_hits_results->{'scan'};
             my $rounded = sprintf( "%.3f", $top_hits_results->{'ppm'} );
             my @fragments            = split( '-', $top_hits_results->{'fragment'} );
             my @unmodified_fragments = split( '-', $top_hits_results->{'unmodified_fragment'} );
@@ -276,7 +276,7 @@ sub print_results_text {
 	else {
 	    push @hits_so_far, $top_hits_results->{'fragment'};
             push @mz_so_far,   $top_hits_results->{'mz'};
-            push @scan_so_far, $top_hits_results->{'scan'};
+            push @scan_so_far, $top_hits_results->{'name'}.$top_hits_results->{'scan'};
 	}
     }
 
@@ -449,7 +449,7 @@ sub print_results_combined {
 	else {
 	    push @hits_so_far, $top_hits_results->{'fragment'};
             push @mz_so_far,   $top_hits_results->{'mz'};
-            push @scan_so_far, $top_hits_results->{'scan'};
+            push @scan_so_far, $top_hits_results->{'name'} .$top_hits_results->{'scan'};
 	}
     }
     print '</table>';
