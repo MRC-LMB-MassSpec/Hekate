@@ -128,7 +128,7 @@ my $chart = Chart::Gnuplot->new(
                                  title     => "$title"
 );
 
-$chart->gnuplot('/usr/local/bin/gnuplot');
+$chart->gnuplot('/usr/bin/gnuplot');
 
 my @unmatched = ( [ 1, 1 ], [ 2, 2 ] );
 my @bions     = ( [ 1, 1 ] );
