@@ -81,11 +81,11 @@ print $sequence;
 my $version = version();
 print <<ENDHTML;
 </title>
-    <link href="/v$version/flot/layout.css" rel="stylesheet" type="text/css"></link>
+    <link href="/flot/layout.css" rel="stylesheet" type="text/css"></link>
     <!--[if IE]><script language="javascript" type="text/javascript" src="/flot/excanvas.min.js"></script><![endif]-->
-    <script language="javascript" type="text/javascript" src="/v$version/flot/jquery.js"></script>
-    <script language="javascript" type="text/javascript" src="/v$version/flot/jquery.flot.js"></script>
-    <script language="javascript" type="text/javascript" src="/v$version/flot/jquery.flot.selection.js"></script>
+    <script language="javascript" type="text/javascript" src="/flot/jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="/flot/jquery.flot.js"></script>
+    <script language="javascript" type="text/javascript" src="/flot/jquery.flot.selection.js"></script>
 
  
 <script type="text/javascript">
@@ -116,8 +116,8 @@ function getValue(varname)
 }
 // end hide -->
 </script>
-<link rel="stylesheet" type="text/css" href="/v$version/css/xlink.css" media="screen">
-<link rel="stylesheet" type="text/css" href="/v$version/css/print.css" media="print">
+<link rel="stylesheet" type="text/css" href="/css/xlink.css" media="screen">
+<link rel="stylesheet" type="text/css" href="/css/print.css" media="print">
 <style type="text/css">
 	table {
 		margin:auto;
@@ -148,8 +148,8 @@ function getValue(varname)
 </div>
 <div id="menu">
     <ul id="nav">
-        <li id="home"><a id="home" href="/cgi-bin/v$version/index.pl">Home</a></li>
-        <li id="results"><a id="results" href="/cgi-bin/v$version/results.pl">Results</a></li>
+        <li id="home"><a id="home" href="/cgi-bin/index.pl">Home</a></li>
+        <li id="results"><a id="results" href="/cgi-bin/results.pl">Results</a></li>
    </ul>
 </div>
 <div id="banner">
