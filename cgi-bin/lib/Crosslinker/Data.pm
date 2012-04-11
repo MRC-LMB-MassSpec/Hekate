@@ -312,7 +312,8 @@ sub import_cgi_query {
     }
 
     if ( defined $query->param('decoy') ) {
-        $protien_sequences = generate_decoy($protien_sequences);	
+        $protien_sequences = generate_decoy($protien_sequences);
+	$fasta = $protien_sequences;
         warn "Generating Decoy Database....\n";
     }
 

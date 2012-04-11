@@ -97,7 +97,7 @@ my $top_10;
 my @masses;
 my $title;
 
-if ( $query->param('heavy') == 0 ) {
+if ( !defined $query->param('heavy') ||  $query->param('heavy') == 0 ) {
     $data   = $top_hits_results->{'MSn_string'};
     $top_10 = $top_hits_results->{'top_10'};
     @masses = split "\n", $data;
@@ -176,9 +176,9 @@ foreach my $mass_abundance (@masses) {
         } else    #Would rather a Y or B/A drawn before drawing a water loss...
         {
             $top_10 =~ m/(.);(Y\[-H2O\]|A\[-H2O\]|B\[-H2O\])<sub>(\d*)<\/sub><sup>(\d)\+<\/sup> = $mass/;
-            if   ( $1 eq '5' ) { $chain = 'a' }
+            if   (defined $1 && ( $1 eq '5' )) { $chain = 'a' }
             else               { $chain = 'b' }
-            if ( $2 eq 'A[-H2O]' || $2 eq 'B[-H2O]' || $2 eq 'Y[-H2O]' ) {
+            if ( defined $2 && ($2 eq 'A[-H2O]' || $2 eq 'B[-H2O]' || $2 eq 'Y[-H2O]' )) {
                 push( @waterions, [ $mass, $abundance ] );
                 $chart->label(
                                text      => "$chain$2$3($4+) = $mass Th",

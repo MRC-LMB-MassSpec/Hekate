@@ -50,6 +50,7 @@ my ( $name, $desc, $cut_residues, $protein_sequences, $reactive_site, $mono_mass
 $settings->finish();
 # $settings_dbh->disconnect();
 
+
 ########################
 #                      #
 # Constants            #
@@ -200,9 +201,9 @@ print '<br/><form name="input" action="" method="post"><table>';
 print '<tr><td style="font-weight: bold;" colspan="3">Set Alignment Correction and Name:</td></tr>';
 print '<input type="hidden" name="table" value="' . $table . '"/>';
 
-my $settings = $settings_dbh->prepare("SELECT * FROM settings WHERE name = ?");
-$settings->execute($table);
-my ( $name, $desc, $cut_residues, $protein_sequences, $reactive_site, $mono_mass_diff, $xlinker_mass, $decoy, $ms2_da, $ms1_ppm, $is_finished ) = $settings->fetchrow_array;
+# my $settings = $settings_dbh->prepare("SELECT * FROM settings WHERE name = ?");
+# $settings->execute($table);
+# my ( $name, $desc, $cut_residues, $protein_sequences, $reactive_site, $mono_mass_diff, $xlinker_mass, $decoy, $ms2_da, $ms1_ppm, $is_finished ) = $settings->fetchrow_array;
 
 
 my %error;

@@ -145,9 +145,9 @@ foreach my $mass_abundance (@masses) {
         } else    #Would rather a Y or B/A drawn before drawing a water loss...
         {
             $top_10 =~ m/(.);(Y\[-H2O]|A\[-H2O]|B\[-H2O])<sub>(\d*)<\/sub><sup>(\d)\+<\/sup> = $mass/;
-            if   ( $1 eq '&#945' ) { $chain = 'a' }
+            if   ( defined $1 && $1 eq '&#945' ) { $chain = 'a' }
             else                   { $chain = 'b' }
-            if ( $2 eq 'A[-H2O]' || $2 eq 'B[-H2O]' || $2 eq 'Y[-H2O]' ) {
+            if ( defined $2 && ($2 eq 'A[-H2O]' || $2 eq 'B[-H2O]' || $2 eq 'Y[-H2O]') ) {
                 push( @waterions, [ $mass, $abundance ] );
 
             }

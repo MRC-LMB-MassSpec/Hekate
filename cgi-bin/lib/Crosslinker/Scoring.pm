@@ -15,7 +15,7 @@ sub print_pymol {
 
     my  %error         = %{$error_ref};
     my  %names         = %{$names_ref};
-    my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $table );
+#     my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $table );
 
     my $fasta = $protien_sequences;
     $protien_sequences =~ s/^>.*$/>/mg;
@@ -94,7 +94,7 @@ sub print_results_text {
 
     my ( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protien_sequences, $reactive_site, $dbh, $xlinker_mass, $mono_mass_diff, $table, $repeats ) = @_;
 
-    my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $table );
+   
 
     my $fasta = $protien_sequences;
     $protien_sequences =~ s/^>.*$/>/mg;
@@ -182,10 +182,12 @@ sub print_results_text {
 		print $new_division,$top_hits_results->{'monolink_mass'},$finish_division;
 
                 if ( $top_hits_results->{'no_of_mods'} > 1 ) {
-                    print "$top_hits_results->{'no_of_mods'} x";
+                    print "$top_hits_results->{'no_of_mods'} x ";
 
                 }
-                print " $modifications{$top_hits_results->{'modification'}}{Name}";
+# 		warn "Scan = $top_hits_results->{'scan'} ";
+		my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $top_hits_results->{'name'});
+                print $modifications{$top_hits_results->{'modification'}}{Name};
 		print $finish_division;
 
 
@@ -236,11 +238,12 @@ sub print_results_text {
 
 		print $new_division,$top_hits_results->{'monolink_mass'},$finish_division;
 
+		my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $top_hits_results->{'name'});
                 if ( $top_hits_results->{'no_of_mods'} > 1 ) {
-                    print "$top_hits_results->{'no_of_mods'} x";
+                    print "$top_hits_results->{'no_of_mods'} x ";
 
                 }
-                print " $modifications{$top_hits_results->{'modification'}}{Name}";
+                print "$modifications{$top_hits_results->{'modification'}}{Name}";
 		print $finish_division;
 
 
@@ -430,12 +433,12 @@ sub print_results_combined {
             print "</td><td>";
             print_ms2_link( $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'}, $top_hits_results->{'fragment'}, $top_hits_results->{'modification'}, $top_hits_results->{'best_x'}, $top_hits_results->{'best_y'}, $xlinker_mass, $mono_mass_diff, $top_hits_results->{'top_10'}, $reactive_site, $reactive_site, $top_hits_results->{'name'} );
 
-	    my $varible_mod_string;
+	    my $varible_mod_string ='';
 	    my $dynamic_mods = get_mods( $top_hits_results->{'name'}, 'dynamic' );
 	    while ( ( my $dynamic_mod = $dynamic_mods->fetchrow_hashref ) ) {		
 		$varible_mod_string = $varible_mod_string . $dynamic_mod->{'mod_residue'}. ":". $dynamic_mod->{'mod_mass'}. ",";
 	    }	
-	    my $static_mod_string;
+	    my $static_mod_string = '';
 	    my $fixed_mods = get_mods( $top_hits_results->{'name'}, 'fixed' );
 	    while ( ( my $fixed_mod = $fixed_mods->fetchrow_hashref ) ) {
 

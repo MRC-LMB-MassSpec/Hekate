@@ -96,9 +96,9 @@ my $settings_sql = $settings_dbh->prepare("SELECT value FROM pymol_settings WHER
 	  } else {
 	      $error{$table_name}{ substr( $sequences_results->{'seq'}, 1 ) } = 0;
 	  }
-	  my $settings_sql = $settings_dbh->prepare("SELECT value FROM pymol_settings WHERE experiment=? AND setting=?");
+	  $settings_sql = $settings_dbh->prepare("SELECT value FROM pymol_settings WHERE experiment=? AND setting=?");
 	  $settings_sql->execute( $table_name, substr( $sequences_results->{'seq'}, 1 ) . "_name" );
-	  my $row = $settings_sql->fetch;
+	  $row = $settings_sql->fetch;
 	  if ( exists $row->[0] ) {
 	      my $names_value = $row->[0];
 	      $names{$table_name}{ substr( $sequences_results->{'seq'}, 1 ) } = $row->[0];
@@ -154,7 +154,7 @@ if ( defined $order ) {
     $top_hits = $results_dbh->prepare( "SELECT * FROM (" . $SQL_query . ") ORDER BY score DESC " );    #nice injection problem here, need to sort
 }
 $top_hits->execute(@table);
-print_pymol( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table',\%error, \%names  );
+print_pymol( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 0,\%error, \%names  );
 
 $SQL_query = "";
 print_heading('Top Scoring Monolink Matches');
@@ -172,7 +172,7 @@ if ( defined $order ) {
     $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY score DESC" );    #nice injection problem here, need to sort
 }
 $top_hits->execute(@table);
-print_pymol( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table' , \%error, \%names );
+print_pymol( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined, $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 0 , \%error, \%names );
 
 print_page_bottom_fancy;
 $top_hits->finish();

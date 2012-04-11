@@ -87,7 +87,7 @@ print "<Table>
 <tr><td style='font-weight: bold;'>Threshold:</td><td>$threshold %</td><td style='font-weight: bold;'>Doublets Found: </td><td>$doublets_found </td></tr>
 </table>";
 
-my $varible_mod_string;
+my $varible_mod_string ='';
 
 print_heading('Dynamic Modifications');
 print "<table>";
@@ -99,7 +99,7 @@ while ( ( my $dynamic_mod = $dynamic_mods->fetchrow_hashref ) ) {
 }
 print "</table>";
 
-my $static_mod_string;
+my $static_mod_string ='';
 print_heading('Fixed Modifications');
 print "<table>";
 print "<tr><td>ID</td><td>Name</td><td>Mass</td><td>Residue</td></tr>";
