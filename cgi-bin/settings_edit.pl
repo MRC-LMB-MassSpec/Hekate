@@ -40,18 +40,18 @@ ENDHTML
       my $enzymes = get_conf_value( $dbh, $row_id );
       print '<form method="POST" enctype="multipart/form-data" action="settings_edit.pl" >';
       print "<h2>Enzymes</h2>";
-      print "<table><tr><td>ID</td><td>Enzyme</td><td>Cleave at</td><td>Restrict</td><td>Edit/Delete</td></tr>";
+      print "<table><tr><td>ID</td><td>Enzyme</td><td>Cleave at</td><td>Restrict</td><td>N or C</td><td>Edit/Delete</td></tr>";
 
       while ( ( my $enzyme = $enzymes->fetchrow_hashref ) ) {
          print
-"<tr><td>$row_id</td><td><input type='text' name='name' size='10' maxlength='20' value='$enzyme->{'name'}'/></td><td><input type='text' name='setting1' size='10' maxlength='10' value='$enzyme->{'setting1'}'/></td><td><input type='text' name='setting2' size='5' maxlength='1' value='$enzyme->{'setting2'}'/></td><td><input type='submit' value='Save' /></td></tr>";
+"<tr><td>$row_id</td><td><input type='text' name='name' size='10' maxlength='20' value='$enzyme->{'name'}'/></td><td><input type='text' name='setting1' size='10' maxlength='10' value='$enzyme->{'setting1'}'/></td><td><input type='text' name='setting2' size='5' maxlength='1' value='$enzyme->{'setting2'}'/></td><td><select name='setting3'><option>C</option><option>N</option></select><td><input type='submit' value='Save' /></td></tr>";
       }
       print
 "</table><input type='hidden' name='type' value='enzyme'/><input type='hidden' name='id' value='$row_id'/><input type='hidden' name='confirmed' size='10' maxlength='10' value='yes'/></form>";
    } elsif ( $query->param('confirmed') eq 'yes' ) {
       my $row_id = $query->param('id');
       my $dbh    = connect_conf_db;
-      update_conf( $dbh, $query->param('type'), $query->param('name'), $query->param('setting1'), $query->param('setting2'), 0, 0, 0, $row_id );
+      update_conf( $dbh, $query->param('type'), $query->param('name'), $query->param('setting1'), $query->param('setting2'), $query->param('setting3'), 0, 0, $row_id );
 
       print "<p>Setting edited return to <a href='settings.pl?page=" . $query->param('type') . "s'>previous page?</a></p>";
 

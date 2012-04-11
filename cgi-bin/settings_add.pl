@@ -33,7 +33,7 @@ if ( !defined $query->param('type') ) {
 } elsif ( $query->param('type') eq 'enzyme' ) {
 
    my $dbh = connect_conf_db;
-   add_conf( $dbh, $query->param('type'), $query->param('name'), $query->param('setting1'), $query->param('setting2'), 0, 0, 0 );
+   add_conf( $dbh, $query->param('type'), $query->param('name'), $query->param('setting1'), $query->param('setting2'), $query->param('setting3'), 0, 0 );
 
    print "<p>Setting added return to <a href='settings.pl?page=" . $query->param('type') . "s'>previous page?</a></p>";
 

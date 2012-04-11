@@ -24,7 +24,7 @@ sub generate_page {
         $reactive_site,         $scan_width,         $sequence_names_ref, $match_ppm,         $min_peptide_length, $mass_of_deuterium,
         $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
         $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
-        $threshold
+        $threshold,		$n_or_c
    ) = @_;
 
    while ( $state == -2 ) {
@@ -61,7 +61,7 @@ sub generate_page {
    }
 
    foreach my $sequence (@sequences) {
-      @sequence_fragments = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues );
+      @sequence_fragments = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
       @fragments = ( @fragments, @sequence_fragments );
       warn "Sequence $count = $sequence_names[$count] \n";
       warn "Digested peptides size:", scalar(@fragments), " \n";

@@ -84,7 +84,7 @@ while ( ( my $mod = $mods->fetchrow_hashref ) ) {
 print <<ENDHTML;
   </select>
 </td><td>
-    Fixed Modifications (Unimplimented):
+    Fixed Modifications:
     <select style="width: 20em;" multiple="multiple" size="5"  name="fixed_mod">
 ENDHTML
 

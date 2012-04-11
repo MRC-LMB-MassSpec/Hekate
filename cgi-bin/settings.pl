@@ -41,8 +41,7 @@ if ( !defined $query->param('page') ) {
 	<li><a href="settings.pl?page=fixed_mods">Fixed</a></li>
 	</ul>
 	</li>
-	<li><a href="settings.pl?page=sequences">Sequences</a></li>
-	<li>Experiment Settings</li>
+	<li><a href="settings.pl?page=sequences">Sequences</a></li>	
 	<li><a href="settings.pl?page=crosslinkers">Crosslink Reagents</a></li>
 	</p>
 	
@@ -56,11 +55,11 @@ ENDHTML
 
    while ( ( my $enzyme = $enzymes->fetchrow_hashref ) ) {
       print
-"<tr><td>$enzyme->{'rowid'}</td><td>$enzyme->{'name'}</td><td>$enzyme->{'setting1'}</td><td>$enzyme->{'setting2'}</td><td>C</td><td><a href='settings_edit.pl?id=$enzyme->{'rowid'}&type=$enzyme->{'type'}'>Edit</a>/<a href='settings_delete.pl?ID=$enzyme->{'rowid'}&type=$enzyme->{'type'}'>Delete</a></td></tr>";
+"<tr><td>$enzyme->{'rowid'}</td><td>$enzyme->{'name'}</td><td>$enzyme->{'setting1'}</td><td>$enzyme->{'setting2'}</td><td>$enzyme->{'setting3'}</td><td><a href='settings_edit.pl?id=$enzyme->{'rowid'}&type=$enzyme->{'type'}'>Edit</a>/<a href='settings_delete.pl?ID=$enzyme->{'rowid'}&type=$enzyme->{'type'}'>Delete</a></td></tr>";
    }
 
    print
-"<tr><td>?</td><td><input type='hidden' name='type' size='10' maxlength='10' value='enzyme'/><input type='text' name='name' size='10' maxlength='20' value='Name'/></td><td><input type='text' name='setting1' size='10' maxlength='10' value='KR'/></td><td><input type='text' name='setting2' size='5' maxlength='1' value='P'/></td><td>C</td><td><input type='submit' value='Add' /></td></tr>";
+"<tr><td>?</td><td><input type='hidden' name='type' size='10' maxlength='10' value='enzyme'/><input type='text' name='name' size='10' maxlength='20' value='Name'/></td><td><input type='text' name='setting1' size='10' maxlength='10' value='KR'/></td><td><input type='text' name='setting2' size='5' maxlength='1' value='P'/></td><td><select name='setting3'><option>C</option><option>N</option></select></td><td><input type='submit' value='Add' /></td></tr>";
    print "</table></form>";
    $enzymes->finish;
    $dbh->disconnect;

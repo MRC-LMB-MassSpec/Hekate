@@ -79,30 +79,45 @@ sub residue_position    #locates peptides in proteins
 
 sub digest_proteins    #Digest a string into an array of peptides
 {
-   my ( $missed_clevages, $protein_sequences, $cut_residues, $nocut_residues ) = @_;
+   my ( $missed_clevages, $protein_sequences, $cut_residues, $nocut_residues, $n_or_c ) = @_;
    my @protein_fragments;
    $protein_sequences =~ s/[^A-Z]//g;
    my $protein = $protein_sequences;
    $protein =~ s/[^\w\d>]//g;
    if ( $nocut_residues eq '' ) { $nocut_residues = '9' }
    ;                   #Numbers don't appear in sequences so this just works, easier than having a second regex
-   warn "No Cut:", $nocut_residues, "\n";
-   my @digest = $protein =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){1}/g
-     ;                 #digest peptide into an array of strings using split
-   my @single_digest = @digest;
-
-   for ( my $i = 2 ; $i < $missed_clevages + 2 ; $i++ ) {
-      my @single_digest_trimmed = @single_digest;    #need to include missed cleavages for each possible missed position
-      my @parts = $protein =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){$i}/g
-        ;                                            #second [KRDE needs to be [KR_EOF_] however you do that
-      push( @digest, @parts );
-      for ( my $j = 1 ; $j < $i ; $j++ ) {
-         shift @single_digest_trimmed;
-         @parts =
-           join( "", @single_digest_trimmed ) =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){$i}/g;
-         push( @digest, @parts );
-
+   warn "No Cut:", $nocut_residues, "\n";   
+   my @digest;
+   if ($n_or_c eq 'C') {
+     warn "Protease type:", $n_or_c, "\n";
+     @digest = $protein =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){1}/g;            
+     my @single_digest = @digest;
+     for ( my $i = 2 ; $i < $missed_clevages + 2 ; $i++ ) {
+        my @single_digest_trimmed = @single_digest;    #need to include missed cleavages for each possible missed position
+        my @parts = $protein =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){$i}/g;                                           
+        push( @digest, @parts );
+        for ( my $j = 1 ; $j < $i ; $j++ ) {
+           shift @single_digest_trimmed;
+           @parts =
+             join( "", @single_digest_trimmed ) =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){$i}/g;
+           push( @digest, @parts );
+        }
       }
+   } else {
+     warn "Protease type:", $n_or_c, "\n";
+     @digest = $protein =~ m/(?:(?:[$cut_residues](?!$nocut_residues)|^.)(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*){1}/g;
+     my @single_digest = @digest;
+      for ( my $i = 2 ; $i < $missed_clevages + 2 ; $i++ ) {
+         my @single_digest_trimmed = @single_digest;   
+         my @parts = $protein =~ m/(?:(?:[$cut_residues](?!$nocut_residues)|^.)(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*){1}/g;                                           
+         push( @digest, @parts );
+         for ( my $j = 1 ; $j < $i ; $j++ ) {
+            shift @single_digest_trimmed;
+            @parts =
+              join( "", @single_digest_trimmed ) =~ m/(?:(?:[$cut_residues](?!$nocut_residues)|^.)(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*){1}/g;
+            push( @digest, @parts );
+         }
+       }
    }
    return @digest;
 }
