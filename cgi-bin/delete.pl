@@ -30,17 +30,17 @@ my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { Rais
 print_page_top_fancy('Delete');
 
 if ( $areyousure eq 'yes' ) {
-    my $drop_table = $settings_dbh->prepare("DELETE FROM settings WHERE name = ?");
-    $drop_table->execute($table);
-    $drop_table = $settings_dbh->prepare("DELETE FROM modifications WHERE run_id = ?");
-    $drop_table->execute($table);
-    $drop_table = $results_dbh->prepare("DELETE FROM results WHERE name = ?");
-    $drop_table->execute($table);
-    print_heading("Deleting $table ...");
-    print "<p>Sucess: Results '$table' deleted.</p>";
+   my $drop_table = $settings_dbh->prepare("DELETE FROM settings WHERE name = ?");
+   $drop_table->execute($table);
+   $drop_table = $settings_dbh->prepare("DELETE FROM modifications WHERE run_id = ?");
+   $drop_table->execute($table);
+   $drop_table = $results_dbh->prepare("DELETE FROM results WHERE name = ?");
+   $drop_table->execute($table);
+   print_heading("Deleting $table ...");
+   print "<p>Sucess: Results '$table' deleted.</p>";
 } else {
-    print "<p>Are you sure you want to delete $table?</p>";
-    print "<p><a href='delete.pl?table=$table&areyousure=yes'>Yes</a>  or <a href='results.pl'>No</a></p>";
+   print "<p>Are you sure you want to delete $table?</p>";
+   print "<p><a href='delete.pl?table=$table&areyousure=yes'>Yes</a>  or <a href='results.pl'>No</a></p>";
 }
 print_page_bottom_fancy;
 $results_dbh->disconnect();

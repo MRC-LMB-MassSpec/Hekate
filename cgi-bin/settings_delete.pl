@@ -29,11 +29,11 @@ my $version = version();
 my $query = new CGI;
 
 if ( !defined $query->param('ID') ) {
-    print 'Required Information Not Supplied';
+   print 'Required Information Not Supplied';
 } else {
-    my $dbh = connect_conf_db;
-    delete_conf( $dbh, $query->param('ID') );
-    print "<p>Setting deleted return to <a href='settings.pl?page=" . $query->param('type') . "s'>previous page?</a></p>";
+   my $dbh = connect_conf_db;
+   delete_conf( $dbh, $query->param('ID') );
+   print "<p>Setting deleted return to <a href='settings.pl?page=" . $query->param('type') . "s'>previous page?</a></p>";
 }
 
 print_page_bottom_fancy;

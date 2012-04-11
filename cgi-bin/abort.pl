@@ -22,21 +22,21 @@ my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { Rais
 
 print_page_top_fancy('Rename');
 
-my $table_list = $settings_dbh->prepare("SELECT name, desc, finished FROM settings WHERE name=? ORDER BY length(name) DESC, name DESC");
+my $table_list = $settings_dbh->prepare( "SELECT name, desc, finished FROM settings WHERE name=? ORDER BY length(name) DESC, name DESC" );
 $table_list->execute($table);
 
 my $table_settings = $table_list->fetchrow_hashref;
 
 if ( $table_settings->{'finished'} != -1 ) {
-    my $settings_sql = $settings_dbh->prepare( "
+   my $settings_sql = $settings_dbh->prepare( "
 					UPDATE settings 
 					SET finished=-4
 					WHERE name=?
 					" );
-    $settings_sql->execute($table);
+   $settings_sql->execute($table);
 } else {
 
-    print "<p>Can't abort, processing already finished!</p>";
+   print "<p>Can't abort, processing already finished!</p>";
 
 }
 

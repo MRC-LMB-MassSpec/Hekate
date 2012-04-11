@@ -46,7 +46,7 @@ my $dbh = connect_conf_db;
 my $enzymes = get_conf( $dbh, 'enzyme' );
 
 while ( ( my $enzyme = $enzymes->fetchrow_hashref ) ) {
-    print "<option value='" . $enzyme->{'rowid'} . "'>" . $enzyme->{'name'} . "</option>";
+   print "<option value='" . $enzyme->{'rowid'} . "'>" . $enzyme->{'name'} . "</option>";
 }
 
 $enzymes->finish();
@@ -77,9 +77,9 @@ ENDHTML
 
 my $mods = get_conf( $dbh, 'dynamic_mod' );
 while ( ( my $mod = $mods->fetchrow_hashref ) ) {
-    my $selected = '';
-    if ( $mod->{'setting3'} == 1 ) { $selected = 'selected="true"' }
-    print "<option $selected value='" . $mod->{'rowid'} . "'>" . $mod->{'name'} . "</option>";
+   my $selected = '';
+   if ( $mod->{'setting3'} == 1 ) { $selected = 'selected="true"' }
+   print "<option $selected value='" . $mod->{'rowid'} . "'>" . $mod->{'name'} . "</option>";
 }
 print <<ENDHTML;
   </select>
@@ -90,9 +90,9 @@ ENDHTML
 
 $mods = get_conf( $dbh, 'fixed_mod' );
 while ( ( my $mod = $mods->fetchrow_hashref ) ) {
-    my $selected = '';
-    if ( $mod->{'setting3'} == 1 ) { $selected = 'selected="true"' }
-    print "<option $selected value='" . $mod->{'rowid'} . "'>" . $mod->{'name'} . "</option>";
+   my $selected = '';
+   if ( $mod->{'setting3'} == 1 ) { $selected = 'selected="true"' }
+   print "<option $selected value='" . $mod->{'rowid'} . "'>" . $mod->{'name'} . "</option>";
 }
 $mods->finish();
 print <<ENDHTML;
@@ -106,7 +106,7 @@ ENDHTML
 
 my $crosslinkers = get_conf( $dbh, 'crosslinker' );
 while ( ( my $crosslinker = $crosslinkers->fetchrow_hashref ) ) {
-    print "<option value='" . $crosslinker->{'rowid'} . "'>" . $crosslinker->{'name'} . "</option>";
+   print "<option value='" . $crosslinker->{'rowid'} . "'>" . $crosslinker->{'name'} . "</option>";
 }
 $crosslinkers->finish();
 print "<option value='-1' selected='true'>Custom (enter below)</option></select>";
@@ -157,7 +157,7 @@ ENDHTML
 
 my $sequences = get_conf( $dbh, 'sequence' );
 while ( ( my $sequence = $sequences->fetchrow_hashref ) ) {
-    print "<option value='" . $sequence->{'rowid'} . "'>" . $sequence->{'name'} . "</option>";
+   print "<option value='" . $sequence->{'rowid'} . "'>" . $sequence->{'name'} . "</option>";
 }
 $sequences->finish();
 print "<option value='-1' selected='true'>Custom (enter below in FASTA format)</option>";
@@ -200,7 +200,6 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
 </form>
 
 ENDHTML
-
 
 $dbh->disconnect();
 

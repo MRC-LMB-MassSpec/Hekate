@@ -45,7 +45,8 @@ my $total_ion_current_corrected;
 my $total_ion_current = 0;
 
 # Constants
-my ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, $mass_of_carbon13, $no_of_fractions, $min_peptide_length, $scan_width ) = constants;
+my ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, $mass_of_carbon13, $no_of_fractions, $min_peptide_length, $scan_width ) =
+  constants;
 my %residuemass = protein_residuemass($table);
 warn $monolink;
 
@@ -190,15 +191,15 @@ ENDHTML
 
 my @peptides = split /-/, $sequence;
 for ( my $i = 0 ; $i < @peptides ; $i++ ) {
-    my $peptide = $peptides[$i];
-    my @residues = split //, $peptide;
-    my @tmp;
-    for ( my $n = 0 ; $n < @residues ; $n++ ) {
-        if ( $residues[$n] eq $xlink_res ) {
-            $xlink_pos[$i] = $n;
-            last;
-        }
-    }
+   my $peptide = $peptides[$i];
+   my @residues = split //, $peptide;
+   my @tmp;
+   for ( my $n = 0 ; $n < @residues ; $n++ ) {
+      if ( $residues[$n] eq $xlink_res ) {
+         $xlink_pos[$i] = $n;
+         last;
+      }
+   }
 
 }
 
@@ -209,7 +210,7 @@ for ( my $i = 0 ; $i < @peptides ; $i++ ) {
 #######
 
 if ( $modification ne 'NoMod' && $modification ne 'MonoLink' ) {
-    $residuemass{'X'} = $residuemass{ $modifications{$modification}{Location} } + $modifications{$modification}{Delta};
+   $residuemass{'X'} = $residuemass{ $modifications{$modification}{Location} } + $modifications{$modification}{Delta};
 }
 
 #######
@@ -228,239 +229,317 @@ my %unsorted_data;
 $dbh->do("CREATE TABLE masses  (mass REAL, abundance REAL)");
 my $newline = $dbh->prepare("INSERT INTO masses (mass , abundance) VALUES (?, ?)");
 foreach my $mass_abundance (@masses) {
-    my ( $mass, $abundance ) = split " ", $mass_abundance;
-    if ( $abundance > $max_abundance ) { $max_abundance = $abundance }
-    $unsorted_data{$mass} = $abundance;
-    $TIC                  = $TIC + $abundance;
-    $ms2_masses{$mass}    = $abundance;
-    $newline->execute( $mass, $abundance );
-    $total_ion_current = $total_ion_current + $abundance;
-    $data_java         = $data_java . '[' . $mass . ',' . $abundance . '],';
+   my ( $mass, $abundance ) = split " ", $mass_abundance;
+   if ( $abundance > $max_abundance ) { $max_abundance = $abundance }
+   $unsorted_data{$mass} = $abundance;
+   $TIC                  = $TIC + $abundance;
+   $ms2_masses{$mass}    = $abundance;
+   $newline->execute( $mass, $abundance );
+   $total_ion_current = $total_ion_current + $abundance;
+   $data_java         = $data_java . '[' . $mass . ',' . $abundance . '],';
 }
 
 if ( $data2 ne "" ) {
-    $dbh->do("CREATE TABLE d2_masses  (mass REAL, abundance REAL)");
-    my $newline = $dbh->prepare("INSERT INTO d2_masses (mass, abundance) VALUES (?, ?)");
-    foreach my $mass_abundance (@d2_masses) {
-        my ( $mass, $abundance ) = split " ", $mass_abundance;
-        if ( $abundance > $max_abundance ) { $max_abundance = $abundance }
-        $newline->execute( $mass, $abundance );
+   $dbh->do("CREATE TABLE d2_masses  (mass REAL, abundance REAL)");
+   my $newline = $dbh->prepare("INSERT INTO d2_masses (mass, abundance) VALUES (?, ?)");
+   foreach my $mass_abundance (@d2_masses) {
+      my ( $mass, $abundance ) = split " ", $mass_abundance;
+      if ( $abundance > $max_abundance ) { $max_abundance = $abundance }
+      $newline->execute( $mass, $abundance );
 
-        $data_java = $data_java . '[' . $mass . ',' . -$abundance . '],';
-    }
+      $data_java = $data_java . '[' . $mass . ',' . -$abundance . '],';
+   }
 } else {
-    $dbh->do("CREATE TABLE d2_masses AS SELECT * FROM masses");
+   $dbh->do("CREATE TABLE d2_masses AS SELECT * FROM masses");
 }
 
 my $mass_seperation_upper = +$ms2_error;
 my $mass_seperation_lower = -$ms2_error;
 my $matchlist = $dbh->prepare(
-    "SELECT masses.*, d2_masses.mass as d2_mass, d2_masses.abundance 
-    as d2_abundance FROM masses inner join d2_masses on (d2_masses.mass between masses.mass -  ? and masses.mass + ? AND d2_masses.abundance between masses.abundance*0.5 and masses.abundance*2)" );
+   "SELECT masses.*, d2_masses.mass as d2_mass, d2_masses.abundance 
+    as d2_abundance FROM masses inner join d2_masses on (d2_masses.mass between masses.mass -  ? and masses.mass + ? AND d2_masses.abundance between masses.abundance*0.5 and masses.abundance*2)"
+);
 my %matched_common;
 my %d2_matched_common;
 my %matched_xlink;
 $matchlist->execute( $match_tol, $match_tol );
-while ( my $searchmass = $matchlist->fetchrow_hashref ) {
-    $matched_common{ $searchmass->{'mass'} }       = $searchmass->{'abundance'};
-    $d2_matched_common{ $searchmass->{'d2_mass'} } = $searchmass->{'d2_abundance'};
 
-    #   $total_ion_current_corrected = $total_ion_current_corrected + $searchmass->{'abundance'};
-    $data_green = $data_green . '[' . $searchmass->{'mass'} . ',' . $searchmass->{'abundance'} . '],';
-    if ( $data2 ne "" ) { $data_green = $data_green . '[' . $searchmass->{'d2_mass'} . ',' . -$searchmass->{'d2_abundance'} . '],' }
+while ( my $searchmass = $matchlist->fetchrow_hashref ) {
+   $matched_common{ $searchmass->{'mass'} }       = $searchmass->{'abundance'};
+   $d2_matched_common{ $searchmass->{'d2_mass'} } = $searchmass->{'d2_abundance'};
+
+   #   $total_ion_current_corrected = $total_ion_current_corrected + $searchmass->{'abundance'};
+   $data_green = $data_green . '[' . $searchmass->{'mass'} . ',' . $searchmass->{'abundance'} . '],';
+   if ( $data2 ne "" ) {
+      $data_green = $data_green . '[' . $searchmass->{'d2_mass'} . ',' . -$searchmass->{'d2_abundance'} . '],';
+   }
 }
 
 $matchlist = $dbh->prepare(
-    "SELECT masses.*, d2_masses.mass as d2_mass, d2_masses.abundance 
-    as d2_abundance FROM masses inner join d2_masses on (d2_masses.mass between masses.mass +  (?) and masses.mass + (?) AND d2_masses.abundance between masses.abundance*0.5 and masses.abundance*2) " );
+   "SELECT masses.*, d2_masses.mass as d2_mass, d2_masses.abundance 
+    as d2_abundance FROM masses inner join d2_masses on (d2_masses.mass between masses.mass +  (?) and masses.mass + (?) AND d2_masses.abundance between masses.abundance*0.5 and masses.abundance*2) "
+);
 for ( my $i = 1 ; $i < 4 ; $i++ ) {
-    $matchlist->execute( ( $xlink_d / $i ) - $match_tol, ( $xlink_d / $i ) + $match_tol );
-    while ( my $searchmass = $matchlist->fetchrow_hashref ) {
-        $matched_xlink{ $searchmass->{'mass'} } = $searchmass->{'abundance'};
+   $matchlist->execute( ( $xlink_d / $i ) - $match_tol, ( $xlink_d / $i ) + $match_tol );
+   while ( my $searchmass = $matchlist->fetchrow_hashref ) {
+      $matched_xlink{ $searchmass->{'mass'} } = $searchmass->{'abundance'};
 
-        # 	if (!(grep $_ eq $searchmass->{'mass'}, keys %matched_common))
-        # 	  {$total_ion_current_corrected = $total_ion_current_corrected + $searchmass->{'abundance'};}
-        if ( defined $matched_common{ $searchmass->{'mass'} } == 0 && defined $d2_matched_common{ $searchmass->{'d2_mass'} } == 0 ) {    #Purely for cosmetic reasons don't add overlapping peaks
-            $data_red = $data_red . '[' . $searchmass->{'mass'} . ',' . $searchmass->{'abundance'} . '],';
-            if ( $data2 ne "" ) { $data_red = $data_red . '[' . $searchmass->{'d2_mass'} . ',' . -$searchmass->{'d2_abundance'} . '],' }
-        }
-    }
+      # 	if (!(grep $_ eq $searchmass->{'mass'}, keys %matched_common))
+      # 	  {$total_ion_current_corrected = $total_ion_current_corrected + $searchmass->{'abundance'};}
+      if (    defined $matched_common{ $searchmass->{'mass'} } == 0
+           && defined $d2_matched_common{ $searchmass->{'d2_mass'} } == 0 )
+      {    #Purely for cosmetic reasons don't add overlapping peaks
+         $data_red = $data_red . '[' . $searchmass->{'mass'} . ',' . $searchmass->{'abundance'} . '],';
+         if ( $data2 ne "" ) {
+            $data_red = $data_red . '[' . $searchmass->{'d2_mass'} . ',' . -$searchmass->{'d2_abundance'} . '],';
+         }
+      }
+   }
 }
 
 my $matched_TIC = 0;
 @peptides = split /-/, $sequence;
 my @xlink_half;
 for ( my $i = 0 ; $i < @peptides ; $i++ ) {
-    my $peptide      = $peptides[$i];
-    my @residues     = split //, $peptide;
-    my $peptide_mass = 0;
-    foreach my $residue (@residues) {    #split the peptide in indivual amino acids
-        $peptide_mass = $peptide_mass + $residuemass{$residue};    #tally the masses of each amino acid one at a time
-    }
-    $xlink_half[$i] = $peptide_mass + $terminalmass;
+   my $peptide      = $peptides[$i];
+   my @residues     = split //, $peptide;
+   my $peptide_mass = 0;
+   foreach my $residue (@residues) {    #split the peptide in indivual amino acids
+      $peptide_mass = $peptide_mass + $residuemass{ $residue };    #tally the masses of each amino acid one at a time
+   }
+   $xlink_half[$i] = $peptide_mass + $terminalmass;
 }
 
 if ( !defined $xlink_half[1] ) {
-    $xlink_half[1] = 0;
+   $xlink_half[1] = 0;
 }
 
 for ( my $i = 0 ; $i < @peptides ; $i++ ) {
-    if   ( $i == 0 ) { print "<h2>alpha-chain</h2>"; }
-    else             { print "<h2>beta-chain</h2>"; }
-    my $peptide = $peptides[$i];
-    print "<br/><br/><table border=0 cellpadding=4><tr>";
-    for ( my $n = 0 ; $n < @peptides ; $n++ ) {
-        for ( my $charge = 1 ; $charge < 4 ; $charge++ ) {
-            print "<td class='table-heading'>";
-            if ( $n > 0 ) { print " xlink-"; }
-            print "b-ion+$charge</td>";
-            my @residues   = split //, $peptide;
-            my $ion_mass   = 0;
-            my $residue_no = 0;
-            foreach my $residue (@residues) {
-                $residue_no = $residue_no + 1;
-                print "<td";
-                $ion_mass = $ion_mass + $residuemass{$residue};
-                if ( $residue_no == $xlink_pos[$i] + 1 && $sequence =~ m/^[^-]*$/ ) { $ion_mass = $ion_mass + $monolink; }
-                my $mz = ( ( $ion_mass + ( $charge * $mass_of_hydrogen ) + ( $n * ( $xlink + $xlink_half[ abs( $i - 1 ) ] ) ) ) / $charge );
-                my $match = 0;
-                if ( $n == 0 ) {
-                    foreach my $ms2_mass ( keys %unsorted_data ) {
-                        if ( $ms2_mass < ( $mz + $ms2_error ) && $ms2_mass > ( $mz - $ms2_error ) ) {
-                            if ( abs( $match - $mz ) > abs( $mz - $ms2_mass ) ) { $match = $ms2_mass }
-                        }
-                    }
-                } else {
-                    foreach my $ms2_mass ( keys %unsorted_data ) {
-                        if ( $ms2_mass < ( $mz + $ms2_error ) && $ms2_mass > ( $mz - $ms2_error ) ) {
-                            if ( abs( $match - $mz ) > abs( $mz - $ms2_mass ) ) { $match = $ms2_mass }
-                        }
-                    }
-                }
-
-                if ( $n == 0 && $residue_no <= $xlink_pos[$i] && $match != 0 ) {
-                    $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
-
-                    # 	    $matched_TIC = $matched_TIC+ $matched_common{$match};
-                    if    ( $unsorted_data{$match} / $max_abundance < 0.001 ) { print " style='background-color:#008800' >"; }
-                    elsif ( $unsorted_data{$match} / $max_abundance < 0.01 )  { print " style='background-color:#00AA00' >"; }
-                    elsif ( $unsorted_data{$match} / $max_abundance < 0.1 )   { print " style='background-color:#00DD00' >"; }
-                    else                                                      { print " style='background-color:#00FF00' >"; }
-                } elsif ( $n == 0 && $residue_no > $xlink_pos[$i] && $sequence =~ m/^[^-]*$/ && $match != 0 ) {
-                    $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
-
-                    # 	     $matched_TIC = $matched_TIC+ $unsorted_data{$match};
-                    if    ( $unsorted_data{$match} / $max_abundance < 0.001 ) { print " style='background-color:#880000' >"; }
-                    elsif ( $matched_common{$match} / $max_abundance < 0.01 ) { print " style='background-color:#AA0000' >"; }
-                    elsif ( $matched_common{$match} / $max_abundance < 0.1 )  { print " style='background-color:#DD0000' >"; }
-                    else                                                      { print " style='background-color:#FF0000' >"; }
-                } elsif ( $n == 1 && $residue_no > $xlink_pos[$i] && $match != 0 ) {
-
-                    # 	      $matched_TIC = $matched_TIC+ $unsorted_data{$match};
-                    $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
-                    if    ( $unsorted_data{$match} / $max_abundance < 0.001 ) { print " style='background-color:#880000' >"; }
-                    elsif ( $unsorted_data{$match} / $max_abundance < 0.01 )  { print " style='background-color:#AA0000' >"; }
-                    elsif ( $unsorted_data{$match} / $max_abundance < 0.1 )   { print " style='background-color:#DD0000' >"; }
-                    else                                                      { print " style='background-color:#FF0000' >"; }
-                } elsif ( $residue_no > $xlink_pos[$i] && $sequence =~ /\-/ && $n == 0 ) {
-                    print " style='background-color:#F0F0F0; color:#D0D0D0;' >";
-                } elsif ( $residue_no <= $xlink_pos[$i] && $n == 1 ) {
-                    print " style='background-color:#F0F0F0; color:#D0D0D0;' >";
-                } else {
-                    print ">";
-                }
-                printf "<B>%.2f</B>", $mz;
-                if ( $match != 0 ) { printf "<br/>(%.2f)", $match; }
-                print "</td>";
+   if   ( $i == 0 ) { print "<h2>alpha-chain</h2>"; }
+   else             { print "<h2>beta-chain</h2>"; }
+   my $peptide = $peptides[$i];
+   print "<br/><br/><table border=0 cellpadding=4><tr>";
+   for ( my $n = 0 ; $n < @peptides ; $n++ ) {
+      for ( my $charge = 1 ; $charge < 4 ; $charge++ ) {
+         print "<td class='table-heading'>";
+         if ( $n > 0 ) { print " xlink-"; }
+         print "b-ion+$charge</td>";
+         my @residues   = split //, $peptide;
+         my $ion_mass   = 0;
+         my $residue_no = 0;
+         foreach my $residue (@residues) {
+            $residue_no = $residue_no + 1;
+            print "<td";
+            $ion_mass = $ion_mass + $residuemass{$residue};
+            if ( $residue_no == $xlink_pos[$i] + 1 && $sequence =~ m/^[^-]*$/ ) {
+               $ion_mass = $ion_mass + $monolink;
             }
-            print "</tr>\n<tr>";
-        }
-    }
-
-    print "<td class='table-heading'>AA</td>";
-    my @residues = split //, $peptide;
-    foreach my $residue (@residues) {
-        print "<td class='table-heading'>$residue</td>";
-    }
-    print "</tr>\n<tr>";
-
-    for ( my $n = 0 ; $n < @peptides ; $n++ ) {
-
-        for ( my $charge = 1 ; $charge < 4 ; $charge++ ) {
-            print "<td class='table-heading'>";
-            if ( $n > 0 ) { print " xlink-"; }
-            print "y-ion+$charge</td><td style='background-color:#F0F0F0; color:#D0D0D0;'></td>";
-            my @residues = split //, $peptide;
-            my $peptide_mass = 0;
-            foreach my $residue (@residues) {    #split the peptide in indivual amino acids
-                $peptide_mass = $peptide_mass + $residuemass{$residue};    #tally the masses of each amino acid one at a time
+            my $mz = ( ( $ion_mass + ( $charge * $mass_of_hydrogen ) + ( $n * ( $xlink + $xlink_half[ abs( $i - 1 ) ] ) ) ) / $charge );
+            my $match = 0;
+            if ( $n == 0 ) {
+               foreach my $ms2_mass ( keys %unsorted_data ) {
+                  if (    $ms2_mass < ( $mz + $ms2_error )
+                       && $ms2_mass > ( $mz - $ms2_error ) )
+                  {
+                     if ( abs( $match - $mz ) > abs( $mz - $ms2_mass ) ) {
+                        $match = $ms2_mass;
+                     }
+                  }
+               }
+            } else {
+               foreach my $ms2_mass ( keys %unsorted_data ) {
+                  if (    $ms2_mass < ( $mz + $ms2_error )
+                       && $ms2_mass > ( $mz - $ms2_error ) )
+                  {
+                     if ( abs( $match - $mz ) > abs( $mz - $ms2_mass ) ) {
+                        $match = $ms2_mass;
+                     }
+                  }
+               }
             }
-            if ( $sequence =~ m/^[^-]*$/ ) { $peptide_mass = $peptide_mass + $monolink }
-            my $ion_mass   = $peptide_mass;
-            my $residue_no = 0;
-            foreach my $residue (@residues) {
-                $residue_no = $residue_no + 1;
-                if ( $residue_no == @residues ) { last; }
-                print "<td";
-                $ion_mass = $ion_mass - $residuemass{$residue};
-                if ( $residue_no == $xlink_pos[$i] + 1 && $sequence =~ m/^[^-]*$/ ) { $ion_mass = $ion_mass - $monolink }
-                my $mz = ( ( $ion_mass + $terminalmass + ( $charge * $mass_of_hydrogen ) + ( $n * ( $xlink + $xlink_half[ abs( $i - 1 ) ] ) ) ) / $charge );
 
-                my $match = 0;
-                if ( $n == 0 ) {
+            if ( $n == 0 && $residue_no <= $xlink_pos[$i] && $match != 0 ) {
+               $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
 
-                    foreach my $ms2_mass ( keys %unsorted_data ) {
-                        if ( $ms2_mass < ( $mz + $ms2_error ) && $ms2_mass > ( $mz - $ms2_error ) ) {
-                            if ( abs( $match - $mz ) > abs( $mz - $ms2_mass ) ) { $match = $ms2_mass }
-                        }
-                    }
-                } else {
-                    foreach my $ms2_mass ( keys %unsorted_data ) {
-                        if ( $ms2_mass < ( $mz + $ms2_error ) && $ms2_mass > ( $mz - $ms2_error ) ) {
-                            if ( abs( $match - $mz ) > abs( $mz - $ms2_mass ) ) { $match = $ms2_mass }
-                        }
-                    }
-                }
-                if ( $n == 0 && $residue_no - 1 >= $xlink_pos[$i] && $match != 0 ) {
+               # 	    $matched_TIC = $matched_TIC+ $matched_common{$match};
+               if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
+                  print " style='background-color:#008800' >";
+               } elsif ( $unsorted_data{$match} / $max_abundance < 0.01 ) {
+                  print " style='background-color:#00AA00' >";
+               } elsif ( $unsorted_data{$match} / $max_abundance < 0.1 ) {
+                  print " style='background-color:#00DD00' >";
+               } else {
+                  print " style='background-color:#00FF00' >";
+               }
+            } elsif (    $n == 0
+                      && $residue_no > $xlink_pos[$i]
+                      && $sequence =~ m/^[^-]*$/
+                      && $match != 0 )
+            {
+               $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
 
-                    # 	    $matched_TIC = $matched_TIC + $matched_common{$match};
-                    $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
-                    if    ( $unsorted_data{$match} / $max_abundance < 0.001 ) { print " style='background-color:#008800' >"; }
-                    elsif ( $unsorted_data{$match} / $max_abundance < 0.01 )  { print " style='background-color:#00AA00' >"; }
-                    elsif ( $unsorted_data{$match} / $max_abundance < 0.1 )   { print " style='background-color:#00DD00' >"; }
-                    else                                                      { print " style='background-color:#00FF00' >"; }
-                } elsif ( $n == 0 && $residue_no - 1 < $xlink_pos[$i] && $sequence =~ m/^[^-]*$/ && $match != 0 ) {
-                    $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
+               # 	     $matched_TIC = $matched_TIC+ $unsorted_data{$match};
+               if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
+                  print " style='background-color:#880000' >";
+               } elsif ( $matched_common{$match} / $max_abundance < 0.01 ) {
+                  print " style='background-color:#AA0000' >";
+               } elsif ( $matched_common{$match} / $max_abundance < 0.1 ) {
+                  print " style='background-color:#DD0000' >";
+               } else {
+                  print " style='background-color:#FF0000' >";
+               }
+            } elsif ( $n == 1 && $residue_no > $xlink_pos[$i] && $match != 0 ) {
 
-                    # 	    $matched_TIC = $matched_TIC+ $matched_common{$match};
-                    if    ( $unsorted_data{$match} / $max_abundance < 0.001 ) { print " style='background-color:#880000' >"; }
-                    elsif ( $unsorted_data{$match} / $max_abundance < 0.01 )  { print " style='background-color:#AA0000' >"; }
-                    elsif ( $unsorted_data{$match} / $max_abundance < 0.1 )   { print " style='background-color:#DD0000' >"; }
-                    else                                                      { print " style='background-color:#FF0000' >"; }
-                } elsif ( $n == 1 && $residue_no - 1 < $xlink_pos[$i] && $match != 0 ) {
-                    $data_match = $data_match . '[' . ($match) . ' ,' . $unsorted_data{$match} . '],';
-
-                    # 	      $matched_TIC = $matched_TIC+ $unsorted_data{$match};
-                    if    ( $unsorted_data{$match} / $max_abundance < 0.001 ) { print " style='background-color:#880000' >"; }
-                    elsif ( $unsorted_data{$match} / $max_abundance < 0.01 )  { print " style='background-color:#AA0000' >"; }
-                    elsif ( $unsorted_data{$match} / $max_abundance < 0.1 )   { print " style='background-color:#DD0000' >"; }
-                    else                                                      { print " style='background-color:#FF0000' >"; }
-                } elsif ( $residue_no - 1 < $xlink_pos[$i] && $sequence =~ /\-/ && $n == 0 ) {
-                    print " style='background-color:#F0F0F0; color:#D0D0D0;' >";
-                } elsif ( $residue_no - 1 >= $xlink_pos[$i] && $n == 1 ) {
-                    print " style='background-color:#F0F0F0; color:#D0D0D0;' >";
-                } else {
-                    print ">";
-                }
-                printf "<B>%.2f</B>", $mz;
-                if ( $match != 0 ) { printf "<br/>(%.2f)", $match; }
-                print "</td>";
+               # 	      $matched_TIC = $matched_TIC+ $unsorted_data{$match};
+               $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
+               if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
+                  print " style='background-color:#880000' >";
+               } elsif ( $unsorted_data{$match} / $max_abundance < 0.01 ) {
+                  print " style='background-color:#AA0000' >";
+               } elsif ( $unsorted_data{$match} / $max_abundance < 0.1 ) {
+                  print " style='background-color:#DD0000' >";
+               } else {
+                  print " style='background-color:#FF0000' >";
+               }
+            } elsif (    $residue_no > $xlink_pos[$i]
+                      && $sequence =~ /\-/
+                      && $n == 0 )
+            {
+               print " style='background-color:#F0F0F0; color:#D0D0D0;' >";
+            } elsif ( $residue_no <= $xlink_pos[$i] && $n == 1 ) {
+               print " style='background-color:#F0F0F0; color:#D0D0D0;' >";
+            } else {
+               print ">";
             }
-            print "</tr>\n<tr>";
-        }
-    }
+            printf "<B>%.2f</B>", $mz;
+            if ( $match != 0 ) { printf "<br/>(%.2f)", $match; }
+            print "</td>";
+         }
+         print "</tr>\n<tr>";
+      }
+   }
 
-    print "</tr></table>";
+   print "<td class='table-heading'>AA</td>";
+   my @residues = split //, $peptide;
+   foreach my $residue (@residues) {
+      print "<td class='table-heading'>$residue</td>";
+   }
+   print "</tr>\n<tr>";
+
+   for ( my $n = 0 ; $n < @peptides ; $n++ ) {
+
+      for ( my $charge = 1 ; $charge < 4 ; $charge++ ) {
+         print "<td class='table-heading'>";
+         if ( $n > 0 ) { print " xlink-"; }
+         print "y-ion+$charge</td><td style='background-color:#F0F0F0; color:#D0D0D0;'></td>";
+         my @residues = split //, $peptide;
+         my $peptide_mass = 0;
+         foreach my $residue (@residues) {    #split the peptide in indivual amino acids
+            $peptide_mass = $peptide_mass + $residuemass{ $residue };    #tally the masses of each amino acid one at a time
+         }
+         if ( $sequence =~ m/^[^-]*$/ ) {
+            $peptide_mass = $peptide_mass + $monolink;
+         }
+         my $ion_mass   = $peptide_mass;
+         my $residue_no = 0;
+         foreach my $residue (@residues) {
+            $residue_no = $residue_no + 1;
+            if ( $residue_no == @residues ) { last; }
+            print "<td";
+            $ion_mass = $ion_mass - $residuemass{$residue};
+            if ( $residue_no == $xlink_pos[$i] + 1 && $sequence =~ m/^[^-]*$/ ) {
+               $ion_mass = $ion_mass - $monolink;
+            }
+            my $mz = ( ( $ion_mass + $terminalmass + ( $charge * $mass_of_hydrogen ) + ( $n * ( $xlink + $xlink_half[ abs( $i - 1 ) ] ) ) ) / $charge );
+
+            my $match = 0;
+            if ( $n == 0 ) {
+
+               foreach my $ms2_mass ( keys %unsorted_data ) {
+                  if (    $ms2_mass < ( $mz + $ms2_error )
+                       && $ms2_mass > ( $mz - $ms2_error ) )
+                  {
+                     if ( abs( $match - $mz ) > abs( $mz - $ms2_mass ) ) {
+                        $match = $ms2_mass;
+                     }
+                  }
+               }
+            } else {
+               foreach my $ms2_mass ( keys %unsorted_data ) {
+                  if (    $ms2_mass < ( $mz + $ms2_error )
+                       && $ms2_mass > ( $mz - $ms2_error ) )
+                  {
+                     if ( abs( $match - $mz ) > abs( $mz - $ms2_mass ) ) {
+                        $match = $ms2_mass;
+                     }
+                  }
+               }
+            }
+            if ( $n == 0 && $residue_no - 1 >= $xlink_pos[$i] && $match != 0 ) {
+
+               # 	    $matched_TIC = $matched_TIC + $matched_common{$match};
+               $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
+               if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
+                  print " style='background-color:#008800' >";
+               } elsif ( $unsorted_data{$match} / $max_abundance < 0.01 ) {
+                  print " style='background-color:#00AA00' >";
+               } elsif ( $unsorted_data{$match} / $max_abundance < 0.1 ) {
+                  print " style='background-color:#00DD00' >";
+               } else {
+                  print " style='background-color:#00FF00' >";
+               }
+            } elsif (    $n == 0
+                      && $residue_no - 1 < $xlink_pos[$i]
+                      && $sequence =~ m/^[^-]*$/
+                      && $match != 0 )
+            {
+               $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
+
+               # 	    $matched_TIC = $matched_TIC+ $matched_common{$match};
+               if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
+                  print " style='background-color:#880000' >";
+               } elsif ( $unsorted_data{$match} / $max_abundance < 0.01 ) {
+                  print " style='background-color:#AA0000' >";
+               } elsif ( $unsorted_data{$match} / $max_abundance < 0.1 ) {
+                  print " style='background-color:#DD0000' >";
+               } else {
+                  print " style='background-color:#FF0000' >";
+               }
+            } elsif (    $n == 1
+                      && $residue_no - 1 < $xlink_pos[$i]
+                      && $match != 0 )
+            {
+               $data_match = $data_match . '[' . ($match) . ' ,' . $unsorted_data{$match} . '],';
+
+               # 	      $matched_TIC = $matched_TIC+ $unsorted_data{$match};
+               if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
+                  print " style='background-color:#880000' >";
+               } elsif ( $unsorted_data{$match} / $max_abundance < 0.01 ) {
+                  print " style='background-color:#AA0000' >";
+               } elsif ( $unsorted_data{$match} / $max_abundance < 0.1 ) {
+                  print " style='background-color:#DD0000' >";
+               } else {
+                  print " style='background-color:#FF0000' >";
+               }
+            } elsif (    $residue_no - 1 < $xlink_pos[$i]
+                      && $sequence =~ /\-/
+                      && $n == 0 )
+            {
+               print " style='background-color:#F0F0F0; color:#D0D0D0;' >";
+            } elsif ( $residue_no - 1 >= $xlink_pos[$i] && $n == 1 ) {
+               print " style='background-color:#F0F0F0; color:#D0D0D0;' >";
+            } else {
+               print ">";
+            }
+            printf "<B>%.2f</B>", $mz;
+            if ( $match != 0 ) { printf "<br/>(%.2f)", $match; }
+            print "</td>";
+         }
+         print "</tr>\n<tr>";
+      }
+   }
+
+   print "</tr></table>";
 }
 
 #
