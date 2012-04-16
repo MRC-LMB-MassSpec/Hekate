@@ -150,7 +150,7 @@ $SQL_query = "";
 
 if ( defined $order ) {
    for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
-      $SQL_query = $SQL_query . "SELECT * FROM (SELECT * FROM results WHERE name=? AND fragment LIKE '%-%' ORDER BY score DESC) UNION ALL ";
+      $SQL_query = $SQL_query . "SELECT * FROM (SELECT * FROM results WHERE name=? ORDER BY score DESC) UNION ALL ";
    }
    $SQL_query = substr( $SQL_query, 0, -10 );
    $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY sequence1_name, sequence2_name LIMIT 50" );    #nice injection problem here, need to sort
@@ -166,14 +166,14 @@ print_pymol(
              $top_hits,         $mass_of_hydrogen, $mass_of_deuterium,          $mass_of_carbon12,
              $mass_of_carbon13, $cut_residues,     $protein_sequences_combined, $reactive_site,
              $results_dbh,      $xlinker_mass,     $mono_mass_diff,             \%mass_seperation_hash,
-             0,                 \%error,           \%names
+             0,                 \%error,           \%names,			2
 );
 
 $SQL_query = "";
 print_heading('Top Scoring Monolink Matches');
 if ( defined $order ) {
    for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
-      $SQL_query = $SQL_query . "SELECT * FROM (SELECT * FROM results WHERE name=? AND fragment NOT LIKE '%-%' ORDER BY score DESC) UNION ALL ";
+      $SQL_query = $SQL_query . "SELECT * FROM (SELECT * FROM results WHERE name=?  ORDER BY score DESC) UNION ALL ";
    }
    $SQL_query = substr( $SQL_query, 0, -10 );
    $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY sequence1_name, sequence2_name" );    #nice injection problem here, need to sort
@@ -189,7 +189,7 @@ print_pymol(
              $top_hits,         $mass_of_hydrogen, $mass_of_deuterium,          $mass_of_carbon12,
              $mass_of_carbon13, $cut_residues,     $protein_sequences_combined, $reactive_site,
              $results_dbh,      $xlinker_mass,     $mono_mass_diff,             \%mass_seperation_hash,
-             0,                 \%error,           \%names
+             0,                 \%error,           \%names,			1
 );
 
 print_page_bottom_fancy;

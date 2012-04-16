@@ -186,33 +186,33 @@ print_heading('Pymol Scripts');
 my $top_hits;
 if ( defined $order ) {
    $top_hits = $results_dbh->prepare(
-                      "SELECT * FROM (SELECT * FROM results WHERE name=? and fragment LIKE '%-%' ORDER BY score DESC) ORDER BY sequence1_name, sequence2_name" )
+                      "SELECT * FROM (SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC) ORDER BY sequence1_name, sequence2_name" )
      ;    #nice injection problem here, need to sort
 } else {
    $top_hits =
-     $results_dbh->prepare( "SELECT * FROM results WHERE name=? and fragment LIKE '%-%' ORDER BY score DESC" );    #nice injection problem here, need to sort
+     $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC" );    #nice injection problem here, need to sort
 }
 $top_hits->execute($table);
 print_pymol(
              $top_hits,          $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues,
              $protein_sequences, $reactive_site,    $results_dbh,       $xlinker_mass,     $mono_mass_diff,   $table,
-             0,                  \%error,           \%names
+             0,                  \%error,           \%names,		2
 );
 
 if ( defined $order ) {
    $top_hits =
-     $results_dbh->prepare( "SELECT * FROM (SELECT * FROM results WHERE name=? and fragment NOT LIKE '%-%' ORDER BY score DESC) ORDER BY sequence1_name" )
+     $results_dbh->prepare( "SELECT * FROM (SELECT * FROM results AND score > 0 WHERE name=?  ORDER BY score DESC) ORDER BY sequence1_name" )
      ;                                                                                                             #nice injection problem here, need to sort
 } else {
    $top_hits =
-     $results_dbh->prepare( "SELECT * FROM results WHERE name=? and fragment NOT LIKE '%-%' ORDER BY score DESC" );   #nice injection problem here, need to sort
+     $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC" );   #nice injection problem here, need to sort
 }
 
 $top_hits->execute($table);
 print_pymol(
              $top_hits,          $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues,
              $protein_sequences, $reactive_site,    $results_dbh,       $xlinker_mass,     $mono_mass_diff,   $table,
-             0,                  \%error,           \%names
+             0,                  \%error,           \%names,		1
 );
 
 print_page_bottom_fancy;

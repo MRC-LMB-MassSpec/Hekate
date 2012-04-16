@@ -125,11 +125,11 @@ if ( $short == 1 ) {
 my $top_hits;
 if ( defined $order ) {
    $top_hits = $results_dbh->prepare(
-                      "SELECT * FROM (SELECT * FROM results WHERE name=?  ORDER BY score DESC) ORDER BY sequence1_name, sequence2_name" )
+                      "SELECT * FROM (SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC) ORDER BY sequence1_name, sequence2_name" )
      ;    #nice injection problem here, need to sort
 } else {
    $top_hits =
-     $results_dbh->prepare( "SELECT * FROM results WHERE name=?  ORDER BY score DESC" );    #nice injection problem here, need to sort
+     $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC" );    #nice injection problem here, need to sort
 }
 $top_hits->execute($table);
 print_results(
@@ -146,11 +146,11 @@ if ( $short == 1 ) {
 }
 if ( defined $order ) {
    $top_hits =
-     $results_dbh->prepare( "SELECT * FROM (SELECT * FROM results WHERE name=? AND  ORDER BY score DESC) ORDER BY sequence1_name" )
+     $results_dbh->prepare( "SELECT * FROM (SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC) ORDER BY sequence1_name" )
      ;    #nice injection problem here, need to sort
 } else {
    $top_hits =
-     $results_dbh->prepare( "SELECT * FROM results WHERE name=? ORDER BY score DESC" );   #nice injection problem here, need to sort
+     $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC" );   #nice injection problem here, need to sort
 }
 
 $top_hits->execute($table);

@@ -14,11 +14,13 @@ sub print_pymol {
    my (
         $top_hits,       $mass_of_hydrogen,  $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13,
         $cut_residues,   $protien_sequences, $reactive_site,     $dbh,              $xlinker_mass,
-        $mono_mass_diff, $table,             $repeats,           $error_ref,        $names_ref
+        $mono_mass_diff, $table,             $repeats,           $error_ref,        $names_ref,
+	$xlink_mono_or_all
    ) = @_;
 
    my %error = %{$error_ref};
    my %names = %{$names_ref};
+   if ( !defined $xlink_mono_or_all ) 	{ $xlink_mono_or_all  = 0 }
 
    #     my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $table );
 
@@ -43,12 +45,28 @@ sub print_pymol {
 
    while ( ( my $top_hits_results = $top_hits->fetchrow_hashref ) ) {
 
+#       if (
+#            ( !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far ) && !( grep $_ eq $top_hits_results->{'mz'}, @mz_so_far ) && $repeats == 0 )
+#            || ( $repeats == 1
+#                 && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far ) )
+#         )
+      
       if (
-           ( !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far ) && !( grep $_ eq $top_hits_results->{'mz'}, @mz_so_far ) && $repeats == 0 )
-           || ( $repeats == 1
-                && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far ) )
+           (
+                !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far )
+             && !( grep $_ eq $top_hits_results->{'mz'},   @mz_so_far )
+             && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
+             && $repeats == 0
+	     &&    (( $top_hits_results->{'fragment'} =~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 2 ))
+		|| ( $top_hits_results->{'fragment'} !~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 1 )))
+           )
+           || (    $repeats == 1
+                && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
+              )
+              
         )
       {
+
          push @hits_so_far, $top_hits_results->{'fragment'};
          push @mz_so_far,   $top_hits_results->{'mz'};
          push @scan_so_far, $top_hits_results->{'scan'};

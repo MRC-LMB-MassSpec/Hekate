@@ -66,7 +66,7 @@ sub print_results_paper {
    my (
         $top_hits,          $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues,
         $protien_sequences, $reactive_site,    $dbh,               $xlinker_mass,     $mono_mass_diff,   $table,
-        $mass_seperation,   $repeats,          $scan_repeats,      $error_ref,        $names_ref
+        $mass_seperation,   $repeats,          $scan_repeats,      $error_ref,        $names_ref, 	 $xlink_mono_or_all
    ) = @_;
 
    my $max_hits;
@@ -75,6 +75,7 @@ sub print_results_paper {
    my %error = %{$error_ref};
    my %names = %{$names_ref};
 
+   if ( !defined $xlink_mono_or_all ) 	{ $xlink_mono_or_all  = 0 }
    if ( !defined $max_hits ) { $max_hits  = 0 }
    if ( !$repeats )          { $repeats   = 0 }
    if ( !$no_tables )        { $no_tables = 0 }
@@ -103,12 +104,14 @@ sub print_results_paper {
 
       # 	if ($top_hits_results->{'fragment'} =~ '-')
       #  	{
-      if (
+     if (
            (
                 !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far )
              && !( grep $_ eq $top_hits_results->{'mz'},   @mz_so_far )
              && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
              && $repeats == 0
+	     &&    (( $top_hits_results->{'fragment'} =~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 2 ))
+		|| ( $top_hits_results->{'fragment'} !~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 1 )))
            )
            || (    $repeats == 1
                 && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
@@ -201,7 +204,11 @@ sub print_results_paper {
 #             print "</td><td>";
 
          print "</td></tr>";
-      }
+         } else {
+         push @hits_so_far, $top_hits_results->{'fragment'};
+         push @mz_so_far,   $top_hits_results->{'mz'};
+         push @scan_so_far, $top_hits_results->{'scan'};
+        }
    }
 
    #     }
@@ -328,12 +335,12 @@ if ( $is_finished != '-1' ) {
    print '<div style="text-align:center"><h2 style="color:red;">Warning: Data analysis not finished</h2></div>';
 }
 
-my $top_hits = $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND fragment LIKE '%-%' AND SCORE > 0 ORDER BY score+0 DESC" );
+my $top_hits = $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND  SCORE > 0 ORDER BY score+0 DESC" );
 $top_hits->execute($table);
 print_results_paper(
                      $top_hits,          $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues,
                      $protein_sequences, $reactive_site,    $results_dbh,       $xlinker_mass,     $mono_mass_diff,   $table,
-                     $mass_seperation,   0,                 0,                  \%error,           \%names
+                     $mass_seperation,   0,                 0,                  \%error,           \%names,		2
 );
 
 # my $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND fragment NOT LIKE '%-%' AND SCORE > 0 ORDER BY score+0 DESC");
