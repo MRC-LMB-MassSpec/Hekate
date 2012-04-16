@@ -102,7 +102,7 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
 "<tr><td>?</td><td><input type='hidden' name='type' size='10' maxlength='10' value='crosslinker'/><input type='text' name='name' size='10' maxlength='20' value='Name'/></td>
 <td><input type='text' name='setting1' size='10' maxlength='1' value='K'/></td>
 <td><input type='text' name='setting2' size='10' maxlength='10' value='96.0211296'/></td>
-<td><input type='text' name='setting3' size='10' maxlength='10' value='114.0316942'/></td>
+<td><input type='text' name='setting3' size='10' maxlength='50' value='114.0316942'/></td>
 <td><select name='setting4'><option>deuterium</option><option>carbon-13</option><option>none</option></select></td>
 <td><input type='text' name='setting5' size='10' maxlength='10' value='4'/></td>
 <td><input type='submit' value='Add' /></td></tr>";

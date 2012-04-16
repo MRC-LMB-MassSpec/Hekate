@@ -359,15 +359,16 @@ sub print_results_text {
 sub print_results {
 
    my (
-        $top_hits,      $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13,  $cut_residues,    $protien_sequences,
-        $reactive_site, $dbh,              $xlinker_mass,      $mono_mass_diff,   $table,             $mass_seperation, $repeats,
-        $scan_repeats,  $no_tables,        $max_hits,          $monolink,         $static_mod_string, $varible_mod_string
+        $top_hits,      $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13,  $cut_residues,      $protien_sequences,
+        $reactive_site, $dbh,              $xlinker_mass,      $mono_mass_diff,   $table,             $mass_seperation,   $repeats,
+        $scan_repeats,  $no_tables,        $max_hits,          $monolink,         $static_mod_string, $varible_mod_string,$xlink_mono_or_all
    ) = @_;
 
-   if ( !defined $max_hits ) { $max_hits  = 0 }
-   if ( !$repeats )          { $repeats   = 0 }
-   if ( !$no_tables )        { $no_tables = 0 }
-   if ( !defined $monolink ) { $monolink  = 0 }
+   if ( !defined $max_hits ) 		{ $max_hits  = 0 }
+   if ( !defined $xlink_mono_or_all ) 	{ $xlink_mono_or_all  = 0 }
+   if ( !$repeats )          		{ $repeats   = 0 }
+   if ( !$no_tables )       		{ $no_tables = 0 }
+   if ( !defined $monolink )		{ $monolink  = 0 }
 
    my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $table );
 
@@ -397,6 +398,8 @@ sub print_results {
              && !( grep $_ eq $top_hits_results->{'mz'},   @mz_so_far )
              && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
              && $repeats == 0
+	     &&    (( $top_hits_results->{'fragment'} =~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 2 ))
+		|| ( $top_hits_results->{'fragment'} !~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 1 )))
            )
            || (    $repeats == 1
                 && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
@@ -408,67 +411,65 @@ sub print_results {
          push @mz_so_far,   $top_hits_results->{'mz'};
          push @scan_so_far, $top_hits_results->{'scan'};
          my $rounded = sprintf( "%.3f", $top_hits_results->{'ppm'} );
-         print "<tr><td>", $printed_hits + 1,
-"</td><td><a href='view_scan.pl?table=$table&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}'>$top_hits_results->{'score'}</a></td><td>$top_hits_results->{'mz'}</td><td>$top_hits_results->{'charge'}+</td><td>$rounded</td>";
-         my @fragments = split( '-', $top_hits_results->{'fragment'} );
-         my @unmodified_fragments =
-           split( '-', $top_hits_results->{'unmodified_fragment'} );
-         if ( $top_hits_results->{'fragment'} =~ '-' ) {
-            $printed_hits = $printed_hits + 1;
-            print "<td><a href='view_peptide.pl?table=$table&peptide=$fragments[0]-$fragments[1]'>";
-            print residue_position $unmodified_fragments[0], $protien_sequences;
-            print ".", $fragments[0], "&#8209;";
-            print residue_position $unmodified_fragments[1], $protien_sequences;
-            print ".", $fragments[1] . "</td><td>", $top_hits_results->{'best_x'} + 1, "&#8209;", $top_hits_results->{'best_y'} + 1, "</a></td><td>";
-         } else {
-            $printed_hits = $printed_hits + 1;
-            print "<td><a href='view_peptide.pl?table=$table&peptide=$fragments[0]'>";
-            print residue_position $unmodified_fragments[0], $protien_sequences;
-            print ".", $fragments[0];
-            print "&nbsp;</td><td>", $top_hits_results->{'best_x'} + 1, "</a></td><td>";
-         }
-         if ( $monolink == 1 ) {
-            if ( $top_hits_results->{'monolink_mass'} eq 0 ) {
-               print 'N/A</td><td>';
-            } else {
-               print "$top_hits_results->{'monolink_mass'}</td><td>";
-            }
-         }
-         if ( $top_hits_results->{'no_of_mods'} > 1 ) {
-            print "$top_hits_results->{'no_of_mods'} x";
-         }
-         print
-           " $modifications{$top_hits_results->{'modification'}}{Name}</td><td>",
+
+           print "<tr><td>", $printed_hits + 1, "</td><td><a href='view_scan.pl?table=$table&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}'>$top_hits_results->{'score'}</a></td><td>$top_hits_results->{'mz'}</td><td>$top_hits_results->{'charge'}+</td><td>$rounded</td>";
+           my @fragments = split( '-', $top_hits_results->{'fragment'} );
+           my @unmodified_fragments =
+             split( '-', $top_hits_results->{'unmodified_fragment'} );
+           if ( $top_hits_results->{'fragment'} =~ '-' ) {
+              $printed_hits = $printed_hits + 1;
+              print "<td><a href='view_peptide.pl?table=$table&peptide=$fragments[0]-$fragments[1]'>";
+              print residue_position $unmodified_fragments[0], $protien_sequences;
+              print ".", $fragments[0], "&#8209;";
+              print residue_position $unmodified_fragments[1], $protien_sequences;
+              print ".", $fragments[1] . "</td><td>", $top_hits_results->{'best_x'} + 1, "&#8209;", $top_hits_results->{'best_y'} + 1, "</a></td><td>";
+           } else {
+              $printed_hits = $printed_hits + 1;
+              print "<td><a href='view_peptide.pl?table=$table&peptide=$fragments[0]'>";
+              print residue_position $unmodified_fragments[0], $protien_sequences;
+              print ".", $fragments[0];
+              print "&nbsp;</td><td>", $top_hits_results->{'best_x'} + 1, "</a></td><td>";
+           }
+           if ( $monolink == 1 ) {
+              if ( $top_hits_results->{'monolink_mass'} eq 0 ) {
+                 print 'N/A</td><td>';
+              } else {
+                 print "$top_hits_results->{'monolink_mass'}</td><td>";
+              }
+           }
+           if ( $top_hits_results->{'no_of_mods'} > 1 ) {
+              print "$top_hits_results->{'no_of_mods'} x";
+           }
+           print " $modifications{$top_hits_results->{'modification'}}{Name}</td><td>",
            substr( $top_hits_results->{'sequence1_name'}, 1 );
-         if ( $top_hits_results->{'fragment'} =~ '-' ) {
-            print " - ", substr( $top_hits_results->{'sequence2_name'}, 1 );
-         }
-         print "</td><td> $top_hits_results->{'fraction'}</td><td>";
-         print
-"<a  href='view_img.pl?table=$table&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$table&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>$top_hits_results->{'scan'}</a> <br/><a  href='view_img.pl?table=$table&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1' class='screenshot' rel='view_thumb.pl?table=$table&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1'>$top_hits_results->{'d2_scan'}</a>";
-         print "</td><td>";
-         print_ms2_link(
+           if ( $top_hits_results->{'fragment'} =~ '-' ) {
+              print " - ", substr( $top_hits_results->{'sequence2_name'}, 1 );
+           }
+           print "</td><td> $top_hits_results->{'fraction'}</td><td>";
+           print "<a  href='view_img.pl?table=$table&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$table&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>$top_hits_results->{'scan'}</a> <br/><a  href='view_img.pl?table=$table&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1' class='screenshot' rel='view_thumb.pl?table=$table&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1'>$top_hits_results->{'d2_scan'}</a>";
+           print "</td><td>";
+           print_ms2_link(
                          $top_hits_results->{'MSn_string'},   $top_hits_results->{'d2_MSn_string'}, $top_hits_results->{'fragment'},
                          $top_hits_results->{'modification'}, $top_hits_results->{'best_x'},        $top_hits_results->{'best_y'},
                          $xlinker_mass,                       $mono_mass_diff,                      $top_hits_results->{'top_10'},
                          $reactive_site,                      $table
-         );
+           );
 
-         print_xquest_link(
+           print_xquest_link(
                             $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'}, $top_hits_results->{'mz'},
                             $top_hits_results->{'charge'},     $top_hits_results->{'fragment'},      $mass_seperation,
                             $mass_of_deuterium,                $mass_of_hydrogen,                    $mass_of_carbon13,
                             $mass_of_carbon12,                 $cut_residues,                        $xlinker_mass,
                             $mono_mass_diff,                   $reactive_site,                       $fasta,
                             $static_mod_string,                $varible_mod_string
-         );
+           );
 
-         print "</td></tr>";
-      } else {
+           print "</td></tr>";
+        } else {
          push @hits_so_far, $top_hits_results->{'fragment'};
          push @mz_so_far,   $top_hits_results->{'mz'};
          push @scan_so_far, $top_hits_results->{'scan'};
-      }
+        }
    }
    print '</table>';
 

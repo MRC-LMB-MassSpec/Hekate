@@ -125,18 +125,18 @@ if ( $short == 1 ) {
 my $top_hits;
 if ( defined $order ) {
    $top_hits = $results_dbh->prepare(
-                      "SELECT * FROM (SELECT * FROM results WHERE name=? AND fragment LIKE '%-%' ORDER BY score DESC) ORDER BY sequence1_name, sequence2_name" )
+                      "SELECT * FROM (SELECT * FROM results WHERE name=?  ORDER BY score DESC) ORDER BY sequence1_name, sequence2_name" )
      ;    #nice injection problem here, need to sort
 } else {
    $top_hits =
-     $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND fragment LIKE '%-%' ORDER BY score DESC" );    #nice injection problem here, need to sort
+     $results_dbh->prepare( "SELECT * FROM results WHERE name=?  ORDER BY score DESC" );    #nice injection problem here, need to sort
 }
 $top_hits->execute($table);
 print_results(
                $top_hits,          $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues,
                $protein_sequences, $reactive_site,    $results_dbh,       $xlinker_mass,     $mono_mass_diff,   $table,
                $mass_seperation,   0,                 0,                  0,                 50 * $short,       0,
-               $static_mod_string, $varible_mod_string
+               $static_mod_string, $varible_mod_string, 2
 );
 
 if ( $short == 1 ) {
@@ -146,11 +146,11 @@ if ( $short == 1 ) {
 }
 if ( defined $order ) {
    $top_hits =
-     $results_dbh->prepare( "SELECT * FROM (SELECT * FROM results WHERE name=? AND fragment NOT LIKE '%-%' ORDER BY score DESC) ORDER BY sequence1_name" )
+     $results_dbh->prepare( "SELECT * FROM (SELECT * FROM results WHERE name=? AND  ORDER BY score DESC) ORDER BY sequence1_name" )
      ;    #nice injection problem here, need to sort
 } else {
    $top_hits =
-     $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND fragment NOT LIKE '%-%' ORDER BY score DESC" );   #nice injection problem here, need to sort
+     $results_dbh->prepare( "SELECT * FROM results WHERE name=? ORDER BY score DESC" );   #nice injection problem here, need to sort
 }
 
 $top_hits->execute($table);
@@ -158,7 +158,7 @@ print_results(
                $top_hits,          $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues,
                $protein_sequences, $reactive_site,    $results_dbh,       $xlinker_mass,     $mono_mass_diff,   $table,
                $mass_seperation,   0,                 0,                  0,                 50 * $short,       1,
-               $static_mod_string, $varible_mod_string
+               $static_mod_string, $varible_mod_string, 1
 );
 
 print_page_bottom_fancy;

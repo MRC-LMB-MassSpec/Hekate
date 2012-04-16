@@ -86,7 +86,7 @@ ENDHTML
       my $dbh          = connect_conf_db;
       my $crosslinkers = get_conf_value( $dbh, $row_id );
       print '<form method="POST" enctype="multipart/form-data" action="settings_edit.pl" >';
-      print "<h2>Crosslinking Reagents</h2>";
+      print "<h2>Crosslinking Reagent</h2>";
       print
         "<table><tr><td>ID</td><td>Name</td><td>Reactivity</td><td>Mass</td><td>MonoLink Mass</td><td>Isotope</td><td>Seperation</d><td>Edit/Delete</td></tr>";
 
