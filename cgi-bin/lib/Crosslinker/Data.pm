@@ -4,7 +4,6 @@ package Crosslinker::Data;
 use base 'Exporter';
 use lib 'lib';
 use Crosslinker::Scoring;
-use Crosslinker::Links;
 use Crosslinker::Config;
 
 our @EXPORT = (
@@ -14,7 +13,7 @@ our @EXPORT = (
 );
 ######
 #
-# Data import functions
+# Data import functions & database management
 #
 ######
 

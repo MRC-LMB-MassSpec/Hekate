@@ -13,11 +13,9 @@ use DBI;
 
 use lib 'lib';
 use Crosslinker::HTML;
-use Crosslinker::Links;
-use Crosslinker::Scoring;
+use Crosslinker::Results;
 use Crosslinker::Constants;
 use Crosslinker::Config;
-
 ########################
 #                      #
 # Import CGI Varibles  #

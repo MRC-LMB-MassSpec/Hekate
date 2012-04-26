@@ -8,6 +8,8 @@ our @EXPORT = ( 'get_mods', 'get_conf_value', 'connect_conf_db', 'add_conf', 'ge
 #
 # Config import functions
 #
+# Contains functions for the loading and saving of setting to and from the configuration database
+#
 ######
 
 sub get_conf {

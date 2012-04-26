@@ -7,6 +7,14 @@ use Crosslinker::Config;
 
 our @EXPORT = ( 'residue_mass', 'protein_residuemass', 'constants', 'version' );
 
+######
+#
+# Constansts
+#
+# Defines constasts used by Crosslinker
+#
+######
+
 sub residue_mass {
    my %RNA_residuemass = (
                            g => 345.04744,

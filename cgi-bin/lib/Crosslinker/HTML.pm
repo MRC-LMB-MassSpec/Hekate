@@ -12,11 +12,16 @@ our @EXPORT =
   ( 'generate_page', 'print_heading', 'print_subheading', 'print_page_top', 'print_page_bottom', 'print_page_top_fancy', 'print_page_bottom_fancy' );
 ######
 #
-# Creates html for page
+# Creates html for pages
+#
+# Functions for creating various pages
 #
 ######
 
 sub generate_page {
+  
+   #This really should be in data or similar, but in the past it generated a page, now it insteads puts the results into the DB.
+   #much nicer, but hence the strange name.
 
    my (
         $protien_sequences,     $dbh,                $results_dbh,        $settings_dbh,      $results_table,      $no_of_fractions,
