@@ -939,9 +939,9 @@ sub calc_score {
    $matchlist->finish();
    $dbh->disconnect();
 
-   if ( $best_match > 0 ) {
-      warn "$best_sequence - Score: ", sprintf( "%.0f", ($best_match) ), "\n";
-   }
+    if ( $best_match > 0 ) {
+      warn "Best: $best_sequence - Score: ", sprintf( "%.0f", ($best_match) ), "\n";
+    }
    my $td = tv_interval($t0);
    warn "Time Taken = ", $td, " secs \n";
    my $returned_score = sprintf( "%.0f", ($best_match) );

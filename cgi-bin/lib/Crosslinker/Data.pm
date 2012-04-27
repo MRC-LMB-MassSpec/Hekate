@@ -604,13 +604,14 @@ sub matchpeaks {
 
             if (    !( $modifications{$modification}{Name} eq "loop link" && $fragment =~ /[-]/ )
                  && !( $modifications{$modification}{Name} eq "mono link" )
-              )    #crosslink and loop link on the same peptide is a messy option and pretty unlikely, so remove them
+              )    #crosslink and loop link on the same peptide is a messy option,certainly shouldn't give a mass doublet, so remove them
             {
                my @monolink_masses;
 
                my $mass = $fragment_masses{$fragment};
                if ( $fragment !~ /[-]/ ) {
                   @monolink_masses = split( ",", $mono_mass_diff );
+#  		  push @monolink_masses, 0;
                } else {
                   @monolink_masses = ('0');
                }

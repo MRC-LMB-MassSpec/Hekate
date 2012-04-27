@@ -142,6 +142,7 @@ sub digest_proteins_masses    #Calculates the mass of a list of peptides
          }
 
          $protein_fragments_masses{$peptide} = $peptide_mass + $terminalmass;
+# 	 warn $peptide," " ,$peptide_mass + 1.0078250  + 15.9949146 , "\n";
          $peptide_mass = 0;
       }
 
