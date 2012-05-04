@@ -1,0 +1,53 @@
+[Fri Apr 27 12:35:22 2012] *** Log Started ***
+[Fri May  4 10:48:25 2012] crosslinker.pl: Started
+[Fri May  4 10:48:25 2012] crosslinker.pl: Generating Decoy Database....
+[Fri May  4 10:48:25 2012] crosslinker.pl: Reagent: BS2G-d4 
+[Fri May  4 10:48:25 2012] crosslinker.pl: Fixed mod selected: 24: Carbamidomethyl 
+[Fri May  4 10:48:25 2012] crosslinker.pl: Dynamic mod selected: 20: Oxidation (M) 
+[Fri May  4 10:48:25 2012] crosslinker.pl: No Cut:P
+[Fri May  4 10:48:25 2012] crosslinker.pl: Protease type:C
+[Fri May  4 10:48:25 2012] crosslinker.pl: Sequence 0 = >PolIII 
+[Fri May  4 10:48:25 2012] crosslinker.pl: Digested peptides size:894 
+[Fri May  4 10:48:25 2012] crosslinker.pl: No Cut:P
+[Fri May  4 10:48:25 2012] crosslinker.pl: Protease type:C
+[Fri May  4 10:48:25 2012] crosslinker.pl: Sequence 1 = >Clamp 
+[Fri May  4 10:48:25 2012] crosslinker.pl: Digested peptides size:1140 
+[Fri May  4 10:48:25 2012] crosslinker.pl: No Cut:P
+[Fri May  4 10:48:25 2012] crosslinker.pl: Protease type:C
+[Fri May  4 10:48:25 2012] crosslinker.pl: Sequence 2 = >Exo 
+[Fri May  4 10:48:25 2012] crosslinker.pl: Digested peptides size:1314 
+[Fri May  4 10:48:25 2012] crosslinker.pl: No Cut:P
+[Fri May  4 10:48:25 2012] crosslinker.pl: Protease type:C
+[Fri May  4 10:48:25 2012] crosslinker.pl: Sequence 3 = >tau 
+[Fri May  4 10:48:25 2012] crosslinker.pl: Digested peptides size:1749 
+[Fri May  4 10:48:25 2012] crosslinker.pl: No Cut:P
+[Fri May  4 10:48:25 2012] crosslinker.pl: Protease type:C
+[Fri May  4 10:48:25 2012] crosslinker.pl: Sequence 4 = >rPolIII 
+[Fri May  4 10:48:25 2012] crosslinker.pl: Digested peptides size:2640 
+[Fri May  4 10:48:25 2012] crosslinker.pl: No Cut:P
+[Fri May  4 10:48:25 2012] crosslinker.pl: Protease type:C
+[Fri May  4 10:48:25 2012] crosslinker.pl: Sequence 5 = >rClamp 
+[Fri May  4 10:48:25 2012] crosslinker.pl: Digested peptides size:2877 
+[Fri May  4 10:48:25 2012] crosslinker.pl: No Cut:P
+[Fri May  4 10:48:25 2012] crosslinker.pl: Protease type:C
+[Fri May  4 10:48:25 2012] crosslinker.pl: Sequence 6 = >rExo 
+[Fri May  4 10:48:25 2012] crosslinker.pl: Digested peptides size:3051 
+[Fri May  4 10:48:25 2012] crosslinker.pl: No Cut:P
+[Fri May  4 10:48:25 2012] crosslinker.pl: Protease type:C
+[Fri May  4 10:48:25 2012] crosslinker.pl: Sequence 7 = >rtau 
+[Fri May  4 10:48:25 2012] crosslinker.pl: Digested peptides size:3483 
+[Fri May  4 10:48:46 2012] crosslinker.pl: Exceuting Doublet Search
+[Fri May  4 10:48:46 2012] crosslinker.pl: Finished Doublet Search
+[Fri May  4 10:48:46 2012] crosslinker.pl: Starting Peak Matches...
+[Fri May  4 10:48:46 2012] crosslinker.pl: 50 % Peak mz = 493.25119
+[Fri May  4 10:48:49 2012] crosslinker.pl: Best: AXEEPKK-AMGKK - Score: 271
+[Fri May  4 10:48:49 2012] crosslinker.pl: Time Taken = 0.99628 secs 
+[Fri May  4 10:48:50 2012] crosslinker.pl: Best: AMGKK-KPEEXAK - Score: 354
+[Fri May  4 10:48:50 2012] crosslinker.pl: Time Taken = 1.120946 secs 
+[Fri May  4 10:48:56 2012] crosslinker.pl: 100 % Peak mz = 739.37335
+[Fri May  4 10:48:59 2012] crosslinker.pl: Best: AXEEPKK-AMGKK - Score: 259
+[Fri May  4 10:48:59 2012] crosslinker.pl: Time Taken = 0.896127 secs 
+[Fri May  4 10:49:00 2012] crosslinker.pl: Best: AMGKK-KPEEXAK - Score: 465
+[Fri May  4 10:49:00 2012] crosslinker.pl: Time Taken = 0.992608 secs 
+[Fri May  4 10:49:07 2012] crosslinker.pl: Queue empty
+[Fri May  4 10:49:07 2012] crosslinker.pl: completed
