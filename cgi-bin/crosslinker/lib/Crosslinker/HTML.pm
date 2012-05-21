@@ -9,7 +9,8 @@ use Crosslinker::Scoring;
 use Crosslinker::Constants;
 use base 'Exporter';
 our @EXPORT =
-  ( 'generate_page', 'print_heading', 'print_subheading', 'print_page_top', 'print_page_bottom', 'print_page_top_fancy', 'print_page_bottom_fancy' );
+  ( 'generate_page', 'print_heading', 'print_subheading', 'print_page_top', 'print_page_bottom', 'print_page_top_fancy', 'print_page_bottom_fancy',
+    'mgf_doublet_search');
 ######
 #
 # Creates html for pages
@@ -111,6 +112,38 @@ sub generate_page {
    }
    return '-1';
 }
+
+
+sub mgf_doublet_search {
+   
+   my (
+        $upload_filehandle_ref, $doublet_tolerance,   $seperation, $isotope, $linkspacing, $dbh,
+	$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width
+    ) = @_;
+
+  
+   
+   my @upload_filehandle   = @{$upload_filehandle_ref};
+   
+  
+   create_table($dbh);
+
+  
+      if ( defined( $upload_filehandle[1] ) ) {
+         import_mgf( 1, $upload_filehandle[1], $dbh );
+      }
+   
+   my @peaklist = loaddoubletlist_db( $doublet_tolerance, $seperation,       $isotope,          $dbh, $scan_width,
+                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, );
+
+  print "<table><tr><td>mz</td><td>Monoisoptic mass</td><td>Charge</td><td>Scan 1</td><td>Scan 2</td></tr>";
+  foreach my $peak (@peaklist) {
+    print "<tr><td>$peak->{'mz'} </td><td> $peak->{monoisotopic_mw} </td><td> $peak->{charge}+ </td><td> $peak->{scan_num}</td><td> $peak->{d2_scan_num} </td></tr>"
+  }
+  print "</table>";
+
+}
+
 
 sub print_heading    #Prints HTML heading
 {
@@ -268,8 +301,9 @@ Content-type: text/html\n\n
 </div>
 <div id="menu">
     <ul id="nav">
-        <li id="home"><a id="home" href="/cgi-bin/$path/index.pl">Home</a></li>
-        <li id="results"><a id="results" href="/cgi-bin/$path/results.pl">Results</a></li>
+        <li id="home"><a id="home" href="/cgi-bin/$path/index.pl">Crosslinker</a></li>
+        <li id="results"><a id="results" href="/cgi-bin/$path/results.pl">Crosslinker Results</a></li>
+        <li id="results"><a id="results" href="/cgi-bin/$path/doublet_search.pl">Doublet Search</a></li>
         <li id="results"><a id="results" href="/cgi-bin/$path/settings.pl">Settings</a></li>
    </ul>
 </div>

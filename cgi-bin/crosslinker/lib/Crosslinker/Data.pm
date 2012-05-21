@@ -9,7 +9,8 @@ use Crosslinker::Config;
 our @EXPORT = (
                 'connect_db',    'check_state',  'give_permission',    'is_ready',            'disconnect_db', 'set_finished',
                 'save_settings', 'update_state', 'import_cgi_query',   'find_free_tablename', 'matchpeaks',    'create_table',
-                'import_mgf',    'import_csv',   'loaddoubletlist_db', 'generate_decoy',      'set_doublets_found'
+                'import_mgf',    'import_csv',   'loaddoubletlist_db', 'generate_decoy',      'set_doublets_found',
+		'import_mgf_doublet_query'
 );
 ######
 #
@@ -416,6 +417,42 @@ sub import_cgi_query {
             $ms2_error,         $mass_seperation, $isotope,            $linkspacing,        $mono_mass_diff,  $xlinker_mass,
             \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c
    );
+}
+
+
+sub import_mgf_doublet_query {
+   my ( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 ) = @_;
+
+   my $conf_dbh = connect_conf_db;
+
+   my @upload_filehandle;
+   $upload_filehandle[1] = $query->upload("mgf");
+
+   my $doublet_tolerance = $query->param("ms_ppm");
+
+   my $isotope        = $query->param("isotope");
+   my $linkspacing    = $query->param('seperation');
+   my $scan_width    = $query->param('scan_width');
+
+   if ( $query->param('crosslinker') != -1 ) {
+
+      my $crosslinkers = get_conf_value( $conf_dbh, $query->param('crosslinker') );
+      my $crosslinker = $crosslinkers->fetchrow_hashref();
+
+      warn "Reagent: $crosslinker->{'name'} \n";
+      $isotope        = $crosslinker->{'setting4'};
+      $linkspacing    = $crosslinker->{'setting5'};
+   }
+
+   my $mass_seperation;
+   if ( $isotope eq "deuterium" ) {
+      $mass_seperation = $linkspacing * ( $mass_of_deuterium - $mass_of_hydrogen );
+   } else {
+      $mass_seperation = $linkspacing * ( $mass_of_carbon13 - $mass_of_carbon12 );
+   }
+
+   $conf_dbh->disconnect();
+   return (\@upload_filehandle, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width   );
 }
 
 sub find_free_tablename {
