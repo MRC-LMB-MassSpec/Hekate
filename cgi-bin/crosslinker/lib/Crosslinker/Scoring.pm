@@ -372,6 +372,10 @@ sub calc_score {
                         {
                            $n                    = 0;
                            $add_isotope_to_heavy = 0;
+                        } elsif (    $residue_no > $xlink_position[$i]
+                             && $sequence =~ m/^[^-]*$/ )
+                        {
+                           $add_isotope_to_heavy = 0;
                         }
 
                         if (
@@ -389,7 +393,7 @@ sub calc_score {
                           )
                         {
 
-                           # 				    warn "Generating Y,$residue_no - $xlink_position[$i], $mod_position";
+                            				    warn "Generating Y,$residue_no - $xlink_position[$i], $mod_position";
 
                            my $mz =
                              ( ( $ion_mass + $terminalmass + ( $charge * $mass_of_hydrogen ) + ( $n * ( $xlink + $xlink_half[ abs( $i - 1 ) ] ) ) ) / $charge );
@@ -399,19 +403,19 @@ sub calc_score {
                               $fragment_residues = $fragment_residues . '-' . $peptides[ abs( $i - 1 ) ];
                            }
 
-                           # 			    warn "n:$n i:$i +:$charge x:$xlink_position[0] y:$xlink_position[1] $fragment_residues  ", "\n";
-                           #                                 warn $mz, " Y $i $residue_no";
+                            			    warn "n:$n i:$i +:$charge x:$xlink_position[0] y:$xlink_position[1] $fragment_residues  ", "\n";
+                                                           warn $mz, " Y $i $residue_no";
                            $new_theoretical->execute( $mz, 'Y', $i, @residues - $residue_no,
                                                       $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '', $add_isotope_to_heavy )
                              ;    #need to calc position not needed atm.
 
-                           #                                 warn "Y $i", $mz;
+                                                            warn "Y $i", $mz;
                            $new_theoretical->execute( $mz + ($seperation_mz),
                                                       'Y', $i, @residues - $residue_no,
                                                       $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '', $add_isotope_to_heavy )
                              ;    #need to calc position not needed atm.
 
-                           # 				warn  "Y(H) $i", $mz+$seperation_mz ;
+                           				warn  "Y(H) $i", $mz+$seperation_mz ;
                            if (    $fragment_residues =~ /[STED]/
                                 && $ms2_fragmentation{'waterloss'} )
                            {      #WATER loss
