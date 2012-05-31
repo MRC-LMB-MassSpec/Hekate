@@ -190,13 +190,13 @@ sub crosslink_digest {
 	      for ( my $x = 1 ; $x <=  $rxn_residues  ; $x++ ) {
 	      if ( ($xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x) > $min_peptide_mass && ($xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x)  <$max_peptide_mass) {
 	       if ($x > 1) {
-		      my $source = substr($sequence_names[substr($xlink_fragment_sources{$_},0,1)],1)."-".substr($sequence_names[substr($xlink_fragment_sources{$_},1,-1)],1);
+		      my $source = substr($sequence_names[substr($xlink_fragment_sources{$_},0,1)],1),"-",substr($sequence_names[substr($xlink_fragment_sources{$_},-1)],1);
 		      my $mass =  $xlink_fragment_masses{$_}+1.00728+$modifications{$modification}{Delta} *$x ;
 		      $line{$xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x} =
 		      "</td><td>$_ </td><td>$modifications{$modification}{Name} x $x</td><td>$mass</td><td> $source </td></tr>";
 
 	       } else { 
-		      my $source = substr($sequence_names[substr($xlink_fragment_sources{$_},0,1)],1)."-".substr($sequence_names[substr($xlink_fragment_sources{$_},1,-1)],1);
+		      my $source = substr($sequence_names[substr($xlink_fragment_sources{$_},0,1)],1),"-",substr($sequence_names[substr($xlink_fragment_sources{$_},-1)],1);
 		      my $mass =  $xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x ;
 		      $line{$xlink_fragment_masses{$_}+1.00728+$modifications{$modification}{Delta} *$x} =
 		      "</td><td>$_ </td><td>$modifications{$modification}{Name} </td><td>$mass</td><td> $source </td></tr>";
@@ -231,7 +231,7 @@ print "<h2>Monolinks</h2>";
 	    foreach my $modification ( reverse sort( keys %modifications ) ) {
 		my $location = $modifications{$modification}{Location};
 		my $rxn_residues = @{ [ $_ =~ /$location/g ] };
-	    if (    !( $modifications{$modification}{Name} eq "loop link" && @{ [ substr($fragment,-1) =~ /$location/g ] }< 2 )
+	    if (    !( $modifications{$modification}{Name} eq "loop link" && @{ [ substr($_,-1) =~ /$location/g ] }< 2 )
                  && !( $modifications{$modification}{Name} eq "mono link" )
 		)   
             {
