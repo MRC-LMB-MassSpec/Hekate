@@ -76,9 +76,9 @@ sub constants {
 
    my $no_of_fractions    = 20;
    my $min_peptide_length = '3';
-   my $scan_width         = 60;
+#    my $scan_width         = 60;
 
-   return ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, $mass_of_carbon13, $no_of_fractions, $min_peptide_length, $scan_width );
+   return ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, $mass_of_carbon13, $no_of_fractions, $min_peptide_length );
 }
 
 sub version {

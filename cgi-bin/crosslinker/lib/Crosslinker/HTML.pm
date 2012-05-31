@@ -10,7 +10,7 @@ use Crosslinker::Constants;
 use base 'Exporter';
 our @EXPORT =
   ( 'generate_page', 'print_heading', 'print_subheading', 'print_page_top', 'print_page_bottom', 'print_page_top_fancy', 'print_page_bottom_fancy',
-    'mgf_doublet_search');
+    'mgf_doublet_search', 'crosslink_digest');
 ######
 #
 # Creates html for pages
@@ -112,6 +112,167 @@ sub generate_page {
    }
    return '-1';
 }
+
+sub crosslink_digest {
+  
+   #This really should be in data or similar, but in the past it generated a page, now it insteads puts the results into the DB.
+   #much nicer, but hence the strange name.
+
+   my (
+        $protien_sequences,     $dbh,                $results_dbh,        $settings_dbh,      $results_table,      $no_of_fractions,
+        $upload_filehandle_ref, $csv_filehandle_ref, $missed_clevages,    $cut_residues,      $nocut_residues,     $protein_residuemass_ref,
+        $reactive_site,         $scan_width,         $sequence_names_ref, $match_ppm,         $min_peptide_length, $mass_of_deuterium,
+        $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
+        $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
+        $threshold,		$n_or_c,	     $max_peptide_mass,	  $min_peptide_mass
+   ) = @_;
+
+   
+   my %protein_residuemass = %{$protein_residuemass_ref};
+   my @csv_filehandle      = @{$csv_filehandle_ref};
+   my @upload_filehandle   = @{$upload_filehandle_ref};
+   my @sequence_names      = @{$sequence_names_ref};
+   my %modifications       = %{$modifications_ref};
+   my %ms2_fragmentation   = %{$ms2_fragmentation_ref};
+
+   my $fragment;
+   my @fragments;
+   my %fragment_source;
+   my @sequence_fragments;
+   my @sequences = split '>', $protien_sequences;
+   my $count = 0;
+
+   create_table($dbh);
+
+   for ( my $n = 1 ; $n <= $no_of_fractions ; $n++ ) {
+      if ( defined( $upload_filehandle[$n] ) ) {
+         import_mgf( $n, $upload_filehandle[$n], $dbh );
+      }
+
+      #   	import_csv($n,$csv_filehandle[$n], $dbh);
+   }
+
+   foreach my $sequence (@sequences) {
+      @sequence_fragments = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
+      @fragments = ( @fragments, @sequence_fragments );
+
+    
+
+      %fragment_source = ( ( map { $_ => $count } @fragments ), %fragment_source );
+      $count++;
+   }
+
+   my %fragment_masses = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
+
+   my ( $xlink_fragment_masses_ref, $xlink_fragment_sources_ref ) =
+     crosslink_peptides( \%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
+   my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
+   %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses );
+   my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source );
+
+  my $n = 1;
+  print "<h2>Crosslinks</h2>";
+  print "<table>";
+  my %line;
+       foreach (sort { $xlink_fragment_masses{$a} <=> $xlink_fragment_masses{$b} } keys  %xlink_fragment_masses) {
+	if ($_ =~ /-/   )
+	{
+	    foreach my $modification ( reverse sort( keys %modifications ) ) {
+		my $location = $modifications{$modification}{Location};
+		my $rxn_residues = @{ [ $_ =~ /$location/g ] };
+		if ($location eq $reactive_site)
+		  { $rxn_residues = $rxn_residues -2};
+	    if (    !( $modifications{$modification}{Name} eq "loop link" )
+                 && !( $modifications{$modification}{Name} eq "mono link" )
+		)   
+	{
+	     
+	      for ( my $x = 1 ; $x <=  $rxn_residues  ; $x++ ) {
+	      if ( ($xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x) > $min_peptide_mass && ($xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x)  <$max_peptide_mass) {
+	       if ($x > 1) {
+		      my $source = substr($sequence_names[substr($xlink_fragment_sources{$_},0,1)],1)."-".substr($sequence_names[substr($xlink_fragment_sources{$_},1,-1)],1);
+		      my $mass =  $xlink_fragment_masses{$_}+1.00728+$modifications{$modification}{Delta} *$x ;
+		      $line{$xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x} =
+		      "</td><td>$_ </td><td>$modifications{$modification}{Name} x $x</td><td>$mass</td><td> $source </td></tr>";
+
+	       } else { 
+		      my $source = substr($sequence_names[substr($xlink_fragment_sources{$_},0,1)],1)."-".substr($sequence_names[substr($xlink_fragment_sources{$_},1,-1)],1);
+		      my $mass =  $xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x ;
+		      $line{$xlink_fragment_masses{$_}+1.00728+$modifications{$modification}{Delta} *$x} =
+		      "</td><td>$_ </td><td>$modifications{$modification}{Name} </td><td>$mass</td><td> $source </td></tr>";
+
+	       }			   
+	      $n++;
+	      
+	      
+#              $fragment_source{$_} = $sequence_names[1];
+	    
+	      }
+  
+	    }
+	  }
+         }
+      }
+      }
+     $n=0;
+     foreach (sort keys %line)
+      { $n++; print "<tr><td>$n.".$line{$_}; }
+     print "</table>";
+
+
+
+my @monolink_masses = split( ",", $mono_mass_diff );
+$n = 1;
+
+print "<h2>Monolinks</h2>"; 
+  print "<table>";
+  my %line;
+       foreach (sort { $xlink_fragment_masses{$a} <=> $xlink_fragment_masses{$b} } keys  %xlink_fragment_masses) {
+	    foreach my $modification ( reverse sort( keys %modifications ) ) {
+		my $location = $modifications{$modification}{Location};
+		my $rxn_residues = @{ [ $_ =~ /$location/g ] };
+	    if (    !( $modifications{$modification}{Name} eq "loop link" && @{ [ substr($fragment,-1) =~ /$location/g ] }< 2 )
+                 && !( $modifications{$modification}{Name} eq "mono link" )
+		)   
+            {
+	  if ($location eq $reactive_site)
+		  { $rxn_residues = $rxn_residues - 1};
+	      if ($_ !~ /-/ && substr($_,0,-1) =~ /$reactive_site/  )
+	      {
+	      for ( my $x = 1 ; $x <=  $rxn_residues  ; $x++ ) {
+	      foreach my $monolink_mass (@monolink_masses){
+	      if ( ($xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x) > $min_peptide_mass && ($xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x)  <$max_peptide_mass) {
+	       if ($x > 1) {
+		      my $source = substr($sequence_names[$xlink_fragment_sources{$_}],1);
+		      my $mass =  $xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x ;
+		      $line{$xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x} =
+		      "</td><td>$_ </td><td>$modifications{$modification}{Name} x $x</td><td>$mass</td><td> $source </td></tr>";
+
+	       } else { 
+		      my $source = substr($sequence_names[$xlink_fragment_sources{$_}],1);
+		      my $mass =  $xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x ;
+		      $line{$xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x} =
+		      "</td><td>$_ </td><td>$modifications{$modification}{Name} </td><td>$mass</td><td> $source </td></tr>";
+
+	       }			   
+	      $n++;
+	      }
+	      }
+	      }
+#              $fragment_source{$_} = $sequence_names[1];
+	    
+	      }
+  
+	    }
+	  }
+         }
+     $n=0;
+     foreach (sort keys %line)
+      { $n++; print "<tr><td>$n.".$line{$_}; }
+     print "</table>";
+
+}
+
 
 
 sub mgf_doublet_search {
@@ -301,9 +462,12 @@ Content-type: text/html\n\n
 </div>
 <div id="menu">
     <ul id="nav">
-        <li id="home"><a id="home" href="/cgi-bin/$path/index.pl">Crosslinker</a></li>
-        <li id="results"><a id="results" href="/cgi-bin/$path/results.pl">Crosslinker Results</a></li>
-        <li id="results"><a id="results" href="/cgi-bin/$path/doublet_search.pl">Doublet Search</a></li>
+        <li id="home"><a id="home" href="/cgi-bin/$path/index.pl">Crosslinker Full Search</a></li>
+        <li id="results"><a id="results" href="/cgi-bin/$path/results.pl">Results</a></li>
+        <li id="results"><a id="results" href="/cgi-bin/$path/doublet_search.pl">Doublet</a></li>
+        <li id="results"><a id="results" href="/cgi-bin/$path/crosslink_digest.pl">Digest</a></li>
+ <!--       <li id="results"><a id="results" href="/cgi-bin/$path/crosslink_fragment.pl">Fragment</a></li>
+       <li id="results"><a id="results" href="/cgi-bin/$path/crosslink_score.pl">Score</a></li> -->
         <li id="results"><a id="results" href="/cgi-bin/$path/settings.pl">Settings</a></li>
    </ul>
 </div>

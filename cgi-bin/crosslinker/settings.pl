@@ -27,11 +27,10 @@ print_page_top_fancy("Settings");
 my $version = version();
 
 my $query = new CGI;
-
 if ( !defined $query->param('page') ) {
    print <<ENDHTML;
 	
-	<h2>Crosslinker Settings</h2>
+	<h1>Crosslinker Settings</h1>
 	<p>
 	<ul>
 	<li><a href="settings.pl?page=enzymes">Enzymes</a></li>

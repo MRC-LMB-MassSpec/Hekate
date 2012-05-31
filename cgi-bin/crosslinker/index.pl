@@ -58,11 +58,13 @@ print <<ENDHTML;
     
         MS2 accurracy (Da) <input type="text" name="ms2_da" size="2" maxlength="3" value="0.5"/><br/>
      Doublet Spacing Tollerance (ppm) <input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/><br/>
-     Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/>          
+     Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/> 
+        
     </td>
   <td class="half"  >
     Max. Missed Cleavages    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="2"/><br/>
     MS1 accurracy (ppm) <input type="text" name="ms1_ppm" size="2" maxlength="2" value="2"/><br/>
+     Max scan seperation<input type="text" name="scan_width" size="4" maxlength="4" value="60"/><br/>
     Decoy Search: <input type="checkbox" name="decoy" value="true"><br/><br/>         
   </td>
 </tr>

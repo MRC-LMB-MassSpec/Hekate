@@ -16,6 +16,7 @@ use Crosslinker::HTML;
 use Crosslinker::Links;
 use Crosslinker::Scoring;
 use Crosslinker::Constants;
+use Crosslinker::Results;
 
 ########################
 #                      #

@@ -25,7 +25,7 @@ my $path = installed;
 #                      #
 ########################
 
-print_page_top_fancy("Home");
+print_page_top_fancy("Doublet Search");
 my $version = version();
 print_heading('Doublet Search');
 print <<ENDHTML;
@@ -37,9 +37,9 @@ print <<ENDHTML;
   <table >
  <tr>
   <td>Doublet Spacing Tollerance (ppm) <input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/></td>
- <td>Max Scan seperation<input type="text" name="scan_width" size="4" maxlength="4" value="60"/></td>
+ <td>Max scan seperation<input type="text" name="scan_width" size="4" maxlength="4" value="60"/></td>
  </tr><tr>
-  <td class="half"  style="background: white;">
+  <td>
     Crosslinking Reagent:<select name='crosslinker'>
 ENDHTML
 
@@ -49,16 +49,14 @@ while ( ( my $crosslinker = $crosslinkers->fetchrow_hashref ) ) {
    print "<option value='" . $crosslinker->{'rowid'} . "'>" . $crosslinker->{'name'} . "</option>";
 }
 $crosslinkers->finish();
-print "<option value='-1' selected='true'>Custom (enter below)</option></select>";
+print "<option value='-1' selected='true'>Custom (enter right)</option></select>";
 print <<ENDHTML;
-  </td><td style="background: white;"></td>
-    </tr>
-    <tr>
-  <td class="half"  >
-      Atoms on  <select
+  </td>
+  <td>
+      Atoms: <select
 name="isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select>
  
-in heavy form: <input type="text" 
+In heavy form: <input type="text" 
 name="seperation" size="2" maxlength="5" 
 value="4"/> 
 </td>

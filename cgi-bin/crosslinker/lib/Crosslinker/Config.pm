@@ -32,9 +32,9 @@ sub get_conf_value {
 
 sub get_mods {
 
-   my ( $table, $mod_type ) = @_;
+   my ( $table, $mod_type, $dbh ) = @_;
 
-   my $dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
+   if (!defined $dbh) { $dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } )};
    my $sql = $dbh->prepare("SELECT * FROM modifications WHERE run_id = ? AND mod_type = ?");
    $sql->execute( $table, $mod_type );
    return $sql;

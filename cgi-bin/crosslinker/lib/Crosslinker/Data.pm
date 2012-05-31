@@ -308,6 +308,7 @@ sub import_cgi_query {
    my ( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 ) = @_;
    my $fasta = $query->param('user_protein_sequence');
    my $decoy = $query->param('decoy');
+   my $scan_width = $query->param('scan_width');
 
    my $protien_sequences;
    my $conf_dbh = connect_conf_db;
@@ -415,7 +416,7 @@ sub import_cgi_query {
             $protien_sequences, \@sequence_names, $missed_clevages,    \@upload_filehandle, \@csv_filehandle, $reactive_site,
             $cut_residues,      $nocut_residues,  $fasta,              $desc,               $decoy,           $match_ppm,
             $ms2_error,         $mass_seperation, $isotope,            $linkspacing,        $mono_mass_diff,  $xlinker_mass,
-            \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c
+            \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c,	      $scan_width
    );
 }
 

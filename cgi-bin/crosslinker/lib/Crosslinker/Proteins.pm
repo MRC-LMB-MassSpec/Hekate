@@ -9,7 +9,7 @@ our @EXPORT = ( 'modifications', 'residue_position', 'digest_proteins', 'digest_
 
 sub modifications {
 
-   my ( $mono_mass_diff, $xlinker_mass, $reactive_site, $table ) = @_;
+   my ( $mono_mass_diff, $xlinker_mass, $reactive_site, $table, $dbh ) = @_;
 
    my %modifications = (
 
@@ -44,7 +44,7 @@ sub modifications {
    #          }
 
    if ( defined $table ) {
-      my $dynamic_mods = get_mods( $table, 'dynamic' );
+      my $dynamic_mods = get_mods( $table, 'dynamic', $dbh );
       while ( ( my $dynamic_mod = $dynamic_mods->fetchrow_hashref ) ) {
          $modifications{ $dynamic_mod->{'mod_id'} }{'Name'}     = $dynamic_mod->{'mod_name'};
          $modifications{ $dynamic_mod->{'mod_id'} }{'Location'} = $dynamic_mod->{'mod_residue'};
