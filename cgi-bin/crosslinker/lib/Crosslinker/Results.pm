@@ -498,13 +498,14 @@ sub print_results_combined {
    my (
         $top_hits,          $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues,
         $protien_sequences, $reactive_site,    $dbh,               $xlinker_mass,     $mono_mass_diff,   $mass_seperation_ref,
-        $table,             $repeats,          $scan_repeats,      $no_tables
+        $table,             $repeats,          $scan_repeats,      $no_tables,	      $xlink_mono_or_all
    ) = @_;
 
    my %mass_seperation = %{$mass_seperation_ref};
 
    if ( !$repeats )   { $repeats   = 0 }
    if ( !$no_tables ) { $no_tables = 0 }
+   if ( !defined $xlink_mono_or_all ) 	{ $xlink_mono_or_all  = 0 }
 
    my $fasta = $protien_sequences;
    $protien_sequences =~ s/^>.*$/>/mg;
@@ -527,12 +528,14 @@ sub print_results_combined {
       if (
            (
                 !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far )
-             && !( grep $_ eq $top_hits_results->{'mz'}, @mz_so_far )
-             && !( grep $_ eq $top_hits_results->{'name'} . $top_hits_results->{'scan'}, @scan_so_far )
+             && !( grep $_ eq $top_hits_results->{'mz'},   @mz_so_far )
+             && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
              && $repeats == 0
+	     &&    (( $top_hits_results->{'fragment'} =~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 2 ))
+		|| ( $top_hits_results->{'fragment'} !~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 1 )))
            )
            || (    $repeats == 1
-                && !( grep $_ eq $top_hits_results->{'name'} . $top_hits_results->{'scan'}, @scan_so_far )
+                && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
                 && $scan_repeats == 0 )
            || ( $repeats == 1 && $scan_repeats == 1 )
         )
