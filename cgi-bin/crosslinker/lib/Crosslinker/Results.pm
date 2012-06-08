@@ -430,7 +430,7 @@ sub print_results {
          push @scan_so_far, $top_hits_results->{'scan'};
          my $rounded = sprintf( "%.3f", $top_hits_results->{'ppm'} );
 
-           print "<tr><td>", $printed_hits + 1, "</td><td><a href='view_scan.pl?table=$table&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}'>$top_hits_results->{'score'}</a></td><td>$top_hits_results->{'mz'}</td><td>$top_hits_results->{'charge'}+</td><td>$rounded</td>";
+           print "<tr><td>", $printed_hits + 1, "</td><td>$top_hits_results->{'score'}/$top_hits_results->{'best_alpha'}/$top_hits_results->{'best_beta'}</td><td><a href='view_scan.pl?table=$table&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}'>$top_hits_results->{'mz'}</a></td><td>$top_hits_results->{'charge'}+</td><td>$rounded</td>";
            my @fragments = split( '-', $top_hits_results->{'fragment'} );
            my @unmodified_fragments =
              split( '-', $top_hits_results->{'unmodified_fragment'} );

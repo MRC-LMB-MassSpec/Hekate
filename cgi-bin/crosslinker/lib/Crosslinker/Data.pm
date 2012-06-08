@@ -74,7 +74,9 @@ sub connect_db {
      						      matched_crosslink,
 						      d2_matched_common,
 						      d2_matched_crosslink,
-						      monolink_mass) "
+						      monolink_mass,
+						      best_alpha,
+						      best_beta) "
    );
 
    return ( $dbh, $results_dbh, $settings_dbh );
@@ -380,16 +382,29 @@ sub import_cgi_query {
    if   ( defined $query->param('yions') ) { $ms2_fragmentation{'yions'} = '1' }
    else                                    { $ms2_fragmentation{'yions'} = '0' }
 
-   if ( defined $query->param('waterloss') ) {
-      $ms2_fragmentation{'waterloss'} = '1';
-   } else {
-      $ms2_fragmentation{'waterloss'} = '0';
-   }
-   if ( defined $query->param('ammonialoss') ) {
-      $ms2_fragmentation{'ammonialoss'} = '1';
-   } else {
-      $ms2_fragmentation{'ammonialoss'} = '0';
-   }
+   if ( defined $query->param('waterloss') )   { $ms2_fragmentation{'waterloss'} = '1'; }
+   else {				         $ms2_fragmentation{'waterloss'} = '0'; }
+   if ( defined $query->param('ammonialoss') ) { $ms2_fragmentation{'ammonialoss'} = '1';}
+   else {				         $ms2_fragmentation{'ammonialoss'} = '0';}
+   
+   if   ( defined $query->param('aions-score') ) { $ms2_fragmentation{'aions-score'} = '1' }
+   else                                    { $ms2_fragmentation{'aions-score'} = '0' }
+   if   ( defined $query->param('bions-score') ) { $ms2_fragmentation{'bions-score'} = '1' }
+   else                                    { $ms2_fragmentation{'bions-score'} = '0' }
+   if   ( defined $query->param('yions-score') ) { $ms2_fragmentation{'yions-score'} = '1' }
+   else                                    { $ms2_fragmentation{'yions-score'} = '0' }
+
+   if ( defined $query->param('waterloss-score') )   { $ms2_fragmentation{'waterloss-score'} = '1'; }
+   else {				         $ms2_fragmentation{'waterloss-score'} = '0'; }
+   if ( defined $query->param('ammonialoss-score') ) { $ms2_fragmentation{'ammonialoss-score'} = '1';}
+   else {				         $ms2_fragmentation{'ammonialoss-score'} = '0';}
+
+#   warn "aions:". $query->param('aions-score'),",$ms2_fragmentation{'aions-score'}";
+#   warn "bions:". $query->param('bions-score'),",$ms2_fragmentation{'bions-score'}";
+#   warn "yions:". $query->param('yions-score'),",$ms2_fragmentation{'yions-score'}";
+#   warn "wions:". $query->param('waterloss-score'),",$ms2_fragmentation{'waterloss-score'}";
+#   warn "nions:". $query->param('ammonialoss-score'),",$ms2_fragmentation{'ammonialoss-score'}";
+
 
    if ( $query->param('crosslinker') != -1 ) {
 
@@ -569,8 +584,10 @@ sub matchpeaks {
      						      matched_crosslink,
 						      d2_matched_common,
 						      d2_matched_crosslink, 
-						      monolink_mass
-						      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+						      monolink_mass,
+						      best_alpha,
+						      best_beta
+						      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
    );
 
 #######
@@ -686,7 +703,8 @@ sub matchpeaks {
                            my (
                                 $ms2_score,      $modified_fragment, $best_x,               $best_y,          $top_10,
                                 $d2_top_10,      $matched_abundance, $d2_matched_abundance, $total_abundance, $d2_total_abundance,
-                                $matched_common, $matched_crosslink, $d2_matched_common,    $d2_matched_crosslink
+                                $matched_common, $matched_crosslink, $d2_matched_common,    $d2_matched_crosslink,
+				$best_alpha,	 $best_beta
                              )
                              = calc_score(
                                            \%protein_residuemass, $MSn_string,    $d2_MSn_string,      $fragment,
@@ -713,7 +731,7 @@ sub matchpeaks {
                                                   $d2_top_10,                         $matched_abundance,            $d2_matched_abundance,
                                                   $total_abundance,                   $d2_total_abundance,           $matched_common,
                                                   $matched_crosslink,                 $d2_matched_common,            $d2_matched_crosslink,
-                                                  $monolink_mass
+                                                  $monolink_mass,		      $best_alpha,		     $best_beta
                            );
 
 # 		       $results_sql->execute($d2_MSn_string,$d2_MSn_string,$peak->{'d2_mz'},$peak->{'d2_charge'},$d2_modified_fragment, @sequences[(substr($fragment_sources{$fragment},0,1)-1)],@sequences[(substr($fragment_sources{$fragment},-1,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},0,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},-1,1)-1)],$d2_ms2_score, $peak->{'fraction'},"d2_".$peak->{'scan_num'},"d2_".$peak->{'d2_scan_num'}, $modification,$n,$d2_best_x,$d2_best_y,$fragment, $d2_score, $d2_top_10);

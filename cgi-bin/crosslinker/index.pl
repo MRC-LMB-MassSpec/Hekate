@@ -56,16 +56,17 @@ $enzymes->finish();
 print <<ENDHTML;
     </select><br/>
     
-        MS2 accurracy (Da) <input type="text" name="ms2_da" size="2" maxlength="3" value="0.5"/><br/>
+        MS2 accurracy (Da) <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/><br/>
      Doublet Spacing Tollerance (ppm) <input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/><br/>
      Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/> 
-        
+    Intensity Match: <input type="checkbox" name="intensity_match" value="true"><br/>
     </td>
   <td class="half"  >
     Max. Missed Cleavages    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="2"/><br/>
     MS1 accurracy (ppm) <input type="text" name="ms1_ppm" size="2" maxlength="2" value="2"/><br/>
      Max scan seperation<input type="text" name="scan_width" size="4" maxlength="4" value="60"/><br/>
-    Decoy Search: <input type="checkbox" name="decoy" value="true"><br/><br/>         
+    Decoy Search: <input type="checkbox" name="decoy" value="true"><br/>       
+    Require Charge Match: <input type="checkbox" name="charge_match" value="true"><br/>    
   </td>
 </tr>
 <tr>
@@ -133,7 +134,7 @@ value="4"/>
 </tr>
 <tr>
   <td class="half"  style="background: white;">
-    Fragment Ions:
+    Fragment Ions (Label):
    </td>
 </tr>
 <tr>
@@ -145,6 +146,22 @@ value="4"/>
 <td class="half">
    <input type="checkbox" name="waterloss" checked="checked" value="1">Water Loss
    <input type="checkbox" name="ammonialoss"checked="checked" value="1"> Ammonia Loss
+</td>
+</tr>
+<tr>
+  <td class="half"  style="background: white;">
+    Fragment Ions (Score):
+   </td>
+</tr>
+<tr>
+  <td class="half">
+    <input type="checkbox" name="aions-score" value="1"/> A-ions
+    <input type="checkbox" name="bions-score" checked="checked"  value="1"/> B-ions
+    <input type="checkbox" name="yions-score" checked="checked"  value="1"/> Y-ions
+</td>
+<td class="half">
+   <input type="checkbox" name="waterloss-score"  value="1">Water Loss
+   <input type="checkbox" name="ammonialoss-score" value="1"> Ammonia Loss
 </td>
 </tr>
 </table>
