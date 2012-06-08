@@ -128,7 +128,7 @@ if ( defined $order ) {
      ;    #nice injection problem here, need to sort
 } else {
    $top_hits =
-     $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC" );    #nice injection problem here, need to sort
+     $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score  DESC" );    # min (best_alpha,best_beta)
 }
 $top_hits->execute($table);
 print_results(

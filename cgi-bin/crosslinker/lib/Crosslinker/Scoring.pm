@@ -1101,10 +1101,14 @@ sub calc_score {
    my $returned_score = sprintf( "%.0f", ($best_match) );
    $best_alpha = sprintf( "%.0f", ($best_alpha) );
    $best_beta = sprintf( "%.0f", ($best_beta) );
+
+
+   my $min_chain_score;
+   if ($best_alpha < $best_beta) {$min_chain_score = $best_alpha } else {$min_chain_score = $best_beta}
    return (
             $returned_score, $best_sequence,     $best_x,               $best_y,          $top_10,
             $d2_top_10,      $matched_abundance, $d2_matched_abundance, $total_abundance, $d2_total_abundance,
-            $matched_common, $matched_crosslink, $d2_matched_common,    $d2_matched_crosslink, $best_alpha, $best_beta
+            $matched_common, $matched_crosslink, $d2_matched_common,    $d2_matched_crosslink, $best_alpha, $best_beta, $min_chain_score
    );
 }
 

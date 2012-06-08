@@ -75,8 +75,9 @@ sub connect_db {
 						      d2_matched_common,
 						      d2_matched_crosslink,
 						      monolink_mass,
-						      best_alpha,
-						      best_beta) "
+						      best_alpha REAL,
+						      best_beta REAL,
+						      min_chain_score) "
    );
 
    return ( $dbh, $results_dbh, $settings_dbh );
@@ -587,7 +588,7 @@ sub matchpeaks {
 						      monolink_mass,
 						      best_alpha,
 						      best_beta
-						      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+						      )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
    );
 
 #######
@@ -704,7 +705,7 @@ sub matchpeaks {
                                 $ms2_score,      $modified_fragment, $best_x,               $best_y,          $top_10,
                                 $d2_top_10,      $matched_abundance, $d2_matched_abundance, $total_abundance, $d2_total_abundance,
                                 $matched_common, $matched_crosslink, $d2_matched_common,    $d2_matched_crosslink,
-				$best_alpha,	 $best_beta
+				$best_alpha,	 $best_beta, $min_chain_score
                              )
                              = calc_score(
                                            \%protein_residuemass, $MSn_string,    $d2_MSn_string,      $fragment,
