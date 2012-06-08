@@ -788,12 +788,12 @@ sub calc_score {
 
 
                $count = $dbh->prepare(
-                          "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '0'AND peptide_chain ='0'  AND is_scored = '1'" );
+                          "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '0' AND peptide_chain ='0'  AND is_scored = '1'" );
                $count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
                my $n_alpha = $count->fetchrow_array;
 
                $count = $dbh->prepare(
-                          "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '1'AND peptide_chain ='0'  AND is_scored = '1'" );
+                          "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '1' AND peptide_chain ='0'  AND is_scored = '1'" );
                $count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
                my $n_alpha_d2 = $count->fetchrow_array;
 
@@ -826,7 +826,7 @@ sub calc_score {
                   my $k = $count->fetchrow_array;
 
 
-         my $count = $dbh->prepare(
+         $count = $dbh->prepare(
 "SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 0  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1'AND theoretical.peptide_chain = '0'"
                   );
                   $count->execute( $interval,
@@ -835,17 +835,17 @@ sub calc_score {
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
                   my $k_alpha = $count->fetchrow_array;
 
-         my $count = $dbh->prepare(
-"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 0  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1'AND theoretical.peptide_chain = '0'"
+                  $count = $dbh->prepare(
+"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' and theoretical.peptide_chain = '0'"
                   );
                   $count->execute( $interval,
                                    $interval + $interval_range,
-                                   ( $max_abundance * $threshold / 100 ),
+                                   ( $max_abundance_d2 * $threshold / 100 ),
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
-                  my $k_alpha_d2 = $count->fetchrow_array;
+                   my $k_alpha_d2 = $count->fetchrow_array;
 
 
-         my $count = $dbh->prepare(
+         $count = $dbh->prepare(
 "SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 0  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1' AND theoretical.peptide_chain = '1'"
                   );
                   $count->execute( $interval,
@@ -854,8 +854,8 @@ sub calc_score {
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
                   my $k_beta = $count->fetchrow_array;
 
-         my $count = $dbh->prepare(
-"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 0  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' AND theoretical.peptide_chain = '1'"
+	$count = $dbh->prepare(
+"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' AND theoretical.peptide_chain = '1'"
                   );
                   $count->execute( $interval,
                                    $interval + $interval_range,
@@ -864,20 +864,16 @@ sub calc_score {
                   my $k_beta_d2 = $count->fetchrow_array;
 
 
-# my $count = $dbh->prepare("SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select * from ms2 WHERE mass > ? AND mass <= ? AND ms2.heavy_light = 1 ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1'");
-# $count = $dbh->prepare("select COUNT(mass) from ms2 WHERE mass > ? AND mass <= ? AND ms2.heavy_light = 1 ORDER BY ms2.abundance+0 ");
                   $count = $dbh->prepare(
 "SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1'"
                   );
-
-# $count->execute ( $interval,$interval+$interval_range,$q, $ms2_error,$ms2_error, $xlink_position[0],$xlink_position[1],$sequence, $interval,$interval+$interval_range);
                   $count->execute( $interval,
                                    $interval + $interval_range,
                                    ( $max_abundance_d2 * $threshold / 100 ),
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
                   my $d2_k = $count->fetchrow_array;
 
-#                    warn "d2_k,n = $d2_k, $d2_n k,n = $k,$n";
+                 warn "$sequence k_a+b/na+b = ",$k_alpha+$k_beta,"/",$n_alpha+$n_beta,", k/n=$k/$n NEED TO TEST D2 lines";
 
                   my $d0_score = 0;
                   my $d2_score = 0;
@@ -920,7 +916,7 @@ sub calc_score {
            for ( my $j = $k_alpha_d2 ; $j <= $n_alpha_d2 ; $j++ ) {
                       my $binomial_coefficient;
                       if ( $n_alpha_d2 > 150 ) {
-                         my $binomial = Math::BigRat->new( scalar($n_alpha) );
+                         my $binomial = Math::BigRat->new( scalar($n_alpha_d2) );
                          $binomial->bnok($j);
                          $binomial_coefficient = $binomial->as_float();
  
@@ -935,7 +931,7 @@ sub calc_score {
                  for ( my $j = $k_beta ; $j <= $n_beta ; $j++ ) {
                       my $binomial_coefficient;
                       if ( $n_beta > 150 ) {
-                         my $binomial = Math::BigRat->new( scalar($n_beta) );
+                         my $binomial = Math::BigRat->new( scalar($n_beta_d2) );
                          $binomial->bnok($j);
                          $binomial_coefficient = $binomial->as_float();
  
@@ -1000,6 +996,7 @@ sub calc_score {
             }
 
             if ( ( -10 * log $score_total ) > $best_match ) {
+	       warn "d0_score = $d0_score_total,d2_score = $d2_score_total, alpha_score=$score_alpha_total, alpha_d2_score=$score_alpha_d2_total";
                $best_match    = -10 * log $score_total;
 	       $best_alpha    = -10 * log ($score_alpha_total * $score_alpha_d2_total );
 	       $best_beta     = -10 * log ($score_beta_total  * $score_beta_d2_total  );
@@ -1094,7 +1091,7 @@ sub calc_score {
    $dbh->disconnect();
 
     if ( $best_match > 0 ) {
-      warn "Best: $best_sequence - Score: ", sprintf( "%.0f", ($best_match) ),"\n";
+      warn "Best: $best_sequence - Score: ", sprintf( "%.0f", ($best_match) )," - Score(alpha): ", sprintf( "%.0f", ($best_alpha) ),"\n";
     }
    my $td = tv_interval($t0);
    warn "Time Taken = ", $td, " secs \n";
