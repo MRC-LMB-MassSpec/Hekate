@@ -41,6 +41,7 @@ my $data_green    = "";
 my $data_match    = "";
 my $data_red      = "";
 my $max_abundance = 0;
+my $d2_max_abundance = 0;
 my $total_ion_current_corrected;
 my $total_ion_current = 0;
 my $path = installed;
@@ -150,8 +151,8 @@ function getValue(varname)
 </div>
 <div id="menu">
     <ul id="nav">
-        <li id="home"><a id="home" href="/cgi-bin//$path/index.pl">Home</a></li>
-        <li id="results"><a id="results" href="/cgi-bin/$path/results.pl">Results</a></li>
+        <li id="home"><a id="home" href="/cgi-bin/$path/index.pl">Crosslinker Full Search</a></li>
+        <li id="results"><a id="results" href="/cgi-bin/$path/results.pl">Crosslinker Results</a></li>
    </ul>
 </div>
 <div id="banner">
@@ -177,8 +178,8 @@ print <<ENDHTML;
 
   <div id="overview" style="margin: auto;width:400px;height:50px"></div>
 <table><tr><td colspan="2"><span style="font-weight: bold">Key</span></td></tr>
-<tr><td> Green</td><td>Peaks in Both Spectra</td></tr>
-<tr><td>  Red</td><td>  Shifted Peaks between Spectra</td></tr>
+<tr><td> Yellow</td><td>Peaks in Both Spectra</td></tr>
+<tr><td>  Purple</td><td>  Shifted Peaks between Spectra</td></tr>
 <tr><td> Black dot</td><td>Matched</td></tr>
 </table>
 </p>
@@ -243,27 +244,32 @@ foreach my $mass_abundance (@masses) {
 if ( $data2 ne "" ) {
    $dbh->do("CREATE TABLE d2_masses  (mass REAL, abundance REAL)");
    my $newline = $dbh->prepare("INSERT INTO d2_masses (mass, abundance) VALUES (?, ?)");
+   my %pre_normalised_d2_data;
    foreach my $mass_abundance (@d2_masses) {
       my ( $mass, $abundance ) = split " ", $mass_abundance;
-      if ( $abundance > $max_abundance ) { $max_abundance = $abundance }
+      if ( $abundance > $d2_max_abundance ) { $d2_max_abundance = $abundance }
       $newline->execute( $mass, $abundance );
-
-      $data_java = $data_java . '[' . $mass . ',' . -$abundance . '],';
+      $pre_normalised_d2_data{$mass} = $abundance;
    }
+   foreach my $mass (keys %pre_normalised_d2_data)
+    {
+      $data_java = $data_java . '[' . $mass . ',' . -$pre_normalised_d2_data{$mass} * $max_abundance / $d2_max_abundance . '],';
+    }
 } else {
    $dbh->do("CREATE TABLE d2_masses AS SELECT * FROM masses");
 }
+
 
 my $mass_seperation_upper = +$ms2_error;
 my $mass_seperation_lower = -$ms2_error;
 my $matchlist = $dbh->prepare(
    "SELECT masses.*, d2_masses.mass as d2_mass, d2_masses.abundance 
-    as d2_abundance FROM masses inner join d2_masses on (d2_masses.mass between masses.mass -  ? and masses.mass + ? AND d2_masses.abundance between masses.abundance*0.5 and masses.abundance*2)"
+    as d2_abundance FROM masses inner join d2_masses on (d2_masses.mass between masses.mass -  ? and masses.mass + ? AND d2_masses.abundance between masses.abundance*0.5*? and masses.abundance*2* ? )"
 );
 my %matched_common;
 my %d2_matched_common;
 my %matched_xlink;
-$matchlist->execute( $match_tol, $match_tol );
+$matchlist->execute( $match_tol, $match_tol,$d2_max_abundance/$max_abundance , $d2_max_abundance/$max_abundance  );
 
 while ( my $searchmass = $matchlist->fetchrow_hashref ) {
    $matched_common{ $searchmass->{'mass'} }       = $searchmass->{'abundance'};
@@ -272,16 +278,18 @@ while ( my $searchmass = $matchlist->fetchrow_hashref ) {
    #   $total_ion_current_corrected = $total_ion_current_corrected + $searchmass->{'abundance'};
    $data_green = $data_green . '[' . $searchmass->{'mass'} . ',' . $searchmass->{'abundance'} . '],';
    if ( $data2 ne "" ) {
-      $data_green = $data_green . '[' . $searchmass->{'d2_mass'} . ',' . -$searchmass->{'d2_abundance'} . '],';
+      $data_green = $data_green . '[' . $searchmass->{'d2_mass'} . ',' . -$searchmass->{'d2_abundance'}* $max_abundance / $d2_max_abundance . '],';
    }
 }
 
+
+
 $matchlist = $dbh->prepare(
    "SELECT masses.*, d2_masses.mass as d2_mass, d2_masses.abundance 
-    as d2_abundance FROM masses inner join d2_masses on (d2_masses.mass between masses.mass +  (?) and masses.mass + (?) AND d2_masses.abundance between masses.abundance*0.5 and masses.abundance*2) "
+    as d2_abundance FROM masses inner join d2_masses on (d2_masses.mass between masses.mass +  (?) and masses.mass + (?) AND d2_masses.abundance between masses.abundance*0.5* ? and masses.abundance*2 * ?) "
 );
 for ( my $i = 1 ; $i < 4 ; $i++ ) {
-   $matchlist->execute( ( $xlink_d / $i ) - $match_tol, ( $xlink_d / $i ) + $match_tol );
+   $matchlist->execute( ( $xlink_d / $i ) - $match_tol, ( $xlink_d / $i ) + $match_tol, $d2_max_abundance/$max_abundance ,$d2_max_abundance/$max_abundance );
    while ( my $searchmass = $matchlist->fetchrow_hashref ) {
       $matched_xlink{ $searchmass->{'mass'} } = $searchmass->{'abundance'};
 
@@ -292,7 +300,7 @@ for ( my $i = 1 ; $i < 4 ; $i++ ) {
       {    #Purely for cosmetic reasons don't add overlapping peaks
          $data_red = $data_red . '[' . $searchmass->{'mass'} . ',' . $searchmass->{'abundance'} . '],';
          if ( $data2 ne "" ) {
-            $data_red = $data_red . '[' . $searchmass->{'d2_mass'} . ',' . -$searchmass->{'d2_abundance'} . '],';
+            $data_red = $data_red . '[' . $searchmass->{'d2_mass'} . ',' . -$searchmass->{'d2_abundance'}* $max_abundance / $d2_max_abundance . '],';
          }
       }
    }
@@ -364,13 +372,13 @@ for ( my $i = 0 ; $i < @peptides ; $i++ ) {
 
                # 	    $matched_TIC = $matched_TIC+ $matched_common{$match};
                if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
-                  print " style='background-color:#008800' >";
+                  print " style='background-color:#888800' >";
                } elsif ( $unsorted_data{$match} / $max_abundance < 0.01 ) {
-                  print " style='background-color:#00AA00' >";
+                  print " style='background-color:#AAAA00' >";
                } elsif ( $unsorted_data{$match} / $max_abundance < 0.1 ) {
-                  print " style='background-color:#00DD00' >";
+                  print " style='background-color:#DDDD00' >";
                } else {
-                  print " style='background-color:#00FF00' >";
+                  print " style='background-color:#FFFF00' >";
                }
             } elsif (    $n == 0
                       && $residue_no > $xlink_pos[$i]
@@ -381,26 +389,26 @@ for ( my $i = 0 ; $i < @peptides ; $i++ ) {
 
                # 	     $matched_TIC = $matched_TIC+ $unsorted_data{$match};
                if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
-                  print " style='background-color:#880000' >";
+                  print " style='background-color:#880088' >";
                } elsif ( $matched_common{$match} / $max_abundance < 0.01 ) {
-                  print " style='background-color:#AA0000' >";
+                  print " style='background-color:#AA00AA' >";
                } elsif ( $matched_common{$match} / $max_abundance < 0.1 ) {
-                  print " style='background-color:#DD0000' >";
+                  print " style='background-color:#DD00DD' >";
                } else {
-                  print " style='background-color:#FF0000' >";
+                  print " style='background-color:#FF00FF' >";
                }
             } elsif ( $n == 1 && $residue_no > $xlink_pos[$i] && $match != 0 ) {
 
                # 	      $matched_TIC = $matched_TIC+ $unsorted_data{$match};
                $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
                if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
-                  print " style='background-color:#880000' >";
+                  print " style='background-color:#880088' >";
                } elsif ( $unsorted_data{$match} / $max_abundance < 0.01 ) {
-                  print " style='background-color:#AA0000' >";
+                  print " style='background-color:#AA00AA' >";
                } elsif ( $unsorted_data{$match} / $max_abundance < 0.1 ) {
-                  print " style='background-color:#DD0000' >";
+                  print " style='background-color:#DD00DD' >";
                } else {
-                  print " style='background-color:#FF0000' >";
+                  print " style='background-color:#FF00FF' >";
                }
             } elsif (    $residue_no > $xlink_pos[$i]
                       && $sequence =~ /\-/
@@ -481,13 +489,13 @@ for ( my $i = 0 ; $i < @peptides ; $i++ ) {
                # 	    $matched_TIC = $matched_TIC + $matched_common{$match};
                $data_match = $data_match . '[' . ($match) . ',' . $unsorted_data{$match} . '],';
                if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
-                  print " style='background-color:#008800' >";
+                  print " style='background-color:#888800' >";
                } elsif ( $unsorted_data{$match} / $max_abundance < 0.01 ) {
-                  print " style='background-color:#00AA00' >";
+                  print " style='background-color:#AAAA00' >";
                } elsif ( $unsorted_data{$match} / $max_abundance < 0.1 ) {
-                  print " style='background-color:#00DD00' >";
+                  print " style='background-color:#DDDD00' >";
                } else {
-                  print " style='background-color:#00FF00' >";
+                  print " style='background-color:#FFFF00' >";
                }
             } elsif (    $n == 0
                       && $residue_no - 1 < $xlink_pos[$i]
@@ -498,13 +506,13 @@ for ( my $i = 0 ; $i < @peptides ; $i++ ) {
 
                # 	    $matched_TIC = $matched_TIC+ $matched_common{$match};
                if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
-                  print " style='background-color:#880000' >";
+                  print " style='background-color:#880088' >";
                } elsif ( $unsorted_data{$match} / $max_abundance < 0.01 ) {
-                  print " style='background-color:#AA0000' >";
+                  print " style='background-color:#AA00AA' >";
                } elsif ( $unsorted_data{$match} / $max_abundance < 0.1 ) {
-                  print " style='background-color:#DD0000' >";
+                  print " style='background-color:#DD00DD' >";
                } else {
-                  print " style='background-color:#FF0000' >";
+                  print " style='background-color:#FF00FF' >";
                }
             } elsif (    $n == 1
                       && $residue_no - 1 < $xlink_pos[$i]
@@ -514,13 +522,13 @@ for ( my $i = 0 ; $i < @peptides ; $i++ ) {
 
                # 	      $matched_TIC = $matched_TIC+ $unsorted_data{$match};
                if ( $unsorted_data{$match} / $max_abundance < 0.001 ) {
-                  print " style='background-color:#880000' >";
+                  print " style='background-color:#880088' >";
                } elsif ( $unsorted_data{$match} / $max_abundance < 0.01 ) {
-                  print " style='background-color:#AA0000' >";
+                  print " style='background-color:#AA00AA' >";
                } elsif ( $unsorted_data{$match} / $max_abundance < 0.1 ) {
-                  print " style='background-color:#DD0000' >";
+                  print " style='background-color:#DD00DD' >";
                } else {
-                  print " style='background-color:#FF0000' >";
+                  print " style='background-color:#FF00FF' >";
                }
             } elsif (    $residue_no - 1 < $xlink_pos[$i]
                       && $sequence =~ /\-/
@@ -547,8 +555,9 @@ for ( my $i = 0 ; $i < @peptides ; $i++ ) {
 # if ( $total_ion_current_corrected !=0)
 #   {print "<BR><font size=+5>Score:", sprintf ("%.0f", ($matched_TIC/$total_ion_current_corrected *100)), "</font>"};
 
-print "<br/><h2>Ion matches (by intensity)</h2>";
-print "<p>$top_10</p>";
+
+# print "<br/><h2>Crosslinker Ion matches (by intensity) </h2>";
+# print "<p>$top_10</p>";
 
 print <<ENDHTML;
 <script id="source" language="javascript" type="text/javascript">
@@ -590,7 +599,7 @@ print <<ENDHTML
 
 
      var plot = \$.plot(\$("#placeholder"),
-            [ { data: sin, color: '#d0d0d0'}, {data:red,  color: '#ff0000'},{data:green, color: '#00FF00'}, {data:match,points: {show: true}, bars: {show: false}, color: '#000000'} ], options);
+            [ { data: sin, color: '#d0d0d0'}, {data:red,  color: '#9900ff'},{data:green, color: '#ff9900'}, {data:match,points: {show: true}, bars: {show: false}, color: '#000000'} ], options);
  
      function showTooltip(x, y, contents) {
          \$('<div id="tooltip">' + contents + '</div>').css( {
@@ -633,7 +642,7 @@ print <<ENDHTML
 
 
 
- var overview = \$.plot(\$("#overview"), [{ data: sin, color: '#d0d0d0'}, {data:red,  color: '#ff0000'},{data:green,  color: '#00FF00'}], {
+ var overview = \$.plot(\$("#overview"), [{ data: sin, color: '#d0d0d0'}, {data:red,  color: '#9900ff'},{data:green,  color: '#ff9900'}], {
         series: {
             bars: { show: true, lineWidth: 1 },
 	    
@@ -649,7 +658,7 @@ print <<ENDHTML
     
     \$("#placeholder").bind("plotselected", function (event, ranges) {
         // do the zooming
-        plot = \$.plot(\$("#placeholder"), [{ data: sin, color: '#d0d0d0'},{data:red,  color: '#ff0000'}, {data:green, color: '#00FF00'},{data:match,points: {show: true}, bars: {show: false}, color: '#000000'} ],
+        plot = \$.plot(\$("#placeholder"), [{ data: sin, color: '#d0d0d0'},{data:red,  color: '#9900ff'}, {data:green, color: '#ff9900'},{data:match,points: {show: true}, bars: {show: false}, color: '#000000'} ],
                       \$.extend(true, {}, options, {
                           xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
                       }));
