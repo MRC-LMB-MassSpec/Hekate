@@ -64,7 +64,8 @@ if ($child) {
         $protien_sequences, $sequence_names_ref, $missed_clevages,       $upload_filehandle_ref, $csv_filehandle_ref, $reactive_site,
         $cut_residues,      $nocut_residues,     $fasta,                 $desc,                  $decoy,              $match_ppm,
         $ms2_error,         $mass_seperation,    $isotope,               $seperation,            $mono_mass_diff,     $xlinker_mass,
-        $dynamic_mods_ref,  $fixed_mods_ref,     $ms2_fragmentation_ref, $threshold,		 $n_or_c,	      $scan_width
+        $dynamic_mods_ref,  $fixed_mods_ref,     $ms2_fragmentation_ref, $threshold,		 $n_or_c,	      $scan_width,
+	$match_charge
    ) = import_cgi_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
    my @sequence_names    = @{$sequence_names_ref};
    my @upload_filehandle = @{$upload_filehandle_ref};
@@ -94,7 +95,7 @@ if ($child) {
                            $reactive_site,      $scan_width,       \@sequence_names,  $match_ppm,      $min_peptide_length, $mass_of_deuterium,
                            $mass_of_hydrogen,   $mass_of_carbon13, $mass_of_carbon12, \%modifications, $query,              $mono_mass_diff,
                            $xlinker_mass,       $isotope,          $seperation,       $ms2_error,      $state,              \%ms2_fragmentation,
-                           $threshold,		$n_or_c
+                           $threshold,		$n_or_c, 	   $match_charge
    );
 
    #Tidy up

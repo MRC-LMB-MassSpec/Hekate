@@ -374,6 +374,10 @@ sub import_cgi_query {
    my $isotope        = $query->param("isotope");
    my $linkspacing    = $query->param('seperation');
    my $threshold      = $query->param('threshold');
+   my $match_charge   =  0;
+
+   if   ( defined $query->param('charge_match') ) { $match_charge = '1' }
+   else                          	          { $match_charge = '0' }
 
    my %ms2_fragmentation;
    if   ( defined $query->param('aions') ) { $ms2_fragmentation{'aions'} = '1' }
@@ -432,7 +436,8 @@ sub import_cgi_query {
             $protien_sequences, \@sequence_names, $missed_clevages,    \@upload_filehandle, \@csv_filehandle, $reactive_site,
             $cut_residues,      $nocut_residues,  $fasta,              $desc,               $decoy,           $match_ppm,
             $ms2_error,         $mass_seperation, $isotope,            $linkspacing,        $mono_mass_diff,  $xlinker_mass,
-            \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c,	      $scan_width
+            \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c,	      $scan_width,
+	    $match_charge
    );
 }
 
@@ -842,7 +847,7 @@ sub import_csv    #Enters the uploaded CSV into a SQLite database
 sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 {
 
-   my ( $doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, ) = @_;
+   my ( $doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge) = @_;
 
    my $mass_seperation = 0;
    if ( $isotope eq "deuterium" ) {
@@ -875,6 +880,10 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
    $masslist->execute();
 
    if ( $isotope ne "none" ) {
+      my $charge_match_string = "";
+      if ($match_charge == "1") {
+	$charge_match_string = "and d1.charge = d2.charge ";
+      }
       $masslist = $dbh->prepare(
          "SELECT d1.*,
 				  d2.scan_num as d2_scan_num,
@@ -885,8 +894,9 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 				  d2.title as d2_title 
 			  FROM msdata d1 inner join msdata d2 on (d2.monoisotopic_mw between d1.monoisotopic_mw + ? and d1.monoisotopic_mw + ? )
 				  and d2.scan_num between d1.scan_num - ? 
-				  and d1.scan_num + ? 
-				  and d1.fraction = d2.fraction 
+				  and d1.scan_num + ? " . 
+				  $charge_match_string
+				  . "and d1.fraction = d2.fraction 
 				  and d1.msorder = 2
 			  ORDER BY d1.scan_num ASC "
       );
