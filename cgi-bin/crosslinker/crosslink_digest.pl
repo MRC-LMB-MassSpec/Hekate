@@ -29,7 +29,7 @@ print_page_top_fancy("Crosslink Digest");
 my $version = version();
 print_heading('Crosslink Digest');
 print <<ENDHTML;
-<form method="POST" enctype="multipart/form-data" action="digest.pl" target="_blank">
+<form method="POST" enctype="multipart/form-data" action="digest.pl" >
 <table>
 
 <tr cellspacing="3">

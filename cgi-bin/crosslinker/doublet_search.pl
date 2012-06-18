@@ -29,7 +29,7 @@ print_page_top_fancy("Doublet Search");
 my $version = version();
 print_heading('Doublet Search');
 print <<ENDHTML;
-<form method="POST" enctype="multipart/form-data" action="find_doublets.pl" target="_blank">
+<form method="POST" enctype="multipart/form-data" action="find_doublets.pl">
 <table>
 
 <tr cellspacing="3">
