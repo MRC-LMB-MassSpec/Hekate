@@ -74,8 +74,8 @@ sub calc_score {
    my $t0            = [ gettimeofday() ];
    my $best_x;
    my $best_y;
-   my $best_alpha;
-   my $best_beta;
+   my $best_alpha = 0;
+   my $best_beta = 0;
 
    # my $ms2_error = 0.5;  #Dalton error for assigin an ion to a pair of ions between the two spectra
    my $xlink_d   = $seperation;
@@ -873,7 +873,7 @@ sub calc_score {
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range );
                   my $d2_k = $count->fetchrow_array;
 
-                 warn "$sequence k_a+b/na+b = ",$k_alpha+$k_beta,"/",$n_alpha+$n_beta,", k/n=$k/$n NEED TO TEST D2 lines";
+#                  warn "$sequence k_a+b/na+b = ",$k_alpha+$k_beta,"/",$n_alpha+$n_beta,", k/n=$k/$n NEED TO TEST D2 lines";
 
                   my $d0_score = 0;
                   my $d2_score = 0;
@@ -952,7 +952,7 @@ sub calc_score {
  
                          #    warn "ncr=$nCr[$n-1][$j]  bigrat=$binomial_coefficient";
                       } else {
-                         $binomial_coefficient = $nCr[ $n_beta - 1 ][$j];
+                         $binomial_coefficient = $nCr[ $n_beta_d2 - 1 ][$j];
                       }
                       $score_beta_d2= $score_beta_d2 + ( scalar $binomial_coefficient * ( ( $q / 100 )**$j ) * ( ( 1 - ( $q / 100 ) )**( $n_beta_d2 - $j ) ) );
  
@@ -996,7 +996,7 @@ sub calc_score {
             }
 
             if ( ( -10 * log $score_total ) > $best_match ) {
-	       warn "d0_score = $d0_score_total,d2_score = $d2_score_total, alpha_score=$score_alpha_total, alpha_d2_score=$score_alpha_d2_total";
+# 	       warn "d0_score = $d0_score_total,d2_score = $d2_score_total, alpha_score=$score_alpha_total, alpha_d2_score=$score_alpha_d2_total";
                $best_match    = -10 * log $score_total;
 	       $best_alpha    = -10 * log ($score_alpha_total * $score_alpha_d2_total );
 	       $best_beta     = -10 * log ($score_beta_total  * $score_beta_d2_total  );

@@ -42,9 +42,9 @@ use Crosslinker::Constants;
     print_page_top_fancy("Doublet Search");
     my $version = version();	
     print_heading('Results');
-
+ 
      mgf_doublet_search(
-                         \@upload_filehandle, $doublet_tolerance,   $mass_seperation, $isotope, $linkspacing, $dbh,
+                         \@upload_filehandle, $doublet_tolerance,    $linkspacing, $isotope, $linkspacing, $dbh,
  			$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width,
  			$match_charge
     );
@@ -54,7 +54,7 @@ use Crosslinker::Constants;
 
     print "Content-type: text/plain\n\n";
     mgf_doublet_search_mgf_output(
-                        \@upload_filehandle, $doublet_tolerance,   $mass_seperation, $isotope, $linkspacing, $dbh,
+                        \@upload_filehandle, $doublet_tolerance,    $linkspacing, $isotope, $linkspacing, $dbh,
 			$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width,
 			$match_charge
    );

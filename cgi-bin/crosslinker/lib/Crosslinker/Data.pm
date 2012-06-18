@@ -855,6 +855,9 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 
    my ( $doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge) = @_;
 
+
+  warn "$doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge";
+
    my $mass_seperation = 0;
    if ( $isotope eq "deuterium" ) {
       $mass_seperation = $linkspacing * ( $mass_of_deuterium - $mass_of_hydrogen );
@@ -873,17 +876,17 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
    $masslist = $dbh->prepare("CREATE INDEX mz_data ON msdata ( monoisotopic_mw);");
    $masslist->execute();
 
-   $masslist = $dbh->prepare(
-      "DELETE from msdata where msdata.msorder =1 and  exists (SELECT d1.*
-	                          FROM msdata d1 inner join msdata d2 on (d2.mz = d1.mz) 
-					  and d2.scan_num = d1.scan_num 
-        	                          and d2.fraction = d1.fraction
-                        	          and d1.msorder = 1
-					  and d2.msorder = 2
-	                          )"
-   );
-
-   $masslist->execute();
+#    $masslist = $dbh->prepare(
+#       "DELETE from msdata where msdata.msorder =1 and  exists (SELECT d1.*
+# 	                          FROM msdata d1 inner join msdata d2 on (d2.mz = d1.mz) 
+# 					  and d2.scan_num = d1.scan_num 
+#         	                          and d2.fraction = d1.fraction
+#                         	          and d1.msorder = 1
+# 					  and d2.msorder = 2
+# 	                          )"
+#    );
+# 
+#    $masslist->execute();
 
    if ( $isotope ne "none" ) {
       my $charge_match_string = "";
