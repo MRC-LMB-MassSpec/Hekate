@@ -32,7 +32,7 @@ print_heading('Results');
    my ( $dbh, $results_dbh, $settings_dbh ) = connect_db;
 
    my (
-         $upload_filehandle_ref, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width
+         $upload_filehandle_ref, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width, $match_charge
    ) = import_mgf_doublet_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
 
    my @upload_filehandle = @{$upload_filehandle_ref}; 
@@ -41,7 +41,8 @@ print_heading('Results');
 
     mgf_doublet_search(
                         \@upload_filehandle, $doublet_tolerance,   $mass_seperation, $isotope, $linkspacing, $dbh,
-			$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width
+			$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width,
+			$match_charge
    );
 
    #Tidy up

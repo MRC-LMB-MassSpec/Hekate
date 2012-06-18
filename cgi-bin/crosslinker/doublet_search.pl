@@ -60,6 +60,10 @@ In heavy form: <input type="text"
 name="seperation" size="2" maxlength="5" 
 value="4"/> 
 </td>
+<tr>
+<td> Require Charge Match: <input type="checkbox" name="charge_match"  checked="checked" value="true"></td>
+<td> Intensity Match (Non-functioning): <input type="checkbox" name="intensity_match" value="true" checked="false" readonly="readonly"></td>
+</tr>
 </tr>
 
 <tr><td  style="background: white; margin:0">

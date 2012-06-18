@@ -456,6 +456,11 @@ sub import_mgf_doublet_query {
    my $linkspacing    = $query->param('seperation');
    my $scan_width    = $query->param('scan_width');
 
+
+   my $match_charge;
+   if   ( defined $query->param('charge_match') ) { $match_charge = '1' }
+   else                          	          { $match_charge = '0' }
+
    if ( $query->param('crosslinker') != -1 ) {
 
       my $crosslinkers = get_conf_value( $conf_dbh, $query->param('crosslinker') );
@@ -474,7 +479,7 @@ sub import_mgf_doublet_query {
    }
 
    $conf_dbh->disconnect();
-   return (\@upload_filehandle, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width   );
+   return (\@upload_filehandle, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width, $match_charge   );
 }
 
 sub find_free_tablename {
