@@ -10,7 +10,7 @@ use Crosslinker::Constants;
 use base 'Exporter';
 our @EXPORT =
   ( 'generate_page', 'print_heading', 'print_subheading', 'print_page_top', 'print_page_bottom', 'print_page_top_fancy', 'print_page_bottom_fancy',
-    'mgf_doublet_search', 'crosslink_digest');
+    'mgf_doublet_search', 'crosslink_digest', 'mgf_doublet_search_mgf_output');
 ######
 #
 # Creates html for pages
@@ -309,6 +309,53 @@ sub mgf_doublet_search {
     print "<tr><td>$peak->{'mz'} </td><td> $peak->{monoisotopic_mw} </td><td> $peak->{charge}+ </td><td> $peak->{scan_num}</td><td> $peak->{d2_scan_num} </td></tr>"
   }
   print "</table>";
+
+}
+
+
+sub mgf_doublet_search_mgf_output {
+   
+   my (
+        $upload_filehandle_ref, $doublet_tolerance,   $seperation, $isotope, $linkspacing, $dbh,
+	$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width,
+	$match_charge
+    ) = @_;
+
+  
+   
+   my @upload_filehandle   = @{$upload_filehandle_ref};
+   
+  
+   create_table($dbh);
+
+  
+      if ( defined( $upload_filehandle[1] ) ) {
+         import_mgf( 1, $upload_filehandle[1], $dbh );
+      }
+   
+   my @peaklist = loaddoubletlist_db( $doublet_tolerance, $seperation,       $isotope,          $dbh, $scan_width,
+                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge );
+
+#   print "Match charge: $match_charge";
+
+  print "MASS=monoisotopic\n";
+  foreach my $peak (@peaklist) {
+    print "BEGIN IONS\n";
+    print "TITLE=$peak->{title}\n";
+    print "PEPMASS=$peak->{mz} $peak->{abundance}\n";
+    print "CHARGE=$peak->{charge}+\n";
+    print "SCANS=$peak->{scan_num}\n";
+    print "$peak->{MSn_string}";
+    print "END IONS\n\n";
+
+    print "BEGIN IONS\n";
+    print "TITLE=$peak->{d2_title}\n";
+    print "PEPMASS=$peak->{d2_mz} $peak->{d2_abundance}\n";
+    print "CHARGE=$peak->{d2_charge}+\n";
+    print "SCANS=$peak->{d2_scan_num}\n";
+    print "$peak->{d2_MSn_string}";
+    print "END IONS\n\n";
+  }
 
 }
 

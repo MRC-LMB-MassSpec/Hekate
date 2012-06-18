@@ -14,12 +14,16 @@ use CGI::Carp qw ( fatalsToBrowser );
 use POSIX 'setsid';
 use lib 'lib';
 use Crosslinker::Constants;
+use Crosslinker::HTML;
 
 $SIG{CHLD} = 'IGNORE';
 defined( my $child = fork ) or die "Cannot fork: $!\n";
 if ($child) {
-   print "Content-type: text/plain \n\n";
-   print "Parent $$ has finished, Child's PID: $child\n";
+   print_page_top_fancy; 
+   print_heading('File Upload');
+#    print "<p>Parent $$ has finished, Child's PID: $child\n</p>";
+  print "<p>File upload complete, your search has been added to the queue and should appear on the results page soon.</p>";
+  print_page_bottom_fancy;
 } else {
 
    # Import CGI Varibles

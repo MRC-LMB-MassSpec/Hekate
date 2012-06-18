@@ -455,6 +455,7 @@ sub import_mgf_doublet_query {
    my $isotope        = $query->param("isotope");
    my $linkspacing    = $query->param('seperation');
    my $scan_width    = $query->param('scan_width');
+   my $output_format    = $query->param('output_format');
 
 
    my $match_charge;
@@ -479,7 +480,7 @@ sub import_mgf_doublet_query {
    }
 
    $conf_dbh->disconnect();
-   return (\@upload_filehandle, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width, $match_charge   );
+   return (\@upload_filehandle, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width, $match_charge, $output_format   );
 }
 
 sub find_free_tablename {
