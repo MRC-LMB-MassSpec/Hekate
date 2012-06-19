@@ -556,8 +556,8 @@ for ( my $i = 0 ; $i < @peptides ; $i++ ) {
 #   {print "<BR><font size=+5>Score:", sprintf ("%.0f", ($matched_TIC/$total_ion_current_corrected *100)), "</font>"};
 
 
-# print "<br/><h2>Crosslinker Ion matches (by intensity) </h2>";
-# print "<p>$top_10</p>";
+ print "<br/><h2>Crosslinker Ion matches (by intensity) </h2>";
+ print "<p>$top_10</p>";
 
 print <<ENDHTML;
 <script id="source" language="javascript" type="text/javascript">

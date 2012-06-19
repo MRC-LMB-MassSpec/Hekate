@@ -181,7 +181,11 @@ sub print_results_text {
      . $finish_division
      . $new_division . "Score"
      . $finish_division
-     . $new_division . "PPM"
+     . $new_division . "Score (alpha chain)"
+     . $finish_division
+     . $new_division . "Score (beta chain)"
+     . $finish_division 
+    . $new_division . "PPM"
      . $finish_division
      . $new_division . "+"
      . $finish_division
@@ -211,10 +215,10 @@ sub print_results_text {
      . "Neutral Losses"
      . $finish_division
      . $new_division
-     . "No. of Peptide A Ions"
+     . "No. of Peptide-A Ions"
      . $finish_division
      . $new_division
-     . "No. of Peptide B Ions"
+     . "No. of Peptide-B Ions"
      . $finish_division
      . $new_division . "% TIC"
      . $finish_division
@@ -263,7 +267,9 @@ sub print_results_text {
                print $new_division . $unmodified_fragments[1] . "$finish_division";
                print $new_division . $unmodified_fragments[0] . $finish_division;
             }
-            print "$top_hits_results->{'score'}$finish_division$new_division$rounded$finish_division";
+            print "$top_hits_results->{'score'}$finish_division$new_division";
+	    print "$top_hits_results->{'best_alpha'}$finish_division$new_division$top_hits_results->{'best_beta'}$finish_division$new_division";
+	    print "$rounded$finish_division";
             print "$new_division$top_hits_results->{'charge'}$finish_division";
             print "$new_division$top_hits_results->{'name'}$finish_division";
             print "$new_division$top_hits_results->{'fraction'}$finish_division";
@@ -321,7 +327,9 @@ sub print_results_text {
             print "$new_division", "N/A", $finish_division;
             print $new_division . $unmodified_fragments[0] . $finish_division;
             print "$new_division", "N/A", $finish_division;
-            print "$top_hits_results->{'score'}$finish_division$new_division$rounded$finish_division";
+	    print "$top_hits_results->{'score'}$finish_division$new_division";
+	    print "$top_hits_results->{'best_alpha'}$finish_division$new_division$top_hits_results->{'best_beta'}$finish_division$new_division";
+	    print "$rounded$finish_division";
             print "$new_division$top_hits_results->{'charge'}$finish_division";
             print "$new_division$top_hits_results->{'name'}$finish_division";
             print "$new_division$top_hits_results->{'fraction'}$finish_division";
@@ -430,7 +438,7 @@ sub print_results {
          push @scan_so_far, $top_hits_results->{'scan'};
          my $rounded = sprintf( "%.3f", $top_hits_results->{'ppm'} );
 
-           print "<tr><td>", $printed_hits + 1, "</td><td>$top_hits_results->{'score'}/$top_hits_results->{'best_alpha'}/$top_hits_results->{'best_beta'}</td><td><a href='view_scan.pl?table=$table&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}'>$top_hits_results->{'mz'}</a></td><td>$top_hits_results->{'charge'}+</td><td>$rounded</td>";
+           print "<tr><td>", $printed_hits + 1, "</td><td>$top_hits_results->{'score'}</td><td><a href='view_scan.pl?table=$table&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}'>$top_hits_results->{'mz'}</a></td><td>$top_hits_results->{'charge'}+</td><td>$rounded</td>";
            my @fragments = split( '-', $top_hits_results->{'fragment'} );
            my @unmodified_fragments =
              split( '-', $top_hits_results->{'unmodified_fragment'} );
