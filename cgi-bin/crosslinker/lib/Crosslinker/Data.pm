@@ -308,6 +308,9 @@ sub save_settings {
 						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
    );
 
+   if ($match_charge == '1') {$match_charge = 'Yes'} else {$match_charge = 'No'};
+   if ($match_intensity == '1') {$match_intensity = 'Yes'} else {$match_intensity = 'No'};
+
    $settings_sql->execute( $results_table, $desc,   $cut_residues, $protien_sequences, $reactive_site,   $mono_mass_diff, $xlinker_mass,
                            $decoy,         $ms2_da, $ms1_ppm,      $state,             $mass_seperation, $threshold, 	$match_charge,
 			   $match_intensity, $scored_ions );

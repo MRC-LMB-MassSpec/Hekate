@@ -6,6 +6,7 @@ use Crosslinker::Links;
 use Crosslinker::Proteins;
 use Crosslinker::Constants;
 use Crosslinker::Config;
+use Crosslinker::Scoring;
 use base 'Exporter';
 our @EXPORT = ( 'print_results', 'print_results_combined', 'print_report', 'print_pymol', 'print_results_text' );
 
@@ -220,7 +221,18 @@ sub print_results_text {
      . $new_division
      . "No. of Peptide-B Ions"
      . $finish_division
-     . $new_division . "% TIC"
+     . $new_division
+     . "% TIC"
+     . $finish_division
+     . $new_division . "Max Ion Series Length"
+     . $finish_division
+     . $new_division . "Max alpha-B Ion Series Length"
+     . $finish_division
+     . $new_division . "Max alpha-Y Ion Series Length"
+     . $finish_division
+     . $new_division . "Max beta-B Ion Series Length"
+     . $finish_division
+     . $new_division . "Max beta-Y Ion Series Length"
      . $finish_division
      . $finish_line;
 
@@ -258,6 +270,8 @@ sub print_results_text {
                  $finish_division;
                print $new_division . $unmodified_fragments[0] . $finish_division;
                print $new_division . $unmodified_fragments[1] . "$finish_division";
+	       print "$top_hits_results->{'score'}$finish_division$new_division";
+	       print "$top_hits_results->{'best_alpha'}$finish_division$new_division$top_hits_results->{'best_beta'}$finish_division$new_division";
             } else {
                print "$new_division", substr( $top_hits_results->{'sequence2_name'}, 1 ), $finish_division;
                print "$new_division", substr( $top_hits_results->{'sequence1_name'}, 1 ), $finish_division;
@@ -266,9 +280,9 @@ sub print_results_text {
                print $new_division, ( ( residue_position $unmodified_fragments[0], $protien_sequences ) + $top_hits_results->{'best_x'} + 1 ), $finish_division;
                print $new_division . $unmodified_fragments[1] . "$finish_division";
                print $new_division . $unmodified_fragments[0] . $finish_division;
-            }
-            print "$top_hits_results->{'score'}$finish_division$new_division";
-	    print "$top_hits_results->{'best_alpha'}$finish_division$new_division$top_hits_results->{'best_beta'}$finish_division$new_division";
+	       print "$top_hits_results->{'score'}$finish_division$new_division";
+	       print "$top_hits_results->{'best_beta'}$finish_division$new_division$top_hits_results->{'best_alpha'}$finish_division$new_division";
+            }           
 	    print "$rounded$finish_division";
             print "$new_division$top_hits_results->{'charge'}$finish_division";
             print "$new_division$top_hits_results->{'name'}$finish_division";
@@ -371,7 +385,25 @@ sub print_results_text {
 
          }
          $printed_hits = $printed_hits + 1;
-         print $finish_line;
+
+
+	my $max_ion_series_length_ref = find_ion_series($top_10);
+	my %max_ion_series_length = %{$max_ion_series_length_ref};
+	if ( substr( $top_hits_results->{'sequence1_name'}, 1 ) lt substr( $top_hits_results->{'sequence2_name'}, 1 )  || $top_hits_results->{'fragment'} !~ '-' ) {
+	  print $new_division, $max_ion_series_length{'total'},	$finish_division; 
+	  print $new_division, $max_ion_series_length{'alpha_b'}, $finish_division; 
+	  print $new_division, $max_ion_series_length{'alpha_y'}, $finish_division;
+	  print $new_division, $max_ion_series_length{'beta_b'},  $finish_division;
+	  print $new_division, $max_ion_series_length{'beta_y'},  $finish_division;
+	} else  {
+	  print $new_division, $max_ion_series_length{'total'},	$finish_division; 
+	  print $new_division, $max_ion_series_length{'beta_b'},  $finish_division;
+	  print $new_division, $max_ion_series_length{'beta_y'},  $finish_division;
+	  print $new_division, $max_ion_series_length{'alpha_b'}, $finish_division; 
+	  print $new_division, $max_ion_series_length{'alpha_y'}, $finish_division;
+
+	}
+        print $finish_line;
 
       } else {
          push @hits_so_far, $top_hits_results->{'fragment'};

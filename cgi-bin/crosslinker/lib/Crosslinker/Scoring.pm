@@ -6,7 +6,7 @@ use Crosslinker::Proteins;
 use Crosslinker::Constants;
 use Crosslinker::Config;
 use base 'Exporter';
-our @EXPORT = ( 'NextPermute', 'calc_score');
+our @EXPORT = ( 'NextPermute', 'calc_score' , 'find_ion_series');
 
 ######
 #
@@ -1107,6 +1107,83 @@ sub calc_score {
             $d2_top_10,      $matched_abundance, $d2_matched_abundance, $total_abundance, $d2_total_abundance,
             $matched_common, $matched_crosslink, $d2_matched_common,    $d2_matched_crosslink, $best_alpha, $best_beta, $min_chain_score
    );
+}
+
+sub find_ion_series {
+
+
+my ($top_10) = @_;
+my @ion_series = $top_10 =~ m/\&\#[0-9].*\;[A-Z]<sub>[0-9].*<\/sub><sup>[0-9]\+<\/sup>/g;
+my %ion_series_sorted;
+
+foreach my $ion (sort @ion_series)
+{
+$ion =~ /\&\#([0-9].*)\;([A-Z])<sub>([0-9].*)<\/sub><sup>([0-9])\+<\/sup>/;
+$ion_series_sorted{"$1,$2,$4,$3"} = 1 #using a hash to avoid duplicates, if a double match occurs for some reason (it did early on, but shouldn't anymore).
+}
+
+my $current_chain 			= '';
+my $current_ion_type	 		= '';
+my $current_charge_state		= '';
+my $last_fragment_number		= -1;
+my $ion_series_length			= 0;
+my %max_ion_series_length;
+$max_ion_series_length{'total'}	= 0;
+$max_ion_series_length{'alpha_b'}	= 0;
+$max_ion_series_length{'alpha_y'}	= 0;
+$max_ion_series_length{'beta_b'}	= 0;
+$max_ion_series_length{'beta_y'}	= 0;
+
+foreach my $ion (sort keys %ion_series_sorted)
+{
+my ($chain, $ion_type, $charge_state, $fragment_number) = split (",", $ion);
+
+if ($ion_series_length > $max_ion_series_length{'total'}) { $max_ion_series_length{'total'} = $ion_series_length};
+
+	    if ($current_chain == 945 && $current_ion_type eq 'B')      {
+	      if ($ion_series_length > $max_ion_series_length{'alpha_b'}) { $max_ion_series_length{'alpha_b'} = $ion_series_length} 
+	    } elsif ($current_chain == 945 && $current_ion_type eq 'Y') {
+	      if ($ion_series_length > $max_ion_series_length{'alpha_y'}) { $max_ion_series_length{'alpha_y'} = $ion_series_length}
+	    } elsif ($current_chain == 946 && $current_ion_type eq 'B') {
+	      if ($ion_series_length > $max_ion_series_length{'beta_b'}) { $max_ion_series_length{'beta_b'} = $ion_series_length}
+	    } elsif ($current_chain == 946 && $current_ion_type eq 'Y') {
+	      if ($ion_series_length > $max_ion_series_length{'beta_y'}) { $max_ion_series_length{'beta_y'} = $ion_series_length}
+	    } 
+
+if ($chain ne $current_chain)
+	  {	
+	    $current_chain = $chain;
+	    $ion_series_length = 0 ;
+	    $last_fragment_number = -1;
+	  }
+if ($ion_type ne $current_ion_type)
+	  {
+	    $current_ion_type = $ion_type;
+	    $ion_series_length = 0 ;
+	    $last_fragment_number = -1;
+	  }
+if ($charge_state ne $current_charge_state)
+	  {
+	    $current_charge_state = $charge_state;
+	    $ion_series_length = 0 ;
+	    $last_fragment_number = -1;
+	  }
+if ($fragment_number == $last_fragment_number + 1)
+	  {
+
+	    $ion_series_length = $ion_series_length +1;
+	    $last_fragment_number = $fragment_number; 
+	  }
+else 	  {
+	    $ion_series_length = 0 ;
+	  }
+
+#  print "$ion  -  $ion_series_length - $max_ion_series_length{'total'}, aB $max_ion_series_length{'alpha_b'} aY $max_ion_series_length{'alpha_y'} bB $max_ion_series_length{'beta_b'} bY $max_ion_series_length{'beta_y'} <br>";
+$last_fragment_number = $fragment_number;
+}
+
+return \%max_ion_series_length;
+
 }
 
 1;
