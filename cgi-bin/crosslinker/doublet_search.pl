@@ -62,7 +62,7 @@ value="4"/>
 </td>
 <tr>
 <td> Require Charge Match: <input type="checkbox" name="charge_match"  checked="checked" value="true"></td>
-<td> Intensity Match (Non-functioning): <input type="checkbox" name="intensity_match" value="true" checked="false" readonly="readonly"></td>
+<td> Intensity Match: <input type="checkbox" name="intensity_match" value="true"></td>
 </tr>
 <tr>
 <td colspan="2"> Output Format:  HTML <input type="radio" name="output_format" value="HTML" checked="yes">

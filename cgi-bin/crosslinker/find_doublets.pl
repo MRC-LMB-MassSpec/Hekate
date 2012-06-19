@@ -29,7 +29,7 @@ use Crosslinker::Constants;
    my ( $dbh, $results_dbh, $settings_dbh ) = connect_db;
 
    my (
-         $upload_filehandle_ref, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width, $match_charge, $output_format
+         $upload_filehandle_ref, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width, $match_charge, $output_format,  $match_intensity
    ) = import_mgf_doublet_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
 
    my @upload_filehandle = @{$upload_filehandle_ref}; 
@@ -46,7 +46,7 @@ use Crosslinker::Constants;
      mgf_doublet_search(
                          \@upload_filehandle, $doublet_tolerance,    $linkspacing, $isotope, $linkspacing, $dbh,
  			$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width,
- 			$match_charge
+ 			$match_charge, $match_intensity
     );
     print_page_bottom_fancy;
   }
@@ -56,7 +56,7 @@ use Crosslinker::Constants;
     mgf_doublet_search_mgf_output(
                         \@upload_filehandle, $doublet_tolerance,    $linkspacing, $isotope, $linkspacing, $dbh,
 			$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width,
-			$match_charge
+			$match_charge,  $match_intensity
    );
   }
    #Tidy up

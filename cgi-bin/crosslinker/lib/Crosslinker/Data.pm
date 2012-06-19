@@ -375,9 +375,12 @@ sub import_cgi_query {
    my $linkspacing    = $query->param('seperation');
    my $threshold      = $query->param('threshold');
    my $match_charge   =  0;
+   my $match_intensity=  0; 
 
    if   ( defined $query->param('charge_match') ) { $match_charge = '1' }
    else                          	          { $match_charge = '0' }
+   if   ( defined $query->param('intensity_match') ) 	{ $match_intensity = '1' }
+   else                          	          	{ $match_intensity = '0' }
 
    my %ms2_fragmentation;
    if   ( defined $query->param('aions') ) { $ms2_fragmentation{'aions'} = '1' }
@@ -437,7 +440,7 @@ sub import_cgi_query {
             $cut_residues,      $nocut_residues,  $fasta,              $desc,               $decoy,           $match_ppm,
             $ms2_error,         $mass_seperation, $isotope,            $linkspacing,        $mono_mass_diff,  $xlinker_mass,
             \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c,	      $scan_width,
-	    $match_charge
+	    $match_charge,	$match_intensity 
    );
 }
 
@@ -458,9 +461,13 @@ sub import_mgf_doublet_query {
    my $output_format    = $query->param('output_format');
 
 
-   my $match_charge;
+   my $match_charge   =  0;
+   my $match_intensity=  0; 
+
    if   ( defined $query->param('charge_match') ) { $match_charge = '1' }
    else                          	          { $match_charge = '0' }
+   if   ( defined $query->param('intensity_match') ) 	{ $match_intensity = '1' }
+   else                          	          	{ $match_intensity = '0' }
 
    if ( $query->param('crosslinker') != -1 ) {
 
@@ -480,7 +487,7 @@ sub import_mgf_doublet_query {
    }
 
    $conf_dbh->disconnect();
-   return (\@upload_filehandle, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width, $match_charge, $output_format   );
+   return (\@upload_filehandle, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width, $match_charge, $output_format, $match_intensity   );
 }
 
 sub find_free_tablename {
@@ -853,10 +860,10 @@ sub import_csv    #Enters the uploaded CSV into a SQLite database
 sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 {
 
-   my ( $doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge) = @_;
+   my ( $doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge, $match_intensity ) = @_;
 
 
-  warn "$doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge";
+#   warn "$doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge";
 
    my $mass_seperation = 0;
    if ( $isotope eq "deuterium" ) {
@@ -893,6 +900,10 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
       if ($match_charge == "1") {
 	$charge_match_string = "and d1.charge = d2.charge ";
       }
+      my $intensity_match_string = "";
+      if ($match_intensity == "1") {
+	$intensity_match_string = "and d1.abundance = d2.abundance ";
+      }
       $masslist = $dbh->prepare(
          "SELECT d1.*,
 				  d2.scan_num as d2_scan_num,
@@ -904,7 +915,7 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 			  FROM msdata d1 inner join msdata d2 on (d2.monoisotopic_mw between d1.monoisotopic_mw + ? and d1.monoisotopic_mw + ? )
 				  and d2.scan_num between d1.scan_num - ? 
 				  and d1.scan_num + ? " . 
-				  $charge_match_string
+				  $charge_match_string . $intensity_match_string
 				  . "and d1.fraction = d2.fraction 
 				  and d1.msorder = 2
 			  ORDER BY d1.scan_num ASC "

@@ -386,3 +386,53 @@
 [Tue Jun 19 10:48:54 2012] crosslinker.pl: 100 % Peak mz = 608.83240
 [Tue Jun 19 10:48:56 2012] crosslinker.pl: Queue empty
 [Tue Jun 19 10:48:56 2012] crosslinker.pl: completed
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Started
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Fixed mod selected: 24: Carbamidomethyl 
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Dynamic mod selected: 20: Oxidation (M) 
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: No Cut:P
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Protease type:C
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Sequence 0 = >PolIII 
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Digested peptides:387 
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Calulating masses...  
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Crosslinking peptides...  
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Finding doublets...  
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Exceuting Doublet Search
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Finished Doublet Search
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Starting Peak Matches...
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: Queue empty
+[Tue Jun 19 12:15:32 2012] crosslinker.pl: completed
+[Tue Jun 19 12:15:41 2012] crosslinker.pl: Started
+[Tue Jun 19 12:15:41 2012] crosslinker.pl: Fixed mod selected: 24: Carbamidomethyl 
+[Tue Jun 19 12:15:41 2012] crosslinker.pl: Dynamic mod selected: 20: Oxidation (M) 
+[Tue Jun 19 12:15:41 2012] crosslinker.pl: No Cut:P
+[Tue Jun 19 12:15:41 2012] crosslinker.pl: Protease type:C
+[Tue Jun 19 12:15:41 2012] crosslinker.pl: Sequence 0 = >PolIII 
+[Tue Jun 19 12:15:41 2012] crosslinker.pl: Digested peptides:387 
+[Tue Jun 19 12:15:41 2012] crosslinker.pl: Calulating masses...  
+[Tue Jun 19 12:15:41 2012] crosslinker.pl: Crosslinking peptides...  
+[Tue Jun 19 12:15:42 2012] crosslinker.pl: Finding doublets...  
+[Tue Jun 19 12:15:42 2012] crosslinker.pl: Exceuting Doublet Search
+[Tue Jun 19 12:15:42 2012] crosslinker.pl: Finished Doublet Search
+[Tue Jun 19 12:15:42 2012] crosslinker.pl: Starting Peak Matches...
+[Tue Jun 19 12:15:42 2012] crosslinker.pl: Queue empty
+[Tue Jun 19 12:15:42 2012] crosslinker.pl: completed
+[Tue Jun 19 12:16:29 2012] crosslinker.pl: Started
+[Tue Jun 19 12:16:29 2012] crosslinker.pl: Fixed mod selected: 24: Carbamidomethyl 
+[Tue Jun 19 12:16:29 2012] crosslinker.pl: Dynamic mod selected: 20: Oxidation (M) 
+[Tue Jun 19 12:16:29 2012] crosslinker.pl: No Cut:P
+[Tue Jun 19 12:16:29 2012] crosslinker.pl: Protease type:C
+[Tue Jun 19 12:16:29 2012] crosslinker.pl: Sequence 0 = >PolIII 
+[Tue Jun 19 12:16:29 2012] crosslinker.pl: Digested peptides:387 
+[Tue Jun 19 12:16:29 2012] crosslinker.pl: Calulating masses...  
+[Tue Jun 19 12:16:29 2012] crosslinker.pl: Crosslinking peptides...  
+[Tue Jun 19 12:16:30 2012] crosslinker.pl: Finding doublets...  
+[Tue Jun 19 12:16:30 2012] crosslinker.pl: Exceuting Doublet Search
+[Tue Jun 19 12:16:30 2012] crosslinker.pl: Finished Doublet Search
+[Tue Jun 19 12:16:30 2012] crosslinker.pl: Starting Peak Matches...
+[Tue Jun 19 12:16:30 2012] crosslinker.pl: 100 % Peak mz = 739.37335
+[Tue Jun 19 12:16:32 2012] crosslinker.pl: Best: AMGKK-KPEEXAK - Score: 511 - Score(alpha): 80
+[Tue Jun 19 12:16:32 2012] crosslinker.pl: Time Taken = 2.335413 secs 
+[Tue Jun 19 12:16:34 2012] crosslinker.pl: Best: AMGKKKPEEXAK - Score: 534 - Score(alpha): 534
+[Tue Jun 19 12:16:34 2012] crosslinker.pl: Time Taken = 1.968561 secs 
+[Tue Jun 19 12:16:35 2012] crosslinker.pl: Queue empty
+[Tue Jun 19 12:16:35 2012] crosslinker.pl: completed

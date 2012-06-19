@@ -30,7 +30,7 @@ sub generate_page {
         $reactive_site,         $scan_width,         $sequence_names_ref, $match_ppm,         $min_peptide_length, $mass_of_deuterium,
         $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
         $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
-        $threshold,		$n_or_c,	     $match_charge
+        $threshold,		$n_or_c,	     $match_charge,	  $match_intensity 
    ) = @_;
 
    while ( $state == -2 ) {
@@ -94,7 +94,7 @@ sub generate_page {
    warn "Finding doublets...  \n";
    my @peaklist = loaddoubletlist_db( $query->param('ms_ppm'), $seperation,       $isotope,          $dbh, $scan_width,
                                       $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12,
-				      $match_charge);
+				      $match_charge, 	       $match_intensity );
 
    my $doublets_found = @peaklist;
    set_doublets_found( $results_table, $settings_dbh, $doublets_found );
@@ -284,7 +284,7 @@ sub mgf_doublet_search {
    my (
         $upload_filehandle_ref, $doublet_tolerance,   $seperation, $isotope, $linkspacing, $dbh,
 	$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width,
-	$match_charge
+	$match_charge,  $match_intensity
     ) = @_;
 
   
@@ -300,7 +300,7 @@ sub mgf_doublet_search {
       }
    
    my @peaklist = loaddoubletlist_db( $doublet_tolerance, $seperation,       $isotope,          $dbh, $scan_width,
-                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge );
+                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge,  $match_intensity );
 
 #   print "Match charge: $match_charge";
 
@@ -318,7 +318,7 @@ sub mgf_doublet_search_mgf_output {
    my (
         $upload_filehandle_ref, $doublet_tolerance,   $seperation, $isotope, $linkspacing, $dbh,
 	$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width,
-	$match_charge
+	$match_charge,  $match_intensity
     ) = @_;
 
   
@@ -334,7 +334,7 @@ sub mgf_doublet_search_mgf_output {
       }
    
    my @peaklist = loaddoubletlist_db( $doublet_tolerance, $seperation,       $isotope,          $dbh, $scan_width,
-                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge );
+                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge,  $match_intensity );
 
 #   print "Match charge: $match_charge";
 
