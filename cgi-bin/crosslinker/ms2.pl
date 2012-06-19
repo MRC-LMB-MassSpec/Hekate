@@ -556,9 +556,9 @@ for ( my $i = 0 ; $i < @peptides ; $i++ ) {
 # if ( $total_ion_current_corrected !=0)
 #   {print "<BR><font size=+5>Score:", sprintf ("%.0f", ($matched_TIC/$total_ion_current_corrected *100)), "</font>"};
 
-# 
-#  print "<br/><h2>Crosslinker Ion matches (by intensity) </h2>";
-#  print "<p>$top_10</p>";
+ 
+  print "<br/><h2>Crosslinker Ion matches (by intensity) </h2>";
+  print "<p>$top_10</p>";
 
 
 #Find ion series

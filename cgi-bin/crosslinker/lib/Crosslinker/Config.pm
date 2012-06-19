@@ -15,7 +15,7 @@ our @EXPORT = ( 'get_mods', 'get_conf_value', 'connect_conf_db', 'add_conf', 'ge
 sub get_conf {
    my ( $dbh, $setting ) = @_;
 
-   my $sql = $dbh->prepare("SELECT rowid, * FROM setting WHERE type = ?");
+   my $sql = $dbh->prepare("SELECT rowid, * FROM setting WHERE type = ? ORDER BY name ASC");
    $sql->execute($setting);
    return $sql;
 

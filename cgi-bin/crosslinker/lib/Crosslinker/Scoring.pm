@@ -1048,7 +1048,7 @@ sub calc_score {
    }
 
    $matchlist = $dbh->prepare(
-"SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '1' and theoretical.heavy_light = '1' AND abundance > ? ORDER by abundance DESC"
+"SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '1' and theoretical.heavy_light = '1' AND abundance > ? ORDER by abundance DESC "
    );
    $matchlist->execute( $ms2_error, $ms2_error, $best_x, $best_y, $best_sequence, ( $max_abundance_d2 * $threshold / 100 ) );
 
@@ -1066,9 +1066,9 @@ sub calc_score {
    my $d2_matched_common    = 0;
    my $d2_matched_crosslink = 0;
    $matchlist = $dbh->prepare(
-"SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ? ) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '1' and theoretical.heavy_light = '1' GROUP BY ms2.mass"
+"SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ? ) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '1' and theoretical.heavy_light = '1' AND abundance > ? GROUP BY ms2.mass"
    );
-   $matchlist->execute( $ms2_error, $ms2_error, $best_x, $best_y, $best_sequence );
+   $matchlist->execute( $ms2_error, $ms2_error, $best_x, $best_y, $best_sequence, ( $max_abundance_d2 * $threshold / 100 )  );
    while ( my $peaks = $matchlist->fetchrow_hashref ) {
       if ( $peaks->{crosslink_ion} == 0 ) {
          $d2_matched_common = $d2_matched_common + 1;
