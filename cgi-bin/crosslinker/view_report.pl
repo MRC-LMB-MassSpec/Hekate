@@ -43,8 +43,11 @@ my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { Rais
 
 my $settings = $settings_dbh->prepare("SELECT * FROM settings WHERE name = ?");
 $settings->execute($table);
-my ( $name, $desc, $cut_residues, $protein_sequences, $reactive_site, $mono_mass_diff, $xlinker_mass, $decoy, $ms2_da, $ms1_ppm, $is_finished ) =
-  $settings->fetchrow_array;
+my (
+     $name,  $desc,   $cut_residues, $protein_sequences, $reactive_site,   $mono_mass_diff, $xlinker_mass,
+     $decoy, $ms2_da, $ms1_ppm,      $is_finished,       $mass_seperation, $threshold,      $doublets_found,
+     $match_charge,   $match_intensity,	$scored_ions
+) = $settings->fetchrow_array;
 $settings->finish();
 $settings_dbh->disconnect();
 
@@ -64,10 +67,17 @@ my ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, 
 ########################
 
 print_page_top('Report');
+
 print "<Table>
 <tr><td style='font-weight: bold;'>Name:</td><td>$name</td><td style='font-weight: bold;'>Description</td><td>$desc</td></tr>
 <tr><td style='font-weight: bold;'>Cut:</td><td>$cut_residues</td><td style='font-weight: bold;'>Xlink Site</td><td>$reactive_site</td></tr>
-<tr><td style='font-weight: bold;'>Xlinker Mass:</td><td>$xlinker_mass</td><td style='font-weight: bold;'>Monolink</td><td>$mono_mass_diff</td></tr></table><hr/>";
+<tr><td style='font-weight: bold;'>Xlinker Mass:</td><td>$xlinker_mass</td><td style='font-weight: bold;'>Monolink</td><td>$mono_mass_diff</td></tr>
+<tr><td style='font-weight: bold;'>MS1 tollerance:</td><td>$ms1_ppm PPM</td><td style='font-weight: bold;'>MS2 tollerance</td><td>$ms2_da Da</td></tr>
+<tr><td style='font-weight: bold;'>Threshold:</td><td>$threshold %</td><td style='font-weight: bold;'>Doublets Found: </td><td>$doublets_found </td></tr>
+<tr><td style='font-weight: bold;'>Matched Charge:</td><td>$match_charge</td><td style='font-weight: bold;'>Matched Intensity: </td><td>$match_intensity</td></tr>
+<tr><td style='font-weight: bold;'>Ions Scored:</td><td>$scored_ions</td><td style='font-weight: bold;'></td><td></td></tr>
+</table><hr>";
+
 
 if ( $is_finished != '-1' ) {
    print '<div style="text-align:center"><h2 style="color:red;">Warning: Data analysis not finished ' . $is_finished . '</h2></div>';

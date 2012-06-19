@@ -189,7 +189,8 @@ sub save_settings {
    my (
         $settings_dbh,    $results_table,    $cut_residues,   $protien_sequences, $reactive_site, $mono_mass_diff,
         $xlinker_mass,    $state,            $desc,           $decoy,             $ms2_da,        $ms1_ppm,
-        $mass_seperation, $dynamic_mods_ref, $fixed_mods_ref, $threshold
+        $mass_seperation, $dynamic_mods_ref, $fixed_mods_ref, $threshold, 	  $match_charge,  $match_intensity,
+        $scored_ions
    ) = @_;
 
    if ( defined $fixed_mods_ref ) {
@@ -278,7 +279,10 @@ sub save_settings {
 						      finished,
 						      isotoptic_shift,
 						      threshold,
-						      doublets_found			
+						      doublets_found,
+						      charge_match,
+						      intensity_match,
+						      scored_ions
 						) "
    );
 
@@ -297,12 +301,16 @@ sub save_settings {
 						      ms1_ppm,
 						      finished,
 						      isotoptic_shift,	     
-						      threshold
-						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+						      threshold,
+						      charge_match,
+						      intensity_match,
+						      scored_ions
+						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
    );
 
    $settings_sql->execute( $results_table, $desc,   $cut_residues, $protien_sequences, $reactive_site,   $mono_mass_diff, $xlinker_mass,
-                           $decoy,         $ms2_da, $ms1_ppm,      $state,             $mass_seperation, $threshold );
+                           $decoy,         $ms2_da, $ms1_ppm,      $state,             $mass_seperation, $threshold, 	$match_charge,
+			   $match_intensity, $scored_ions );
 
    return;
 }
@@ -376,6 +384,7 @@ sub import_cgi_query {
    my $threshold      = $query->param('threshold');
    my $match_charge   =  0;
    my $match_intensity=  0; 
+   my $scored_ions    =  '';
 
    if   ( defined $query->param('charge_match') ) { $match_charge = '1' }
    else                          	          { $match_charge = '0' }
@@ -383,7 +392,7 @@ sub import_cgi_query {
    else                          	          	{ $match_intensity = '0' }
 
    my %ms2_fragmentation;
-   if   ( defined $query->param('aions') ) { $ms2_fragmentation{'aions'} = '1' }
+   if   ( defined $query->param('aions') ) { $ms2_fragmentation{'aions'} = '1';}
    else                                    { $ms2_fragmentation{'aions'} = '0' }
    if   ( defined $query->param('bions') ) { $ms2_fragmentation{'bions'} = '1' }
    else                                    { $ms2_fragmentation{'bions'} = '0' }
@@ -395,16 +404,21 @@ sub import_cgi_query {
    if ( defined $query->param('ammonialoss') ) { $ms2_fragmentation{'ammonialoss'} = '1';}
    else {				         $ms2_fragmentation{'ammonialoss'} = '0';}
    
-   if   ( defined $query->param('aions-score') ) { $ms2_fragmentation{'aions-score'} = '1' }
+   if   ( defined $query->param('aions-score') ) { $ms2_fragmentation{'aions-score'} = '1';
+						   $scored_ions = $scored_ions . 'A-ions, '; }
    else                                    { $ms2_fragmentation{'aions-score'} = '0' }
-   if   ( defined $query->param('bions-score') ) { $ms2_fragmentation{'bions-score'} = '1' }
+   if   ( defined $query->param('bions-score') ) { $ms2_fragmentation{'bions-score'} = '1';
+						   $scored_ions = $scored_ions . 'B-ions, ';  }
    else                                    { $ms2_fragmentation{'bions-score'} = '0' }
-   if   ( defined $query->param('yions-score') ) { $ms2_fragmentation{'yions-score'} = '1' }
+   if   ( defined $query->param('yions-score') ) { $ms2_fragmentation{'yions-score'} = '1';
+						   $scored_ions = $scored_ions . 'Y-ions, ';  }
    else                                    { $ms2_fragmentation{'yions-score'} = '0' }
 
-   if ( defined $query->param('waterloss-score') )   { $ms2_fragmentation{'waterloss-score'} = '1'; }
+   if ( defined $query->param('waterloss-score') )   { $ms2_fragmentation{'waterloss-score'} = '1';
+						   $scored_ions = $scored_ions . 'water-loss ions, ';  }
    else {				         $ms2_fragmentation{'waterloss-score'} = '0'; }
-   if ( defined $query->param('ammonialoss-score') ) { $ms2_fragmentation{'ammonialoss-score'} = '1';}
+   if ( defined $query->param('ammonialoss-score') ) { $ms2_fragmentation{'ammonialoss-score'} = '1';
+						   $scored_ions = $scored_ions . 'ammonia-loss ions '; }
    else {				         $ms2_fragmentation{'ammonialoss-score'} = '0';}
 
 #   warn "aions:". $query->param('aions-score'),",$ms2_fragmentation{'aions-score'}";
@@ -440,7 +454,7 @@ sub import_cgi_query {
             $cut_residues,      $nocut_residues,  $fasta,              $desc,               $decoy,           $match_ppm,
             $ms2_error,         $mass_seperation, $isotope,            $linkspacing,        $mono_mass_diff,  $xlinker_mass,
             \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c,	      $scan_width,
-	    $match_charge,	$match_intensity 
+	    $match_charge,	$match_intensity, $scored_ions 
    );
 }
 
@@ -493,7 +507,7 @@ sub import_mgf_doublet_query {
 sub find_free_tablename {
    my ($settings_dbh) = @_;
 
-   $settings_dbh->do(
+ $settings_dbh->do(
       "CREATE TABLE IF NOT EXISTS settings (
 						      name,
 						      desc,
@@ -508,7 +522,10 @@ sub find_free_tablename {
 						      finished,
 						      isotoptic_shift,
 						      threshold,
-						      doublets_found
+						      doublets_found,
+						      charge_match,
+						      intensity_match,
+						      scored_ions
 						) "
    );
 
