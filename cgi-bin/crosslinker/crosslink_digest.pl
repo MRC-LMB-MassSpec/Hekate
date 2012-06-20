@@ -48,8 +48,11 @@ my $dbh = connect_conf_db;
 my $enzymes = get_conf( $dbh, 'enzyme' );
 
 while ( ( my $enzyme = $enzymes->fetchrow_hashref ) ) {
-   print "<option value='" . $enzyme->{'rowid'} . "'>" . $enzyme->{'name'} . "</option>";
+  print "<option value='" . $enzyme->{'rowid'}. "' " ;
+  if ($enzyme->{'name'} eq 'Trypsin') { print "selected='true'"};
+  print  ">" . $enzyme->{'name'}. " </option>";
 }
+
 
 $enzymes->finish();
 

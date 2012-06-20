@@ -26,7 +26,7 @@ sub modifications {
       LoopLink => {
                     Name     => 'loop link',
                     Location => $reactive_site,
-                    Delta    => -18.0105646,      #Loop links are treated as a modified monolink (look link on an xlink is too complicated, and wierd)
+                    Delta    => -18.0105646,      #Loop links are treated as a modified monolink (loop link on an xlink is too complicated, and wierd)
       },
       NoMod => {
                  Name     => ' ',
@@ -86,10 +86,10 @@ sub digest_proteins    #Digest a string into an array of peptides
    $protein =~ s/[^\w\d>]//g;
    if ( $nocut_residues eq '' ) { $nocut_residues = '9' }
    ;                   #Numbers don't appear in sequences so this just works, easier than having a second regex
-   warn "No Cut:", $nocut_residues, "\n";   
+#    warn "No Cut:", $nocut_residues, "\n";   
    my @digest;
    if ($n_or_c eq 'C') {
-     warn "Protease type:", $n_or_c, "\n";
+#      warn "Protease type:", $n_or_c, "\n";
      @digest = $protein =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){1}/g;            
      my @single_digest = @digest;
      for ( my $i = 2 ; $i < $missed_clevages + 2 ; $i++ ) {
@@ -105,7 +105,7 @@ sub digest_proteins    #Digest a string into an array of peptides
       }
      }
      elsif ($n_or_c eq 'C..N') {
-     warn "Protease type:", $n_or_c, "\n";   
+#      warn "Protease type:", $n_or_c, "\n";   
      my $cut_residues_c = chop $cut_residues;
 #       $cut_residues = 'RK';
 
@@ -127,10 +127,10 @@ sub digest_proteins    #Digest a string into an array of peptides
  
       foreach my $double_digest_peptide (@double_digest) { 
       my @single_digest = $double_digest_peptide =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){1}/g;            
-      foreach (@single_digest)
-      {
-	warn $_;
-      }
+#       foreach (@single_digest)
+#       {
+#  	warn $_;
+#       }
 
       push @digest, @single_digest;
       for ( my $i = 2 ; $i < $missed_clevages + 2 ; $i++ ) {
@@ -147,7 +147,7 @@ sub digest_proteins    #Digest a string into an array of peptides
        }
    } else {
   
-     warn "Protease type:", $n_or_c, "\n";
+#      warn "Protease type:", $n_or_c, "\n";
      @digest = $protein =~ m/(?:(?:[$cut_residues](?!$nocut_residues)|^.)(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*){1}/g;
      my @single_digest = @digest;
       for ( my $i = 2 ; $i < $missed_clevages + 2 ; $i++ ) {

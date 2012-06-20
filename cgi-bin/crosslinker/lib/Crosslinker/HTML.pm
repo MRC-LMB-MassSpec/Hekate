@@ -10,7 +10,7 @@ use Crosslinker::Constants;
 use base 'Exporter';
 our @EXPORT =
   ( 'generate_page', 'print_heading', 'print_subheading', 'print_page_top', 'print_page_bottom', 'print_page_top_fancy', 'print_page_bottom_fancy',
-    'mgf_doublet_search', 'crosslink_digest', 'mgf_doublet_search_mgf_output');
+    'mgf_doublet_search', 'crosslink_digest', 'mgf_doublet_search_mgf_output', 'generate_page_single_scan');
 ######
 #
 # Creates html for pages
@@ -117,11 +117,90 @@ sub generate_page {
    return '-1';
 }
 
+
+sub generate_page_single_scan {
+  
+
+
+   my (
+        $protien_sequences,     $dbh,                $results_dbh,        $settings_dbh,      $results_table,      $no_of_fractions,
+        $upload_filehandle_ref, $csv_filehandle_ref, $missed_clevages,    $cut_residues,      $nocut_residues,     $protein_residuemass_ref,
+        $reactive_site,         $scan_width,         $sequence_names_ref, $match_ppm,         $min_peptide_length, $mass_of_deuterium,
+        $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
+        $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
+        $threshold,		$n_or_c,	     $match_charge,	  $match_intensity,
+	$light_scan,		$heavy_scan,	   $precursor_charge, $precursor_mass, $mass_seperation, $mass_of_proton  
+   ) = @_;
+
+
+   my %protein_residuemass = %{$protein_residuemass_ref};
+   my @csv_filehandle      = @{$csv_filehandle_ref};
+   my @upload_filehandle   = @{$upload_filehandle_ref};
+   my @sequence_names      = @{$sequence_names_ref};
+   my %modifications       = %{$modifications_ref};
+   my %ms2_fragmentation   = %{$ms2_fragmentation_ref};
+
+   my $fragment;
+   my @fragments;
+   my %fragment_source;
+   my @sequence_fragments;
+   my @sequences = split '>', $protien_sequences;
+   my $count = 0;
+
+   create_table($dbh);
+
+   
+    import_scan( $light_scan,		$heavy_scan,	   $precursor_charge, $precursor_mass, $mass_seperation, $mass_of_proton  , $dbh );
+   
+   foreach my $sequence (@sequences) {
+      @sequence_fragments = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
+      @fragments = ( @fragments, @sequence_fragments );
+#       warn "Sequence $count = $sequence_names[$count] \n";
+#       warn "Digested peptides:", scalar(@fragments), " \n";
+
+      #  foreach (@sequence_fragments) {
+      #	if ($_ eq "YSALFLGMAYGAKR"){ warn "YSALFLGMAYGAKR , $_ , $sequence_names[$count]"; }
+      #        $fragment_source{$_} = $sequence_names[$count];
+      #    }
+
+      %fragment_source = ( ( map { $_ => $count } @fragments ), %fragment_source );
+      $count++;
+   }
+
+#    warn "Calulating masses...  \n";
+   my %fragment_masses = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
+
+#    warn "Crosslinking peptides...  \n";
+   my ( $xlink_fragment_masses_ref, $xlink_fragment_sources_ref ) =
+     crosslink_peptides( \%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
+   my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
+   %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses );
+   my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source );
+
+#    warn "Finding doublets...  \n";
+   my @peaklist = loaddoubletlist_db( 10, $seperation,       $isotope,          $dbh, $scan_width,
+                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12,
+				      $match_charge, 	       $match_intensity );
+
+   my $doublets_found = @peaklist;
+   set_doublets_found( $results_table, $settings_dbh, $doublets_found );
+
+
+   my %fragment_score = matchpeaks(
+                                    \@peaklist,          \%xlink_fragment_masses, \%xlink_fragment_sources, $protien_sequences,
+                                    $match_ppm,          $dbh,                    $results_dbh,             $settings_dbh,
+                                    $results_table,      $mass_of_deuterium,      $mass_of_hydrogen,        $mass_of_carbon13,
+                                    $mass_of_carbon12,   $cut_residues,           $nocut_residues,          \@sequence_names,
+                                    $mono_mass_diff,     $xlinker_mass,           $seperation,              $isotope,
+                                    $reactive_site,      \%modifications,         $ms2_error,               \%protein_residuemass,
+                                    \%ms2_fragmentation, $threshold
+   );
+  
+ 
+}
+
 sub crosslink_digest {
   
-   #This really should be in data or similar, but in the past it generated a page, now it insteads puts the results into the DB.
-   #much nicer, but hence the strange name.
-
    my (
         $protien_sequences,     $dbh,                $results_dbh,        $settings_dbh,      $results_table,      $no_of_fractions,
         $upload_filehandle_ref, $csv_filehandle_ref, $missed_clevages,    $cut_residues,      $nocut_residues,     $protein_residuemass_ref,
@@ -520,6 +599,7 @@ Content-type: text/html\n\n
     <ul id="nav">
         <li id="home"><a id="home" href="/cgi-bin/$path/index.pl">Crosslinker Full Search</a></li>
         <li id="results"><a id="results" href="/cgi-bin/$path/results.pl">Results</a></li>
+        <li id="results"><a id="results" href="/cgi-bin/$path/singlescan.pl">Score Scan</a></li>
         <li id="results"><a id="results" href="/cgi-bin/$path/doublet_search.pl">Doublet</a></li>
         <li id="results"><a id="results" href="/cgi-bin/$path/crosslink_digest.pl">Digest</a></li>
  <!--       <li id="results"><a id="results" href="/cgi-bin/$path/crosslink_fragment.pl">Fragment</a></li>

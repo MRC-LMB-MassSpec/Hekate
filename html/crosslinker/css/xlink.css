@@ -46,6 +46,8 @@ div#banner{
 	margin-bottom: 0em;
 	background-position: 0px -60px;
 	background-image:url('../images/orbitrap.jpg');  /* Image CC Flickr */
+	background-size:100%;
+	background-position:center; 
 	}
 
 div#menu{

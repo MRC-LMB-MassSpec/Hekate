@@ -10,7 +10,7 @@ our @EXPORT = (
                 'connect_db',    'check_state',  'give_permission',    'is_ready',            'disconnect_db', 'set_finished',
                 'save_settings', 'update_state', 'import_cgi_query',   'find_free_tablename', 'matchpeaks',    'create_table',
                 'import_mgf',    'import_csv',   'loaddoubletlist_db', 'generate_decoy',      'set_doublets_found',
-		'import_mgf_doublet_query'
+		'import_mgf_doublet_query',	 'connect_db_single', 'import_scan'
 );
 ######
 #
@@ -82,6 +82,53 @@ sub connect_db {
 
    return ( $dbh, $results_dbh, $settings_dbh );
 }
+
+sub connect_db_single {
+   my $dbh          = DBI->connect( "dbi:SQLite:dbname=:memory:",    "", "", { RaiseError => 1, AutoCommit => 1 } );
+   my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results_single",  "", "", { RaiseError => 1, AutoCommit => 1 } );
+   my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings_single", "", "", { RaiseError => 1, AutoCommit => 1 } );
+
+   $results_dbh->do(
+      "CREATE TABLE IF NOT EXISTS results (
+						      name,
+						      MSn_string,
+						      d2_MSn_string,
+						      mz,
+						      charge,
+						      fragment,    
+						      sequence1,
+						      sequence2,
+						      sequence1_name,
+						      sequence2_name,
+						      score REAL,
+						      fraction,
+						      scan,
+						      d2_scan,
+						      modification,
+						      no_of_mods,
+						      best_x,
+						      best_y,
+						      unmodified_fragment,
+						      ppm,
+						      top_10,
+						      d2_top_10,
+						      matched_abundance,
+						      d2_matched_abundance,
+						      total_abundance,
+						      d2_total_abundance,
+						      matched_common,
+     						      matched_crosslink,
+						      d2_matched_common,
+						      d2_matched_crosslink,
+						      monolink_mass,
+						      best_alpha REAL,
+						      best_beta REAL,
+						      min_chain_score) "
+   );
+
+   return ( $dbh, $results_dbh, $settings_dbh );
+}
+
 
 sub disconnect_db {
    my ( $dbh, $settings_dbh, $results_dbh ) = @_;
@@ -169,7 +216,8 @@ sub is_ready {
 						      doublets_found,
 						      charge_match,
 						      intensity_match,
-						      scored_ions
+						      scored_ions,
+						      time
 						) "
    );
 
@@ -224,7 +272,7 @@ sub save_settings {
          my $fixed_mod = get_conf_value( $conf_dbh, $mod );
          my $fixed_mod_data = $fixed_mod->fetchrow_hashref();
          $settings_sql->execute( $results_table, $mod, $fixed_mod_data->{'name'}, $fixed_mod_data->{'setting1'}, $fixed_mod_data->{'setting2'}, 'fixed' );
-         warn "Fixed mod selected: $mod: $fixed_mod_data->{'name'} \n";
+#          warn "Fixed mod selected: $mod: $fixed_mod_data->{'name'} \n";
          $fixed_mod->finish;
       }
       $conf_dbh->disconnect();
@@ -261,7 +309,7 @@ sub save_settings {
                                  $dynamic_mod_data->{'name'},
                                  $dynamic_mod_data->{'setting1'},
                                  $dynamic_mod_data->{'setting2'}, 'dynamic' );
-         warn "Dynamic mod selected: $mod: $dynamic_mod_data->{'name'} \n";
+#          warn "Dynamic mod selected: $mod: $dynamic_mod_data->{'name'} \n";
          $dynamic_mod->finish;
       }
       $conf_dbh->disconnect();
@@ -285,7 +333,8 @@ sub save_settings {
 						      doublets_found,
 						      charge_match,
 						      intensity_match,
-						      scored_ions
+						      scored_ions,
+						      time
 						) "
    );
 
@@ -307,8 +356,9 @@ sub save_settings {
 						      threshold,
 						      charge_match,
 						      intensity_match,
-						      scored_ions
-						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+						      scored_ions,
+						      time
+						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?)"
    );
 
    if ($match_charge == '1') {$match_charge = 'Yes'} else {$match_charge = 'No'};
@@ -316,7 +366,7 @@ sub save_settings {
 
    $settings_sql->execute( $results_table, $desc,   $cut_residues, $protien_sequences, $reactive_site,   $mono_mass_diff, $xlinker_mass,
                            $decoy,         $ms2_da, $ms1_ppm,      $state,             $mass_seperation, $threshold, 	$match_charge,
-			   $match_intensity, $scored_ions );
+			   $match_intensity, $scored_ions, time );
 
    return;
 }
@@ -326,6 +376,7 @@ sub import_cgi_query {
    my $fasta = $query->param('user_protein_sequence');
    my $decoy = $query->param('decoy');
    my $scan_width = $query->param('scan_width');
+   if (!defined $scan_width) {$scan_width=1}
 
    my $protien_sequences;
    my $conf_dbh = connect_conf_db;
@@ -343,7 +394,7 @@ sub import_cgi_query {
    if ( defined $query->param('decoy') ) {
       $protien_sequences = generate_decoy($protien_sequences);
       $fasta             = $protien_sequences;
-      warn "Generating Decoy Database....\n";
+#       warn "Generating Decoy Database....\n";
    }
 
    $protien_sequences =~ s/\r//g;
@@ -371,6 +422,7 @@ sub import_cgi_query {
 
    my $match_ppm = $query->param("ms1_ppm");
    my $ms2_error = $query->param("ms2_da");
+ 
 
    my $enzymes        = get_conf_value( $conf_dbh, $query->param('enzyme') );
    my $enzyme         = $enzymes->fetchrow_hashref();
@@ -474,10 +526,12 @@ sub import_mgf_doublet_query {
    $upload_filehandle[1] = $query->upload("mgf");
 
    my $doublet_tolerance = $query->param("ms_ppm");
+   if (!defined $doublet_tolerance) {$doublet_tolerance=10}
 
    my $isotope        = $query->param("isotope");
    my $linkspacing    = $query->param('seperation');
    my $scan_width    = $query->param('scan_width');
+  if (!defined $scan_width) {$scan_width=1}
    my $output_format    = $query->param('output_format');
 
 
@@ -531,7 +585,8 @@ sub find_free_tablename {
 						      doublets_found,
 						      charge_match,
 						      intensity_match,
-						      scored_ions
+						      scored_ions,
+						      time
 						) "
    );
 
@@ -643,9 +698,9 @@ sub matchpeaks {
       my $percent_done = sprintf( "%.2f", $peak_no / @peaklist );
       warn $percent_done * 100, " % Peak mz = " . sprintf( "%.5f", $peak->{'mz'} ) . "\n";
 
-      if ( check_state( $settings_dbh, $results_table ) == -4 ) {
-         return %fragment_score;
-      }
+       if ( check_state( $settings_dbh, $results_table ) == -4 ) {
+          return %fragment_score;
+       }
       update_state( $settings_dbh, $results_table, $percent_done );
       my $MSn_string    = "";
       my $d2_MSn_string = "";
@@ -695,6 +750,8 @@ sub matchpeaks {
       # 				$query->param('user_protein_sequence'));
 
       foreach my $fragment ( sort( keys %fragment_masses ) ) {
+
+
          foreach my $modification ( sort( keys %modifications ) ) {
             my $location = $modifications{$modification}{Location};
             my $rxn_residues = @{ [ $fragment =~ /$location/g ] };
@@ -724,6 +781,8 @@ sub matchpeaks {
                      $rxn_residues = ( $rxn_residues - ( 2 * @{ [ $fragment =~ /[-]/g ] } ) ) / 2;
                   }
                   for ( my $n = 1 ; $n <= $rxn_residues ; $n++ ) {
+
+
                      if (
                         (
                            $peak->{monoisotopic_mw} / $peak->{charge} <
@@ -739,7 +798,7 @@ sub matchpeaks {
                         my $rounded = sprintf( "%.3f", $score );
                         {
 
-                           #                                 warn $fragment, $modifications{$modification}{Name}, "\n";
+#                                                            warn $fragment, $modifications{$modification}{Name}, "\n";
                            # 				if ( $modifications{$modification}{Name} eq "loop link" ) { warn "loop link ";	}
 
                            my (
@@ -861,6 +920,27 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
    }
 }
 
+
+sub import_scan    #Enters the uploaded MGF into a SQLite database
+{
+
+   my ($light_scan,		$heavy_scan,	   $precursor_charge, $precursor_mass, $mass_seperation, $mass_of_proton,$dbh ) = @_;
+
+   my %line;
+   my $MSn_count = 0;
+   my $dataset   = 0;
+   my $MSn_string;
+
+ my $newline = $dbh->prepare(
+   "INSERT INTO msdata (scan_num, fraction, title, charge, mz, abundance, monoisotopic_mw, MSn_string, msorder) VALUES (? , ?, ?, ?, ?, ?, ?,?, 2)" );
+         $newline->execute( -1, 1, 'Light Scan', $precursor_charge, $precursor_mass, 1, ($precursor_mass*$precursor_charge) - ($mass_of_proton*$precursor_charge), $light_scan );
+         $newline->execute( -1, 1, 'Heavy Scan', $precursor_charge, 1, 1, ($precursor_mass*$precursor_charge)+$mass_seperation - ($mass_of_proton*$precursor_charge), $heavy_scan );
+
+# warn '1461.7439788'," ",$precursor_mass, " ", ($precursor_mass*$precursor_charge) - ($mass_of_proton*$precursor_charge)
+
+}
+
+
 sub import_csv    #Enters the uploaded CSV into a SQLite database
 {
    my ( $fraction, $file, $dbh ) = @_;
@@ -943,9 +1023,9 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 				  and d1.msorder = 2
 			  ORDER BY d1.scan_num ASC "
       );
-      warn "Exceuting Doublet Search\n";
+#       warn "Exceuting Doublet Search\n";
       $masslist->execute( $mass_seperation_lower, $mass_seperation_upper, $scan_width, $scan_width );
-      warn "Finished Doublet Search\n";
+#       warn "Finished Doublet Search\n";
    } else {
       $masslist = $dbh->prepare(
          "SELECT *
