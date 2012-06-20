@@ -151,3 +151,479 @@
 [Wed Jun 20 16:51:28 2012] crosslinker.pl: 100 % Peak mz = 1076.08752
 [Wed Jun 20 16:51:29 2012] crosslinker.pl: Queue empty
 [Wed Jun 20 16:51:29 2012] crosslinker.pl: completed
+[Wed Jun 20 17:21:15 2012] crosslinker.pl: Started
+[Wed Jun 20 17:21:15 2012] crosslinker.pl: Reagent: BS2G-d4 
+[Wed Jun 20 17:21:20 2012] crosslinker.pl: Sequence 0 = >PolIII 
+[Wed Jun 20 17:21:20 2012] crosslinker.pl: Digested peptides:1190 
+[Wed Jun 20 17:21:20 2012] crosslinker.pl: Calulating masses...  
+[Wed Jun 20 17:21:20 2012] crosslinker.pl: Crosslinking peptides...  
+[Wed Jun 20 17:21:22 2012] crosslinker.pl: Finding doublets...  
+[Wed Jun 20 17:21:22 2012] crosslinker.pl: Starting Peak Matches...
+[Wed Jun 20 17:21:22 2012] crosslinker.pl: 1 % Peak mz = 395.21796
+[Wed Jun 20 17:21:24 2012] crosslinker.pl: 3 % Peak mz = 618.75372
+[Wed Jun 20 17:21:26 2012] crosslinker.pl: 4 % Peak mz = 377.86224
+[Wed Jun 20 17:21:27 2012] crosslinker.pl: Best: AMGKK-KPEE - Score: 54 - Score(alpha): 50
+[Wed Jun 20 17:21:27 2012] crosslinker.pl: Time Taken = 0.229391 secs 
+[Wed Jun 20 17:21:27 2012] crosslinker.pl: Best: AMGKKKPEE - Score: 126 - Score(alpha): 126
+[Wed Jun 20 17:21:27 2012] crosslinker.pl: Time Taken = 0.409626 secs 
+[Wed Jun 20 17:21:29 2012] crosslinker.pl: 6 % Peak mz = 747.37103
+[Wed Jun 20 17:21:30 2012] crosslinker.pl: Best: AXGKK-KPEEXAK - Score: 275 - Score(alpha): 70
+[Wed Jun 20 17:21:30 2012] crosslinker.pl: Time Taken = 0.996597 secs 
+[Wed Jun 20 17:21:32 2012] crosslinker.pl: 7 % Peak mz = 365.22769
+[Wed Jun 20 17:21:34 2012] crosslinker.pl: 9 % Peak mz = 450.71976
+[Wed Jun 20 17:21:36 2012] crosslinker.pl: 10 % Peak mz = 400.74057
+[Wed Jun 20 17:21:37 2012] crosslinker.pl: Best: KLNRR - Score: 222 - Score(alpha): 222
+[Wed Jun 20 17:21:37 2012] crosslinker.pl: Time Taken = 0.100656 secs 
+[Wed Jun 20 17:21:37 2012] crosslinker.pl: 12 % Peak mz = 365.22729
+[Wed Jun 20 17:21:39 2012] crosslinker.pl: 13 % Peak mz = 493.25119
+[Wed Jun 20 17:21:43 2012] crosslinker.pl: Best: AMGKK-KPEEXAK - Score: 361 - Score(alpha): 174
+[Wed Jun 20 17:21:43 2012] crosslinker.pl: Time Taken = 3.144071 secs 
+[Wed Jun 20 17:21:44 2012] crosslinker.pl: 15 % Peak mz = 739.37335
+[Wed Jun 20 17:21:47 2012] crosslinker.pl: Best: AMGKK-KPEEXAK - Score: 511 - Score(alpha): 80
+[Wed Jun 20 17:21:47 2012] crosslinker.pl: Time Taken = 2.001214 secs 
+[Wed Jun 20 17:21:48 2012] crosslinker.pl: 16 % Peak mz = 788.36212
+[Wed Jun 20 17:21:50 2012] crosslinker.pl: 18 % Peak mz = 415.90182
+[Wed Jun 20 17:21:52 2012] crosslinker.pl: 19 % Peak mz = 739.37360
+[Wed Jun 20 17:21:54 2012] crosslinker.pl: Best: AXGKK-KPEEMAK - Score: 307 - Score(alpha): 136
+[Wed Jun 20 17:21:54 2012] crosslinker.pl: Time Taken = 2.031644 secs 
+[Wed Jun 20 17:21:56 2012] crosslinker.pl: 21 % Peak mz = 525.76263
+[Wed Jun 20 17:21:58 2012] crosslinker.pl: 22 % Peak mz = 521.26190
+[Wed Jun 20 17:22:00 2012] crosslinker.pl: 24 % Peak mz = 516.55994
+[Wed Jun 20 17:22:02 2012] crosslinker.pl: 25 % Peak mz = 781.38965
+[Wed Jun 20 17:22:05 2012] crosslinker.pl: 27 % Peak mz = 391.19803
+[Wed Jun 20 17:22:07 2012] crosslinker.pl: 28 % Peak mz = 467.94263
+[Wed Jun 20 17:22:09 2012] crosslinker.pl: Best: AXGKK-TAPLVKK - Score: 105 - Score(alpha): 0
+[Wed Jun 20 17:22:09 2012] crosslinker.pl: Time Taken = 0.918699 secs 
+[Wed Jun 20 17:22:11 2012] crosslinker.pl: 30 % Peak mz = 701.41071
+[Wed Jun 20 17:22:12 2012] crosslinker.pl: Best: AXGKK-TAPLVKK - Score: 310 - Score(alpha): 115
+[Wed Jun 20 17:22:12 2012] crosslinker.pl: Time Taken = 0.760259 secs 
+[Wed Jun 20 17:22:13 2012] crosslinker.pl: 31 % Peak mz = 351.20898
+[Wed Jun 20 17:22:14 2012] crosslinker.pl: Best: AXGKK-TAPLVKK - Score: 174 - Score(alpha): 0
+[Wed Jun 20 17:22:14 2012] crosslinker.pl: Time Taken = 0.869479 secs 
+[Wed Jun 20 17:22:16 2012] crosslinker.pl: 33 % Peak mz = 495.95343
+[Wed Jun 20 17:22:17 2012] crosslinker.pl: Best: KVVGLVD-MINKR - Score: 163 - Score(alpha): 99
+[Wed Jun 20 17:22:17 2012] crosslinker.pl: Time Taken = 0.181034 secs 
+[Wed Jun 20 17:22:18 2012] crosslinker.pl: 34 % Peak mz = 499.24973
+[Wed Jun 20 17:22:20 2012] crosslinker.pl: 36 % Peak mz = 748.37177
+[Wed Jun 20 17:22:21 2012] crosslinker.pl: 37 % Peak mz = 610.01324
+[Wed Jun 20 17:22:25 2012] crosslinker.pl: Best: KKPEEXAK-TAPLVKK - Score: 347 - Score(alpha): 240
+[Wed Jun 20 17:22:25 2012] crosslinker.pl: Time Taken = 2.083935 secs 
+[Wed Jun 20 17:22:25 2012] crosslinker.pl: 39 % Peak mz = 576.59906
+[Wed Jun 20 17:22:27 2012] crosslinker.pl: 40 % Peak mz = 487.91956
+[Wed Jun 20 17:22:28 2012] crosslinker.pl: Best: AMGKK-KPEEMAK - Score: 845 - Score(alpha): 291
+[Wed Jun 20 17:22:28 2012] crosslinker.pl: Time Taken = 1.009059 secs 
+[Wed Jun 20 17:22:30 2012] crosslinker.pl: 42 % Peak mz = 731.37585
+[Wed Jun 20 17:22:31 2012] crosslinker.pl: Best: AMGKK-KPEEMAK - Score: 926 - Score(alpha): 168
+[Wed Jun 20 17:22:31 2012] crosslinker.pl: Time Taken = 0.896456 secs 
+[Wed Jun 20 17:22:32 2012] crosslinker.pl: 43 % Peak mz = 366.19147
+[Wed Jun 20 17:22:34 2012] crosslinker.pl: Best: AMGKK-KPEEMAK - Score: 498 - Score(alpha): 215
+[Wed Jun 20 17:22:34 2012] crosslinker.pl: Time Taken = 1.030695 secs 
+[Wed Jun 20 17:22:35 2012] crosslinker.pl: 45 % Peak mz = 742.36682
+[Wed Jun 20 17:22:37 2012] crosslinker.pl: Best: KDR-NKGGYFRE - Score: 132 - Score(alpha): 92
+[Wed Jun 20 17:22:37 2012] crosslinker.pl: Time Taken = 0.230239 secs 
+[Wed Jun 20 17:22:37 2012] crosslinker.pl: Best: KRD-NKGGYFRE - Score: 132 - Score(alpha): 92
+[Wed Jun 20 17:22:37 2012] crosslinker.pl: Time Taken = 0.229447 secs 
+[Wed Jun 20 17:22:38 2012] crosslinker.pl: 46 % Peak mz = 520.57831
+[Wed Jun 20 17:22:39 2012] crosslinker.pl: Best: KHGREE-SRGXKD - Score: 74 - Score(alpha): 58
+[Wed Jun 20 17:22:39 2012] crosslinker.pl: Time Taken = 0.171696 secs 
+[Wed Jun 20 17:22:40 2012] crosslinker.pl: 48 % Peak mz = 829.35297
+[Wed Jun 20 17:22:41 2012] crosslinker.pl: 49 % Peak mz = 750.35388
+[Wed Jun 20 17:22:43 2012] crosslinker.pl: 51 % Peak mz = 386.23566
+[Wed Jun 20 17:22:46 2012] crosslinker.pl: Best: RAMGKK-TAPLVKK - Score: 88 - Score(alpha): 69
+[Wed Jun 20 17:22:46 2012] crosslinker.pl: Time Taken = 1.067702 secs 
+[Wed Jun 20 17:22:46 2012] crosslinker.pl: 52 % Peak mz = 455.26407
+[Wed Jun 20 17:22:50 2012] crosslinker.pl: Best: XINKRRAK-RAMGKK - Score: 121 - Score(alpha): 85
+[Wed Jun 20 17:22:50 2012] crosslinker.pl: Time Taken = 2.516855 secs 
+[Wed Jun 20 17:22:51 2012] crosslinker.pl: 54 % Peak mz = 415.96817
+[Wed Jun 20 17:22:52 2012] crosslinker.pl: Best: AMGKK-KFAGYGFNK - Score: 99 - Score(alpha): 73
+[Wed Jun 20 17:22:52 2012] crosslinker.pl: Time Taken = 1.100006 secs 
+[Wed Jun 20 17:22:53 2012] crosslinker.pl: Best: KPE-YQQLLEKDR - Score: 133 - Score(alpha): 39
+[Wed Jun 20 17:22:53 2012] crosslinker.pl: Time Taken = 0.220969 secs 
+[Wed Jun 20 17:22:54 2012] crosslinker.pl: 55 % Peak mz = 462.61105
+[Wed Jun 20 17:22:55 2012] crosslinker.pl: Best: AMGKK-TAPLVKK - Score: 130 - Score(alpha): 0
+[Wed Jun 20 17:22:55 2012] crosslinker.pl: Time Taken = 0.524276 secs 
+[Wed Jun 20 17:22:56 2012] crosslinker.pl: 57 % Peak mz = 693.41296
+[Wed Jun 20 17:22:57 2012] crosslinker.pl: Best: AMGKK-TAPLVKK - Score: 580 - Score(alpha): 200
+[Wed Jun 20 17:22:57 2012] crosslinker.pl: Time Taken = 0.743621 secs 
+[Wed Jun 20 17:22:59 2012] crosslinker.pl: 58 % Peak mz = 742.40137
+[Wed Jun 20 17:23:01 2012] crosslinker.pl: 60 % Peak mz = 571.26758
+[Wed Jun 20 17:23:02 2012] crosslinker.pl: 61 % Peak mz = 604.68146
+[Wed Jun 20 17:23:06 2012] crosslinker.pl: Best: KKPEEMAK-TAPLVKK - Score: 389 - Score(alpha): 208
+[Wed Jun 20 17:23:06 2012] crosslinker.pl: Time Taken = 2.278796 secs 
+[Wed Jun 20 17:23:06 2012] crosslinker.pl: 63 % Peak mz = 856.39838
+[Wed Jun 20 17:23:08 2012] crosslinker.pl: 64 % Peak mz = 381.52563
+[Wed Jun 20 17:23:10 2012] crosslinker.pl: 66 % Peak mz = 453.76285
+[Wed Jun 20 17:23:13 2012] crosslinker.pl: Best: KKPEEMAK-TAPLVKK - Score: 149 - Score(alpha): 19
+[Wed Jun 20 17:23:13 2012] crosslinker.pl: Time Taken = 1.521543 secs 
+[Wed Jun 20 17:23:13 2012] crosslinker.pl: 67 % Peak mz = 554.28870
+[Wed Jun 20 17:23:14 2012] crosslinker.pl: Best: AMGKK-KFAGYGFNK - Score: 52 - Score(alpha): 43
+[Wed Jun 20 17:23:14 2012] crosslinker.pl: Time Taken = 0.807702 secs 
+[Wed Jun 20 17:23:15 2012] crosslinker.pl: Best: KPE-YQQLLEKDR - Score: 111 - Score(alpha): 28
+[Wed Jun 20 17:23:15 2012] crosslinker.pl: Time Taken = 0.210506 secs 
+[Wed Jun 20 17:23:16 2012] crosslinker.pl: 69 % Peak mz = 906.51953
+[Wed Jun 20 17:23:19 2012] crosslinker.pl: Best: KKPEEMAK-TAPLVKK - Score: 961 - Score(alpha): 625
+[Wed Jun 20 17:23:19 2012] crosslinker.pl: Time Taken = 1.926959 secs 
+[Wed Jun 20 17:23:20 2012] crosslinker.pl: 70 % Peak mz = 510.26367
+[Wed Jun 20 17:23:21 2012] crosslinker.pl: Best: GMKD-MGLKILPPD - Score: 171 - Score(alpha): 89
+[Wed Jun 20 17:23:21 2012] crosslinker.pl: Time Taken = 0.156436 secs 
+[Wed Jun 20 17:23:22 2012] crosslinker.pl: Best: NKGGYFR-TDTKK - Score: 187 - Score(alpha): 195
+[Wed Jun 20 17:23:22 2012] crosslinker.pl: Time Taken = 0.338902 secs 
+[Wed Jun 20 17:23:22 2012] crosslinker.pl: 72 % Peak mz = 587.79187
+[Wed Jun 20 17:23:24 2012] crosslinker.pl: Best: NGINAELAMK - Score: 84 - Score(alpha): 84
+[Wed Jun 20 17:23:24 2012] crosslinker.pl: Time Taken = 0.156679 secs 
+[Wed Jun 20 17:23:24 2012] crosslinker.pl: 73 % Peak mz = 440.27966
+[Wed Jun 20 17:23:26 2012] crosslinker.pl: 75 % Peak mz = 467.73352
+[Wed Jun 20 17:23:28 2012] crosslinker.pl: 76 % Peak mz = 622.66815
+[Wed Jun 20 17:23:29 2012] crosslinker.pl: Best: DLIKR-LKDMHPTER - Score: 857 - Score(alpha): 143
+[Wed Jun 20 17:23:29 2012] crosslinker.pl: Time Taken = 0.331411 secs 
+[Wed Jun 20 17:23:30 2012] crosslinker.pl: Best: DYLVKRAK-EXAKQR - Score: 226 - Score(alpha): 187
+[Wed Jun 20 17:23:30 2012] crosslinker.pl: Time Taken = 0.562673 secs 
+[Wed Jun 20 17:23:31 2012] crosslinker.pl: Best: KVVGLVDE-YAGLVKFD - Score: 117 - Score(alpha): 83
+[Wed Jun 20 17:23:31 2012] crosslinker.pl: Time Taken = 0.306869 secs 
+[Wed Jun 20 17:23:32 2012] crosslinker.pl: Best: LAMKIFDLVE-TDTKK - Score: 130 - Score(alpha): 113
+[Wed Jun 20 17:23:32 2012] crosslinker.pl: Time Taken = 0.580767 secs 
+[Wed Jun 20 17:23:32 2012] crosslinker.pl: 78 % Peak mz = 503.78223
+[Wed Jun 20 17:23:34 2012] crosslinker.pl: 79 % Peak mz = 488.50531
+[Wed Jun 20 17:23:36 2012] crosslinker.pl: Best: VAIHDGFTLDDPKRPR - Score: 657 - Score(alpha): 657
+[Wed Jun 20 17:23:36 2012] crosslinker.pl: Time Taken = 0.244908 secs 
+[Wed Jun 20 17:23:36 2012] crosslinker.pl: 81 % Peak mz = 746.90393
+[Wed Jun 20 17:23:37 2012] crosslinker.pl: Best: HAGGVVIAPTKITD - Score: 1111 - Score(alpha): 1111
+[Wed Jun 20 17:23:37 2012] crosslinker.pl: Time Taken = 0.20764 secs 
+[Wed Jun 20 17:23:38 2012] crosslinker.pl: 82 % Peak mz = 871.92670
+[Wed Jun 20 17:23:40 2012] crosslinker.pl: 84 % Peak mz = 882.91760
+[Wed Jun 20 17:23:42 2012] crosslinker.pl: 85 % Peak mz = 922.99750
+[Wed Jun 20 17:23:43 2012] crosslinker.pl: Best: EEVKALID-XINKRR - Score: 102 - Score(alpha): 111
+[Wed Jun 20 17:23:43 2012] crosslinker.pl: Time Taken = 0.304143 secs 
+[Wed Jun 20 17:23:44 2012] crosslinker.pl: Best: NAGKHAGGVVIAPTXITD - Score: 323 - Score(alpha): 323
+[Wed Jun 20 17:23:44 2012] crosslinker.pl: Time Taken = 0.448333 secs 
+[Wed Jun 20 17:23:44 2012] crosslinker.pl: 87 % Peak mz = 695.66803
+[Wed Jun 20 17:23:46 2012] crosslinker.pl: 88 % Peak mz = 774.39667
+[Wed Jun 20 17:23:48 2012] crosslinker.pl: Time Taken = 0.023443 secs 
+[Wed Jun 20 17:23:48 2012] crosslinker.pl: 90 % Peak mz = 720.43280
+[Wed Jun 20 17:23:50 2012] crosslinker.pl: Best: GKVITAAGLVVAAR - Score: 355 - Score(alpha): 355
+[Wed Jun 20 17:23:50 2012] crosslinker.pl: Time Taken = 0.26923 secs 
+[Wed Jun 20 17:23:50 2012] crosslinker.pl: 91 % Peak mz = 667.81201
+[Wed Jun 20 17:23:52 2012] crosslinker.pl: 93 % Peak mz = 813.89740
+[Wed Jun 20 17:23:54 2012] crosslinker.pl: 94 % Peak mz = 824.88837
+[Wed Jun 20 17:23:56 2012] crosslinker.pl: 96 % Peak mz = 587.33002
+[Wed Jun 20 17:23:58 2012] crosslinker.pl: Best: VMVTKRGNR - Score: 39 - Score(alpha): 39
+[Wed Jun 20 17:23:58 2012] crosslinker.pl: Time Taken = 0.15962 secs 
+[Wed Jun 20 17:23:58 2012] crosslinker.pl: 97 % Peak mz = 598.32062
+[Wed Jun 20 17:24:00 2012] crosslinker.pl: 99 % Peak mz = 606.30756
+[Wed Jun 20 17:24:03 2012] crosslinker.pl: 100 % Peak mz = 608.83240
+[Wed Jun 20 17:24:05 2012] crosslinker.pl: Queue empty
+[Wed Jun 20 17:24:05 2012] crosslinker.pl: completed
+[Wed Jun 20 17:25:08 2012] crosslinker.pl: Started
+[Wed Jun 20 17:25:13 2012] crosslinker.pl: Sequence 0 = >PolIII 
+[Wed Jun 20 17:25:13 2012] crosslinker.pl: Digested peptides:1190 
+[Wed Jun 20 17:25:13 2012] crosslinker.pl: Sequence 1 = >decoyPolIII 
+[Wed Jun 20 17:25:13 2012] crosslinker.pl: Digested peptides:2376 
+[Wed Jun 20 17:25:13 2012] crosslinker.pl: Calulating masses...  
+[Wed Jun 20 17:25:13 2012] crosslinker.pl: Crosslinking peptides...  
+[Wed Jun 20 17:25:25 2012] crosslinker.pl: Finding doublets...  
+[Wed Jun 20 17:25:25 2012] crosslinker.pl: Starting Peak Matches...
+[Wed Jun 20 17:25:26 2012] crosslinker.pl: 1 % Peak mz = 395.21796
+[Wed Jun 20 17:25:33 2012] crosslinker.pl: 3 % Peak mz = 618.75372
+[Wed Jun 20 17:25:40 2012] crosslinker.pl: 4 % Peak mz = 377.86224
+[Wed Jun 20 17:25:42 2012] crosslinker.pl: Best: AMGKK-KPEE - Score: 54 - Score(alpha): 50
+[Wed Jun 20 17:25:42 2012] crosslinker.pl: Time Taken = 0.229562 secs 
+[Wed Jun 20 17:25:42 2012] crosslinker.pl: Best: AMGKKKPEE - Score: 126 - Score(alpha): 126
+[Wed Jun 20 17:25:42 2012] crosslinker.pl: Time Taken = 0.389469 secs 
+[Wed Jun 20 17:25:48 2012] crosslinker.pl: 6 % Peak mz = 747.37103
+[Wed Jun 20 17:25:50 2012] crosslinker.pl: Best: AXEEPKK-AXGKK - Score: 93 - Score(alpha): 130
+[Wed Jun 20 17:25:50 2012] crosslinker.pl: Time Taken = 0.691099 secs 
+[Wed Jun 20 17:25:51 2012] crosslinker.pl: Best: AXGKK-KPEEXAK - Score: 275 - Score(alpha): 70
+[Wed Jun 20 17:25:51 2012] crosslinker.pl: Time Taken = 0.944863 secs 
+[Wed Jun 20 17:25:52 2012] crosslinker.pl: Best: EXAKQR-KTDTR - Score: 107 - Score(alpha): 130
+[Wed Jun 20 17:25:52 2012] crosslinker.pl: Time Taken = 0.181342 secs 
+[Wed Jun 20 17:25:56 2012] crosslinker.pl: 7 % Peak mz = 365.22769
+[Wed Jun 20 17:26:03 2012] crosslinker.pl: 9 % Peak mz = 450.71976
+[Wed Jun 20 17:26:10 2012] crosslinker.pl: 10 % Peak mz = 400.74057
+[Wed Jun 20 17:26:15 2012] crosslinker.pl: Best: KLNRR - Score: 222 - Score(alpha): 222
+[Wed Jun 20 17:26:15 2012] crosslinker.pl: Time Taken = 0.102313 secs 
+[Wed Jun 20 17:26:17 2012] crosslinker.pl: 12 % Peak mz = 365.22729
+[Wed Jun 20 17:26:24 2012] crosslinker.pl: 13 % Peak mz = 493.25119
+[Wed Jun 20 17:26:27 2012] crosslinker.pl: Best: AMEEPKK-AXGKK - Score: 278 - Score(alpha): 245
+[Wed Jun 20 17:26:27 2012] crosslinker.pl: Time Taken = 2.324522 secs 
+[Wed Jun 20 17:26:30 2012] crosslinker.pl: Best: AMGKK-KPEEXAK - Score: 361 - Score(alpha): 174
+[Wed Jun 20 17:26:30 2012] crosslinker.pl: Time Taken = 2.577888 secs 
+[Wed Jun 20 17:26:36 2012] crosslinker.pl: 15 % Peak mz = 739.37335
+[Wed Jun 20 17:26:39 2012] crosslinker.pl: Best: AXEEPKK-AMGKK - Score: 154 - Score(alpha): 168
+[Wed Jun 20 17:26:39 2012] crosslinker.pl: Time Taken = 1.676553 secs 
+[Wed Jun 20 17:26:40 2012] crosslinker.pl: Best: AMGKK-KPEEXAK - Score: 511 - Score(alpha): 80
+[Wed Jun 20 17:26:40 2012] crosslinker.pl: Time Taken = 1.771303 secs 
+[Wed Jun 20 17:26:46 2012] crosslinker.pl: 16 % Peak mz = 788.36212
+[Wed Jun 20 17:26:53 2012] crosslinker.pl: 18 % Peak mz = 415.90182
+[Wed Jun 20 17:26:58 2012] crosslinker.pl: Best: KLNR-KTDTR - Score: 98 - Score(alpha): 115
+[Wed Jun 20 17:26:58 2012] crosslinker.pl: Time Taken = 0.152462 secs 
+[Wed Jun 20 17:27:00 2012] crosslinker.pl: 19 % Peak mz = 739.37360
+[Wed Jun 20 17:27:03 2012] crosslinker.pl: Best: AXEEPKK-AMGKK - Score: 184 - Score(alpha): 245
+[Wed Jun 20 17:27:03 2012] crosslinker.pl: Time Taken = 1.507084 secs 
+[Wed Jun 20 17:27:05 2012] crosslinker.pl: Best: AXGKK-KPEEMAK - Score: 307 - Score(alpha): 136
+[Wed Jun 20 17:27:05 2012] crosslinker.pl: Time Taken = 1.907968 secs 
+[Wed Jun 20 17:27:05 2012] crosslinker.pl: Best: ARRKNIXE-KSD - Score: 136 - Score(alpha): 157
+[Wed Jun 20 17:27:05 2012] crosslinker.pl: Time Taken = 0.181255 secs 
+[Wed Jun 20 17:27:05 2012] crosslinker.pl: Best: ARRKNIXE-SKD - Score: 136 - Score(alpha): 157
+[Wed Jun 20 17:27:05 2012] crosslinker.pl: Time Taken = 0.17958 secs 
+[Wed Jun 20 17:27:06 2012] crosslinker.pl: Best: EMAKQR-KTDTR - Score: 104 - Score(alpha): 127
+[Wed Jun 20 17:27:06 2012] crosslinker.pl: Time Taken = 0.181912 secs 
+[Wed Jun 20 17:27:10 2012] crosslinker.pl: Best: LGEKAR-SRGXKD - Score: 65 - Score(alpha): 78
+[Wed Jun 20 17:27:10 2012] crosslinker.pl: Time Taken = 0.18506 secs 
+[Wed Jun 20 17:27:11 2012] crosslinker.pl: 21 % Peak mz = 525.76263
+[Wed Jun 20 17:27:18 2012] crosslinker.pl: 22 % Peak mz = 521.26190
+[Wed Jun 20 17:27:25 2012] crosslinker.pl: 24 % Peak mz = 516.55994
+[Wed Jun 20 17:27:31 2012] crosslinker.pl: 25 % Peak mz = 781.38965
+[Wed Jun 20 17:27:38 2012] crosslinker.pl: 27 % Peak mz = 391.19803
+[Wed Jun 20 17:27:45 2012] crosslinker.pl: 28 % Peak mz = 467.94263
+[Wed Jun 20 17:27:47 2012] crosslinker.pl: Best: AXGKK-KVLPATK - Score: 0 - Score(alpha): 0
+[Wed Jun 20 17:27:47 2012] crosslinker.pl: Time Taken = 0.553352 secs 
+[Wed Jun 20 17:27:48 2012] crosslinker.pl: Best: AXGKK-TAPLVKK - Score: 105 - Score(alpha): 0
+[Wed Jun 20 17:27:48 2012] crosslinker.pl: Time Taken = 0.543835 secs 
+[Wed Jun 20 17:27:51 2012] crosslinker.pl: Best: GMKDLIK-NLKK - Score: 0 - Score(alpha): 0
+[Wed Jun 20 17:27:51 2012] crosslinker.pl: Time Taken = 0.920624 secs 
+[Wed Jun 20 17:27:54 2012] crosslinker.pl: 30 % Peak mz = 701.41071
+[Wed Jun 20 17:27:57 2012] crosslinker.pl: Best: AXGKK-KVLPATK - Score: 163 - Score(alpha): 94
+[Wed Jun 20 17:27:57 2012] crosslinker.pl: Time Taken = 0.792788 secs 
+[Wed Jun 20 17:27:58 2012] crosslinker.pl: Best: AXGKK-TAPLVKK - Score: 310 - Score(alpha): 115
+[Wed Jun 20 17:27:58 2012] crosslinker.pl: Time Taken = 0.718483 secs 
+[Wed Jun 20 17:28:01 2012] crosslinker.pl: Best: GMKDLIK-NLKK - Score: 47 - Score(alpha): 60
+[Wed Jun 20 17:28:01 2012] crosslinker.pl: Time Taken = 0.833951 secs 
+[Wed Jun 20 17:28:05 2012] crosslinker.pl: 31 % Peak mz = 351.20898
+[Wed Jun 20 17:28:08 2012] crosslinker.pl: Best: AXGKK-KVLPATK - Score: 0 - Score(alpha): 0
+[Wed Jun 20 17:28:08 2012] crosslinker.pl: Time Taken = 0.962896 secs 
+[Wed Jun 20 17:28:08 2012] crosslinker.pl: Best: AXGKK-TAPLVKK - Score: 174 - Score(alpha): 0
+[Wed Jun 20 17:28:08 2012] crosslinker.pl: Time Taken = 0.703877 secs 
+[Wed Jun 20 17:28:12 2012] crosslinker.pl: Best: GMKDLIK-NLKK - Score: 31 - Score(alpha): 36
+[Wed Jun 20 17:28:12 2012] crosslinker.pl: Time Taken = 0.705241 secs 
+[Wed Jun 20 17:28:15 2012] crosslinker.pl: 33 % Peak mz = 495.95343
+[Wed Jun 20 17:28:17 2012] crosslinker.pl: Best: AMGKKKPE-NLKK - Score: 148 - Score(alpha): 131
+[Wed Jun 20 17:28:17 2012] crosslinker.pl: Time Taken = 1.460039 secs 
+[Wed Jun 20 17:28:22 2012] crosslinker.pl: Best: KVVGLVD-MINKR - Score: 163 - Score(alpha): 99
+[Wed Jun 20 17:28:22 2012] crosslinker.pl: Time Taken = 0.177939 secs 
+[Wed Jun 20 17:28:23 2012] crosslinker.pl: 34 % Peak mz = 499.24973
+[Wed Jun 20 17:28:28 2012] crosslinker.pl: Best: KXGRSE-XINKR - Score: 22 - Score(alpha): 26
+[Wed Jun 20 17:28:28 2012] crosslinker.pl: Time Taken = 0.147331 secs 
+[Wed Jun 20 17:28:28 2012] crosslinker.pl: Best: KNIME-KVLYDE - Score: 32 - Score(alpha): 39
+[Wed Jun 20 17:28:28 2012] crosslinker.pl: Time Taken = 0.15996 secs 
+[Wed Jun 20 17:28:29 2012] crosslinker.pl: Best: LAMKIFD-VDSKD - Score: 9 - Score(alpha): 15
+[Wed Jun 20 17:28:29 2012] crosslinker.pl: Time Taken = 0.148197 secs 
+[Wed Jun 20 17:28:30 2012] crosslinker.pl: 36 % Peak mz = 748.37177
+[Wed Jun 20 17:28:31 2012] crosslinker.pl: Best: AADQHAKAE-KAIE - Score: 101 - Score(alpha): 97
+[Wed Jun 20 17:28:31 2012] crosslinker.pl: Time Taken = 0.217149 secs 
+[Wed Jun 20 17:28:36 2012] crosslinker.pl: Best: KXGRSE-XINKR - Score: 208 - Score(alpha): 143
+[Wed Jun 20 17:28:36 2012] crosslinker.pl: Time Taken = 0.206062 secs 
+[Wed Jun 20 17:28:36 2012] crosslinker.pl: Best: KNIME-KVLYDE - Score: 78 - Score(alpha): 92
+[Wed Jun 20 17:28:36 2012] crosslinker.pl: Time Taken = 0.207055 secs 
+[Wed Jun 20 17:28:36 2012] crosslinker.pl: Best: LAMKIFD-VDSKD - Score: 74 - Score(alpha): 92
+[Wed Jun 20 17:28:36 2012] crosslinker.pl: Time Taken = 0.209226 secs 
+[Wed Jun 20 17:28:38 2012] crosslinker.pl: 37 % Peak mz = 610.01324
+[Wed Jun 20 17:28:41 2012] crosslinker.pl: Best: AXEEPKKK-KVLPATK - Score: 84 - Score(alpha): 22
+[Wed Jun 20 17:28:41 2012] crosslinker.pl: Time Taken = 1.81547 secs 
+[Wed Jun 20 17:28:42 2012] crosslinker.pl: Best: AXEEPKKK-TAPLVKK - Score: 200 - Score(alpha): 35
+[Wed Jun 20 17:28:42 2012] crosslinker.pl: Time Taken = 1.632094 secs 
+[Wed Jun 20 17:28:48 2012] crosslinker.pl: Best: KKPEEXAK-KVLPATK - Score: 246 - Score(alpha): 230
+[Wed Jun 20 17:28:48 2012] crosslinker.pl: Time Taken = 1.909308 secs 
+[Wed Jun 20 17:28:50 2012] crosslinker.pl: Best: KKPEEXAK-TAPLVKK - Score: 347 - Score(alpha): 240
+[Wed Jun 20 17:28:50 2012] crosslinker.pl: Time Taken = 1.820241 secs 
+[Wed Jun 20 17:28:51 2012] crosslinker.pl: 39 % Peak mz = 576.59906
+[Wed Jun 20 17:28:58 2012] crosslinker.pl: 40 % Peak mz = 487.91956
+[Wed Jun 20 17:29:00 2012] crosslinker.pl: Best: AMEEPKK-AMGKK - Score: 317 - Score(alpha): 288
+[Wed Jun 20 17:29:00 2012] crosslinker.pl: Time Taken = 0.893454 secs 
+[Wed Jun 20 17:29:01 2012] crosslinker.pl: Best: AMGKK-KPEEMAK - Score: 845 - Score(alpha): 291
+[Wed Jun 20 17:29:01 2012] crosslinker.pl: Time Taken = 0.99549 secs 
+[Wed Jun 20 17:29:07 2012] crosslinker.pl: 42 % Peak mz = 731.37585
+[Wed Jun 20 17:29:09 2012] crosslinker.pl: Best: AMEEPKK-AMGKK - Score: 353 - Score(alpha): 436
+[Wed Jun 20 17:29:09 2012] crosslinker.pl: Time Taken = 0.822883 secs 
+[Wed Jun 20 17:29:10 2012] crosslinker.pl: Best: AMGKK-KPEEMAK - Score: 926 - Score(alpha): 168
+[Wed Jun 20 17:29:10 2012] crosslinker.pl: Time Taken = 0.872642 secs 
+[Wed Jun 20 17:29:15 2012] crosslinker.pl: 43 % Peak mz = 366.19147
+[Wed Jun 20 17:29:17 2012] crosslinker.pl: Best: AMEEPKK-AMGKK - Score: 212 - Score(alpha): 233
+[Wed Jun 20 17:29:17 2012] crosslinker.pl: Time Taken = 0.833499 secs 
+[Wed Jun 20 17:29:18 2012] crosslinker.pl: Best: AMGKK-KPEEMAK - Score: 498 - Score(alpha): 215
+[Wed Jun 20 17:29:18 2012] crosslinker.pl: Time Taken = 0.936777 secs 
+[Wed Jun 20 17:29:23 2012] crosslinker.pl: 45 % Peak mz = 742.36682
+[Wed Jun 20 17:29:26 2012] crosslinker.pl: Best: DKE-RFYGGKNR - Score: 120 - Score(alpha): 149
+[Wed Jun 20 17:29:26 2012] crosslinker.pl: Time Taken = 0.215247 secs 
+[Wed Jun 20 17:29:29 2012] crosslinker.pl: Best: KDR-NKGGYFRE - Score: 132 - Score(alpha): 92
+[Wed Jun 20 17:29:29 2012] crosslinker.pl: Time Taken = 0.231478 secs 
+[Wed Jun 20 17:29:29 2012] crosslinker.pl: Best: KRD-NKGGYFRE - Score: 132 - Score(alpha): 92
+[Wed Jun 20 17:29:29 2012] crosslinker.pl: Time Taken = 0.225248 secs 
+[Wed Jun 20 17:29:31 2012] crosslinker.pl: 46 % Peak mz = 520.57831
+[Wed Jun 20 17:29:36 2012] crosslinker.pl: Best: KHGREE-SRGXKD - Score: 74 - Score(alpha): 58
+[Wed Jun 20 17:29:36 2012] crosslinker.pl: Time Taken = 0.163137 secs 
+[Wed Jun 20 17:29:38 2012] crosslinker.pl: 48 % Peak mz = 829.35297
+[Wed Jun 20 17:29:44 2012] crosslinker.pl: 49 % Peak mz = 750.35388
+[Wed Jun 20 17:29:51 2012] crosslinker.pl: 51 % Peak mz = 386.23566
+[Wed Jun 20 17:29:57 2012] crosslinker.pl: Best: KKGMAR-KVLPATK - Score: 149 - Score(alpha): 44
+[Wed Jun 20 17:29:57 2012] crosslinker.pl: Time Taken = 1.051995 secs 
+[Wed Jun 20 17:29:58 2012] crosslinker.pl: Best: KKGMAR-TAPLVKK - Score: 85 - Score(alpha): 55
+[Wed Jun 20 17:29:58 2012] crosslinker.pl: Time Taken = 0.957209 secs 
+[Wed Jun 20 17:29:59 2012] crosslinker.pl: Best: KVLPATK-RAMGKK - Score: 140 - Score(alpha): 134
+[Wed Jun 20 17:29:59 2012] crosslinker.pl: Time Taken = 1.017065 secs 
+[Wed Jun 20 17:30:01 2012] crosslinker.pl: Best: RAMGKK-TAPLVKK - Score: 88 - Score(alpha): 69
+[Wed Jun 20 17:30:01 2012] crosslinker.pl: Time Taken = 0.931526 secs 
+[Wed Jun 20 17:30:02 2012] crosslinker.pl: Best: RKLR-RNLKKTD - Score: 97 - Score(alpha): 87
+[Wed Jun 20 17:30:02 2012] crosslinker.pl: Time Taken = 0.326068 secs 
+[Wed Jun 20 17:30:02 2012] crosslinker.pl: Best: RLKR-RNLKKTD - Score: 89 - Score(alpha): 70
+[Wed Jun 20 17:30:02 2012] crosslinker.pl: Time Taken = 0.322345 secs 
+[Wed Jun 20 17:30:02 2012] crosslinker.pl: 52 % Peak mz = 455.26407
+[Wed Jun 20 17:30:10 2012] crosslinker.pl: Best: KKGMAR-XINKRRAK - Score: 131 - Score(alpha): 69
+[Wed Jun 20 17:30:10 2012] crosslinker.pl: Time Taken = 2.545601 secs 
+[Wed Jun 20 17:30:14 2012] crosslinker.pl: Best: XINKRRAK-RAMGKK - Score: 121 - Score(alpha): 85
+[Wed Jun 20 17:30:14 2012] crosslinker.pl: Time Taken = 2.789655 secs 
+[Wed Jun 20 17:30:14 2012] crosslinker.pl: Best: RGHKRD-RLKRRPE - Score: 8 - Score(alpha): 15
+[Wed Jun 20 17:30:14 2012] crosslinker.pl: Time Taken = 0.182477 secs 
+[Wed Jun 20 17:30:14 2012] crosslinker.pl: 54 % Peak mz = 415.96817
+[Wed Jun 20 17:30:16 2012] crosslinker.pl: Best: AKAHQDAAK-KHGRE - Score: 137 - Score(alpha): 136
+[Wed Jun 20 17:30:16 2012] crosslinker.pl: Time Taken = 0.674876 secs 
+[Wed Jun 20 17:30:18 2012] crosslinker.pl: Best: AMGKK-KFAGYGFNK - Score: 99 - Score(alpha): 73
+[Wed Jun 20 17:30:18 2012] crosslinker.pl: Time Taken = 1.076152 secs 
+[Wed Jun 20 17:30:23 2012] crosslinker.pl: Best: KPE-YQQLLEKDR - Score: 133 - Score(alpha): 39
+[Wed Jun 20 17:30:23 2012] crosslinker.pl: Time Taken = 0.411729 secs 
+[Wed Jun 20 17:30:24 2012] crosslinker.pl: 55 % Peak mz = 462.61105
+[Wed Jun 20 17:30:26 2012] crosslinker.pl: Best: AMGKK-KVLPATK - Score: 0 - Score(alpha): 0
+[Wed Jun 20 17:30:26 2012] crosslinker.pl: Time Taken = 0.512439 secs 
+[Wed Jun 20 17:30:27 2012] crosslinker.pl: Best: AMGKK-TAPLVKK - Score: 130 - Score(alpha): 0
+[Wed Jun 20 17:30:27 2012] crosslinker.pl: Time Taken = 0.524921 secs 
+[Wed Jun 20 17:30:32 2012] crosslinker.pl: 57 % Peak mz = 693.41296
+[Wed Jun 20 17:30:34 2012] crosslinker.pl: Best: AMGKK-KVLPATK - Score: 388 - Score(alpha): 104
+[Wed Jun 20 17:30:34 2012] crosslinker.pl: Time Taken = 0.756679 secs 
+[Wed Jun 20 17:30:35 2012] crosslinker.pl: Best: AMGKK-TAPLVKK - Score: 580 - Score(alpha): 200
+[Wed Jun 20 17:30:35 2012] crosslinker.pl: Time Taken = 0.735571 secs 
+[Wed Jun 20 17:30:40 2012] crosslinker.pl: 58 % Peak mz = 742.40137
+[Wed Jun 20 17:30:43 2012] crosslinker.pl: Best: DPKRPR-KTDTR - Score: 176 - Score(alpha): 162
+[Wed Jun 20 17:30:43 2012] crosslinker.pl: Time Taken = 0.20481 secs 
+[Wed Jun 20 17:30:44 2012] crosslinker.pl: Best: FIKMALE-KYAR - Score: 237 - Score(alpha): 186
+[Wed Jun 20 17:30:44 2012] crosslinker.pl: Time Taken = 0.197579 secs 
+[Wed Jun 20 17:30:50 2012] crosslinker.pl: 60 % Peak mz = 571.26758
+[Wed Jun 20 17:30:59 2012] crosslinker.pl: 61 % Peak mz = 604.68146
+[Wed Jun 20 17:31:02 2012] crosslinker.pl: Best: AMEEPKKK-KVLPATK - Score: 102 - Score(alpha): 55
+[Wed Jun 20 17:31:02 2012] crosslinker.pl: Time Taken = 2.132783 secs 
+[Wed Jun 20 17:31:04 2012] crosslinker.pl: Best: AMEEPKKK-TAPLVKK - Score: 231 - Score(alpha): 53
+[Wed Jun 20 17:31:04 2012] crosslinker.pl: Time Taken = 1.848187 secs 
+[Wed Jun 20 17:31:09 2012] crosslinker.pl: Best: KGXARR-LIKRLQPD - Score: 72 - Score(alpha): 111
+[Wed Jun 20 17:31:09 2012] crosslinker.pl: Time Taken = 0.252424 secs 
+[Wed Jun 20 17:31:12 2012] crosslinker.pl: Best: KKPEEMAK-KVLPATK - Score: 225 - Score(alpha): 215
+[Wed Jun 20 17:31:12 2012] crosslinker.pl: Time Taken = 3.129404 secs 
+[Wed Jun 20 17:31:15 2012] crosslinker.pl: Best: KKPEEMAK-TAPLVKK - Score: 389 - Score(alpha): 208
+[Wed Jun 20 17:31:15 2012] crosslinker.pl: Time Taken = 2.919716 secs 
+[Wed Jun 20 17:31:17 2012] crosslinker.pl: 63 % Peak mz = 856.39838
+[Wed Jun 20 17:31:20 2012] crosslinker.pl: Best: EVKALID-KEMCFD - Score: 132 - Score(alpha): 157
+[Wed Jun 20 17:31:20 2012] crosslinker.pl: Time Taken = 0.260518 secs 
+[Wed Jun 20 17:31:25 2012] crosslinker.pl: 64 % Peak mz = 381.52563
+[Wed Jun 20 17:31:32 2012] crosslinker.pl: 66 % Peak mz = 453.76285
+[Wed Jun 20 17:31:35 2012] crosslinker.pl: Best: AMEEPKKK-KVLPATK - Score: 37 - Score(alpha): 51
+[Wed Jun 20 17:31:35 2012] crosslinker.pl: Time Taken = 1.820086 secs 
+[Wed Jun 20 17:31:37 2012] crosslinker.pl: Best: AMEEPKKK-TAPLVKK - Score: 173 - Score(alpha): 51
+[Wed Jun 20 17:31:37 2012] crosslinker.pl: Time Taken = 1.444679 secs 
+[Wed Jun 20 17:31:40 2012] crosslinker.pl: Best: KGXARR-LIKRLQPD - Score: 90 - Score(alpha): 132
+[Wed Jun 20 17:31:40 2012] crosslinker.pl: Time Taken = 0.181753 secs 
+[Wed Jun 20 17:31:42 2012] crosslinker.pl: Best: KKPEEMAK-KVLPATK - Score: 14 - Score(alpha): 19
+[Wed Jun 20 17:31:42 2012] crosslinker.pl: Time Taken = 1.573407 secs 
+[Wed Jun 20 17:31:44 2012] crosslinker.pl: Best: KKPEEMAK-TAPLVKK - Score: 149 - Score(alpha): 19
+[Wed Jun 20 17:31:44 2012] crosslinker.pl: Time Taken = 1.664785 secs 
+[Wed Jun 20 17:31:46 2012] crosslinker.pl: 67 % Peak mz = 554.28870
+[Wed Jun 20 17:31:47 2012] crosslinker.pl: Best: AKAHQDAAK-KHGRE - Score: 81 - Score(alpha): 95
+[Wed Jun 20 17:31:47 2012] crosslinker.pl: Time Taken = 0.429759 secs 
+[Wed Jun 20 17:31:48 2012] crosslinker.pl: Best: AMGKK-KFAGYGFNK - Score: 52 - Score(alpha): 43
+[Wed Jun 20 17:31:48 2012] crosslinker.pl: Time Taken = 0.858272 secs 
+[Wed Jun 20 17:31:54 2012] crosslinker.pl: Best: KPE-YQQLLEKDR - Score: 111 - Score(alpha): 28
+[Wed Jun 20 17:31:54 2012] crosslinker.pl: Time Taken = 0.210227 secs 
+[Wed Jun 20 17:31:56 2012] crosslinker.pl: 69 % Peak mz = 906.51953
+[Wed Jun 20 17:31:59 2012] crosslinker.pl: Best: AMEEPKKK-KVLPATK - Score: 452 - Score(alpha): 211
+[Wed Jun 20 17:31:59 2012] crosslinker.pl: Time Taken = 1.966764 secs 
+[Wed Jun 20 17:32:02 2012] crosslinker.pl: Best: AMEEPKKK-TAPLVKK - Score: 589 - Score(alpha): 211
+[Wed Jun 20 17:32:02 2012] crosslinker.pl: Time Taken = 2.74438 secs 
+[Wed Jun 20 17:32:09 2012] crosslinker.pl: Best: KKPEEMAK-KVLPATK - Score: 820 - Score(alpha): 609
+[Wed Jun 20 17:32:09 2012] crosslinker.pl: Time Taken = 2.104045 secs 
+[Wed Jun 20 17:32:11 2012] crosslinker.pl: Best: KKPEEMAK-TAPLVKK - Score: 961 - Score(alpha): 625
+[Wed Jun 20 17:32:11 2012] crosslinker.pl: Time Taken = 2.511007 secs 
+[Wed Jun 20 17:32:15 2012] crosslinker.pl: 70 % Peak mz = 510.26367
+[Wed Jun 20 17:32:21 2012] crosslinker.pl: Best: FYGGKNR-TDTKK - Score: 167 - Score(alpha): 173
+[Wed Jun 20 17:32:21 2012] crosslinker.pl: Time Taken = 0.332117 secs 
+[Wed Jun 20 17:32:21 2012] crosslinker.pl: Best: GMKD-MGLKILPPD - Score: 171 - Score(alpha): 89
+[Wed Jun 20 17:32:21 2012] crosslinker.pl: Time Taken = 0.240701 secs 
+[Wed Jun 20 17:32:22 2012] crosslinker.pl: Best: KDDLPIAAID-KTD - Score: 162 - Score(alpha): 173
+[Wed Jun 20 17:32:22 2012] crosslinker.pl: Time Taken = 0.164142 secs 
+[Wed Jun 20 17:32:25 2012] crosslinker.pl: Best: NKGGYFR-TDTKK - Score: 187 - Score(alpha): 195
+[Wed Jun 20 17:32:25 2012] crosslinker.pl: Time Taken = 0.433436 secs 
+[Wed Jun 20 17:32:25 2012] crosslinker.pl: 72 % Peak mz = 587.79187
+[Wed Jun 20 17:32:32 2012] crosslinker.pl: Best: MALEANIGNK - Score: 243 - Score(alpha): 243
+[Wed Jun 20 17:32:32 2012] crosslinker.pl: Time Taken = 0.152881 secs 
+[Wed Jun 20 17:32:33 2012] crosslinker.pl: Best: NGINAELAMK - Score: 84 - Score(alpha): 84
+[Wed Jun 20 17:32:33 2012] crosslinker.pl: Time Taken = 0.155657 secs 
+[Wed Jun 20 17:32:33 2012] crosslinker.pl: 73 % Peak mz = 440.27966
+[Wed Jun 20 17:32:41 2012] crosslinker.pl: 75 % Peak mz = 467.73352
+[Wed Jun 20 17:32:49 2012] crosslinker.pl: 76 % Peak mz = 622.66815
+[Wed Jun 20 17:32:52 2012] crosslinker.pl: Best: DLIKR-ETPHMDKLR - Score: 194 - Score(alpha): 145
+[Wed Jun 20 17:32:52 2012] crosslinker.pl: Time Taken = 0.469714 secs 
+[Wed Jun 20 17:32:53 2012] crosslinker.pl: Best: DLIKR-LKDMHPTER - Score: 857 - Score(alpha): 143
+[Wed Jun 20 17:32:53 2012] crosslinker.pl: Time Taken = 0.443375 secs 
+[Wed Jun 20 17:32:53 2012] crosslinker.pl: Best: DVLGVVKE-YAGLVKFD - Score: 238 - Score(alpha): 207
+[Wed Jun 20 17:32:53 2012] crosslinker.pl: Time Taken = 0.413848 secs 
+[Wed Jun 20 17:32:54 2012] crosslinker.pl: Best: DYLVKRAK-EXAKQR - Score: 226 - Score(alpha): 187
+[Wed Jun 20 17:32:54 2012] crosslinker.pl: Time Taken = 0.565648 secs 
+[Wed Jun 20 17:32:55 2012] crosslinker.pl: Best: EXAKQR-KARKVLYD - Score: 75 - Score(alpha): 66
+[Wed Jun 20 17:32:55 2012] crosslinker.pl: Time Taken = 1.00289 secs 
+[Wed Jun 20 17:32:59 2012] crosslinker.pl: Best: KVVGLVDE-YAGLVKFD - Score: 117 - Score(alpha): 83
+[Wed Jun 20 17:32:59 2012] crosslinker.pl: Time Taken = 0.436579 secs 
+[Wed Jun 20 17:33:00 2012] crosslinker.pl: Best: LAMKIFDLVE-TDTKK - Score: 130 - Score(alpha): 113
+[Wed Jun 20 17:33:00 2012] crosslinker.pl: Time Taken = 0.590618 secs 
+[Wed Jun 20 17:33:02 2012] crosslinker.pl: Best: TDTKK-VLDFIKMALE - Score: 150 - Score(alpha): 35
+[Wed Jun 20 17:33:02 2012] crosslinker.pl: Time Taken = 0.705825 secs 
+[Wed Jun 20 17:33:02 2012] crosslinker.pl: 78 % Peak mz = 503.78223
+[Wed Jun 20 17:33:10 2012] crosslinker.pl: 79 % Peak mz = 488.50531
+[Wed Jun 20 17:33:17 2012] crosslinker.pl: Best: VAIHDGFTLDDPKRPR - Score: 657 - Score(alpha): 657
+[Wed Jun 20 17:33:17 2012] crosslinker.pl: Time Taken = 0.256358 secs 
+[Wed Jun 20 17:33:17 2012] crosslinker.pl: 81 % Peak mz = 746.90393
+[Wed Jun 20 17:33:20 2012] crosslinker.pl: Best: DKE-YLVKRAKE - Score: 160 - Score(alpha): 64
+[Wed Jun 20 17:33:20 2012] crosslinker.pl: Time Taken = 0.389272 secs 
+[Wed Jun 20 17:33:22 2012] crosslinker.pl: Best: HAGGVVIAPTKITD - Score: 1111 - Score(alpha): 1111
+[Wed Jun 20 17:33:22 2012] crosslinker.pl: Time Taken = 0.221463 secs 
+[Wed Jun 20 17:33:26 2012] crosslinker.pl: 82 % Peak mz = 871.92670
+[Wed Jun 20 17:33:34 2012] crosslinker.pl: 84 % Peak mz = 882.91760
+[Wed Jun 20 17:33:44 2012] crosslinker.pl: Best: QKAMEEPK-SRGXKD - Score: 212 - Score(alpha): 181
+[Wed Jun 20 17:33:44 2012] crosslinker.pl: Time Taken = 2.104506 secs 
+[Wed Jun 20 17:33:44 2012] crosslinker.pl: 85 % Peak mz = 922.99750
+[Wed Jun 20 17:33:47 2012] crosslinker.pl: Best: EEVKALID-XINKRR - Score: 102 - Score(alpha): 111
+[Wed Jun 20 17:33:47 2012] crosslinker.pl: Time Taken = 0.475832 secs 
+[Wed Jun 20 17:33:49 2012] crosslinker.pl: Best: ILAKVEED-XINKRR - Score: 151 - Score(alpha): 172
+[Wed Jun 20 17:33:49 2012] crosslinker.pl: Time Taken = 0.261648 secs 
+[Wed Jun 20 17:33:51 2012] crosslinker.pl: Best: KLRE-KNGINAELAXK - Score: 188 - Score(alpha): 46
+[Wed Jun 20 17:33:51 2012] crosslinker.pl: Time Taken = 0.594172 secs 
+[Wed Jun 20 17:33:52 2012] crosslinker.pl: Best: NAGKHAGGVVIAPTXITD - Score: 323 - Score(alpha): 323
+[Wed Jun 20 17:33:52 2012] crosslinker.pl: Time Taken = 0.453865 secs 
+[Wed Jun 20 17:33:53 2012] crosslinker.pl: 87 % Peak mz = 695.66803
+[Wed Jun 20 17:33:57 2012] crosslinker.pl: Best: FCMEKR-TVGELKRAMD - Score: 121 - Score(alpha): 45
+[Wed Jun 20 17:33:57 2012] crosslinker.pl: Time Taken = 0.300292 secs 
+[Wed Jun 20 17:34:00 2012] crosslinker.pl: Best: KEMCFD-MARKLEGVTR - Score: 112 - Score(alpha): 100
+[Wed Jun 20 17:34:00 2012] crosslinker.pl: Time Taken = 0.298287 secs 
+[Wed Jun 20 17:34:02 2012] crosslinker.pl: 88 % Peak mz = 774.39667
+[Wed Jun 20 17:34:05 2012] crosslinker.pl: Best: EXAKQR-KLREE - Score: 114 - Score(alpha): 130
+[Wed Jun 20 17:34:05 2012] crosslinker.pl: Time Taken = 0.231612 secs 
+[Wed Jun 20 17:34:09 2012] crosslinker.pl: Time Taken = 0.023114 secs 
+[Wed Jun 20 17:34:09 2012] crosslinker.pl: Time Taken = 0.023938 secs 
+[Wed Jun 20 17:34:09 2012] crosslinker.pl: 90 % Peak mz = 720.43280
+[Wed Jun 20 17:34:10 2012] crosslinker.pl: Best: AAVVLGAATIVKGR - Score: 107 - Score(alpha): 107
+[Wed Jun 20 17:34:10 2012] crosslinker.pl: Time Taken = 0.238908 secs 
+[Wed Jun 20 17:34:14 2012] crosslinker.pl: Best: GKVITAAGLVVAAR - Score: 355 - Score(alpha): 355
+[Wed Jun 20 17:34:14 2012] crosslinker.pl: Time Taken = 0.258809 secs 
+[Wed Jun 20 17:34:17 2012] crosslinker.pl: 91 % Peak mz = 667.81201
+[Wed Jun 20 17:34:19 2012] crosslinker.pl: Best: AXEEPKK-DKE - Score: 316 - Score(alpha): 202
+[Wed Jun 20 17:34:19 2012] crosslinker.pl: Time Taken = 0.346077 secs 
+[Wed Jun 20 17:34:20 2012] crosslinker.pl: Best: DKE-KPEEXAK - Score: 312 - Score(alpha): 170
+[Wed Jun 20 17:34:20 2012] crosslinker.pl: Time Taken = 0.360272 secs 
+[Wed Jun 20 17:34:25 2012] crosslinker.pl: 93 % Peak mz = 813.89740
+[Wed Jun 20 17:34:27 2012] crosslinker.pl: Best: DKE-FKVLGAYEVD - Score: 87 - Score(alpha): 64
+[Wed Jun 20 17:34:27 2012] crosslinker.pl: Time Taken = 0.235606 secs 
+[Wed Jun 20 17:34:27 2012] crosslinker.pl: Best: DKE-VEYAGLVKFD - Score: 117 - Score(alpha): 64
+[Wed Jun 20 17:34:27 2012] crosslinker.pl: Time Taken = 0.231205 secs 
+[Wed Jun 20 17:34:30 2012] crosslinker.pl: Best: GNKAR-LKDXHPTE - Score: 124 - Score(alpha): 100
+[Wed Jun 20 17:34:30 2012] crosslinker.pl: Time Taken = 0.238619 secs 
+[Wed Jun 20 17:34:32 2012] crosslinker.pl: 94 % Peak mz = 824.88837
+[Wed Jun 20 17:34:40 2012] crosslinker.pl: 96 % Peak mz = 587.33002
+[Wed Jun 20 17:34:47 2012] crosslinker.pl: 97 % Peak mz = 598.32062
+[Wed Jun 20 17:34:54 2012] crosslinker.pl: 99 % Peak mz = 606.30756
+[Wed Jun 20 17:35:01 2012] crosslinker.pl: 100 % Peak mz = 608.83240
+[Wed Jun 20 17:35:08 2012] crosslinker.pl: Queue empty
+[Wed Jun 20 17:35:08 2012] crosslinker.pl: completed
