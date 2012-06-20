@@ -51,7 +51,7 @@ my $path = installed;
 my ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, $mass_of_carbon13, $no_of_fractions, $min_peptide_length, $scan_width ) =
   constants;
 my %residuemass = protein_residuemass($table);
-warn $monolink;
+# warn $monolink;
 
 my %modifications = modifications( $monolink, $xlink, $xlink_res, $table );
 

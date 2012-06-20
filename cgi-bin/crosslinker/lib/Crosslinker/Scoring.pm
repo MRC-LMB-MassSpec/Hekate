@@ -1140,13 +1140,13 @@ my ($chain, $ion_type, $charge_state, $fragment_number) = split (",", $ion);
 
 if ($ion_series_length > $max_ion_series_length{'total'}) { $max_ion_series_length{'total'} = $ion_series_length};
 
-	    if ($current_chain == 945 && $current_ion_type eq 'B')      {
+	    if ($current_chain eq '945' && $current_ion_type eq 'B')      {
 	      if ($ion_series_length > $max_ion_series_length{'alpha_b'}) { $max_ion_series_length{'alpha_b'} = $ion_series_length} 
-	    } elsif ($current_chain == 945 && $current_ion_type eq 'Y') {
+	    } elsif ($current_chain eq '945' && $current_ion_type eq 'Y') {
 	      if ($ion_series_length > $max_ion_series_length{'alpha_y'}) { $max_ion_series_length{'alpha_y'} = $ion_series_length}
-	    } elsif ($current_chain == 946 && $current_ion_type eq 'B') {
+	    } elsif ($current_chain eq '946' && $current_ion_type eq 'B') {
 	      if ($ion_series_length > $max_ion_series_length{'beta_b'}) { $max_ion_series_length{'beta_b'} = $ion_series_length}
-	    } elsif ($current_chain == 946 && $current_ion_type eq 'Y') {
+	    } elsif ($current_chain eq '946' && $current_ion_type eq 'Y') {
 	      if ($ion_series_length > $max_ion_series_length{'beta_y'}) { $max_ion_series_length{'beta_y'} = $ion_series_length}
 	    } 
 
