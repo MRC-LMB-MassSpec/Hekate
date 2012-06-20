@@ -11,6 +11,8 @@ use Crosslinker::Data;
 
 my $dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
+create_settings($dbh);
+
 my $table_list = $dbh->prepare( "SELECT name, desc, finished FROM settings  ORDER BY length(name) DESC, name DESC " );
 $table_list->execute();
 

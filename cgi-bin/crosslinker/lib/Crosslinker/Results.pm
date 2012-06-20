@@ -420,7 +420,7 @@ sub print_results {
         $top_hits,      $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13,  $cut_residues,      $protien_sequences,
         $reactive_site, $dbh,              $xlinker_mass,      $mono_mass_diff,   $table,             $mass_seperation,   $repeats,
         $scan_repeats,  $no_tables,        $max_hits,          $monolink,         $static_mod_string, $varible_mod_string,$xlink_mono_or_all,
-	$decoy,		$no_links
+	$decoy,		$no_links,	   $settings_dbh
    ) = @_;
 
    if ( !defined $max_hits ) 		{ $max_hits  = 0 }
@@ -434,7 +434,7 @@ sub print_results {
 
 # warn $decoy;
 
-   my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $table );
+   my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $table, $settings_dbh );
 
    my $fasta = $protien_sequences;
    $protien_sequences =~ s/^>.*$/>/mg;

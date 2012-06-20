@@ -76,9 +76,8 @@ print_heading('Scan Search');
 
    # Setup Modifications
 
-   my %protein_residuemass = protein_residuemass($results_table);
-   my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $results_table );
-
+   my %protein_residuemass = protein_residuemass($results_table, $settings_dbh);
+   my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $results_table, $settings_dbh );
    #Output page
 
    $state = generate_page_single_scan(
@@ -90,7 +89,6 @@ print_heading('Scan Search');
                            $threshold,		$n_or_c, 	   $match_charge,     $match_intensity,
 			   $light_scan,		$heavy_scan,	   $precursor_charge, $precursor_mass, $mass_seperation, $mass_of_proton 
    );
-
 
 
 
@@ -109,6 +107,7 @@ while ( ( my $fixed_mod = $fixed_mods->fetchrow_hashref ) ) {
 
 
 
+
    my $top_hits = $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC" );  
    $top_hits->execute($results_table);
 
@@ -118,7 +117,7 @@ print_heading('Results');
                $top_hits,          $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues,
                $fasta, $reactive_site,    $results_dbh,       $xlinker_mass,     $mono_mass_diff,   $results_table,
                $mass_seperation,   1,                 1,                  0,                 0,       1,
-               $static_mod_string, $varible_mod_string, 0		 ,$decoy,		1
+               $static_mod_string, $varible_mod_string, 0		 ,$decoy,		1, $settings_dbh
 );
 
    #Tidy up

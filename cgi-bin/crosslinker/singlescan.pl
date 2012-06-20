@@ -29,7 +29,7 @@ print_page_top_fancy("Score Scan");
 my $version = version();
 print_heading('Score Scan');
 print <<ENDHTML;
-<form method="POST" enctype="multipart/form-data" action="singlescan_search.pl" target="_blank">
+<form method="POST" enctype="multipart/form-data" action="singlescan_search.pl" >
 <table>
 
 <tr cellspacing="3">

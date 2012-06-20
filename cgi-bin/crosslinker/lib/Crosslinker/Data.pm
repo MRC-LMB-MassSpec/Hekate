@@ -10,7 +10,7 @@ our @EXPORT = (
                 'connect_db',    'check_state',  'give_permission',    'is_ready',            'disconnect_db', 'set_finished',
                 'save_settings', 'update_state', 'import_cgi_query',   'find_free_tablename', 'matchpeaks',    'create_table',
                 'import_mgf',    'import_csv',   'loaddoubletlist_db', 'generate_decoy',      'set_doublets_found',
-		'import_mgf_doublet_query',	 'connect_db_single', 'import_scan'
+		'import_mgf_doublet_query',	 'connect_db_single', 'import_scan', 'create_settings'
 );
 ######
 #
@@ -272,7 +272,6 @@ sub save_settings {
          my $fixed_mod = get_conf_value( $conf_dbh, $mod );
          my $fixed_mod_data = $fixed_mod->fetchrow_hashref();
          $settings_sql->execute( $results_table, $mod, $fixed_mod_data->{'name'}, $fixed_mod_data->{'setting1'}, $fixed_mod_data->{'setting2'}, 'fixed' );
-#          warn "Fixed mod selected: $mod: $fixed_mod_data->{'name'} \n";
          $fixed_mod->finish;
       }
       $conf_dbh->disconnect();
@@ -1041,5 +1040,35 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
    return @peaklist;
 }
 
+
+sub create_settings
+{
+ 
+my ($settings_dbh) = @_;
+
+$settings_dbh->do(
+      "CREATE TABLE IF NOT EXISTS settings (
+						      name,
+						      desc,
+						      cut_residues,
+						      protein_sequences,
+						      reactive_site,
+						      mono_mass_diff,
+						      xlinker_mass,
+						      decoy,
+						      ms2_da,
+						      ms1_ppm,
+						      finished,
+						      isotoptic_shift,
+						      threshold,
+						      doublets_found,
+						      charge_match,
+						      intensity_match,
+						      scored_ions,
+						      time
+						) ");
+
+
+}
 1;
 

@@ -28,7 +28,7 @@ sub residue_mass {
 
 sub protein_residuemass {
 
-   my ($table) = @_;
+   my ($table, $dbh) = @_;
 
    my %protein_residuemass = (
                                G => 57.02146,
@@ -58,7 +58,7 @@ sub protein_residuemass {
    );
 
    if ( defined $table ) {
-      my $fixed_mods = get_mods( $table, 'fixed' );
+      my $fixed_mods = get_mods( $table, 'fixed', $dbh );
       while ( ( my $fixed_mod = $fixed_mods->fetchrow_hashref ) ) {
          $protein_residuemass{ $fixed_mod->{'mod_residue'} } = $protein_residuemass{ $fixed_mod->{'mod_residue'} } + $fixed_mod->{'mod_mass'};
       }

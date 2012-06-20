@@ -140,3 +140,14 @@
 [Wed Jun 20 14:48:28 2012] crosslinker.pl: 100 % Peak mz = 608.83240
 [Wed Jun 20 14:48:28 2012] crosslinker.pl: Queue empty
 [Wed Jun 20 14:48:28 2012] crosslinker.pl: completed
+[Wed Jun 20 16:51:28 2012] crosslinker.pl: Started
+[Wed Jun 20 16:51:28 2012] crosslinker.pl: Fixed mod selected: 24: Carbamidomethyl 
+[Wed Jun 20 16:51:28 2012] crosslinker.pl: Sequence 0 = >PolIII 
+[Wed Jun 20 16:51:28 2012] crosslinker.pl: Digested peptides:387 
+[Wed Jun 20 16:51:28 2012] crosslinker.pl: Calulating masses...  
+[Wed Jun 20 16:51:28 2012] crosslinker.pl: Crosslinking peptides...  
+[Wed Jun 20 16:51:28 2012] crosslinker.pl: Finding doublets...  
+[Wed Jun 20 16:51:28 2012] crosslinker.pl: Starting Peak Matches...
+[Wed Jun 20 16:51:28 2012] crosslinker.pl: 100 % Peak mz = 1076.08752
+[Wed Jun 20 16:51:29 2012] crosslinker.pl: Queue empty
+[Wed Jun 20 16:51:29 2012] crosslinker.pl: completed
