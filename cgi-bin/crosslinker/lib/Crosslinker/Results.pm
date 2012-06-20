@@ -419,7 +419,8 @@ sub print_results {
    my (
         $top_hits,      $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13,  $cut_residues,      $protien_sequences,
         $reactive_site, $dbh,              $xlinker_mass,      $mono_mass_diff,   $table,             $mass_seperation,   $repeats,
-        $scan_repeats,  $no_tables,        $max_hits,          $monolink,         $static_mod_string, $varible_mod_string,$xlink_mono_or_all
+        $scan_repeats,  $no_tables,        $max_hits,          $monolink,         $static_mod_string, $varible_mod_string,$xlink_mono_or_all,
+	$decoy,
    ) = @_;
 
    if ( !defined $max_hits ) 		{ $max_hits  = 0 }
@@ -427,6 +428,7 @@ sub print_results {
    if ( !$repeats )          		{ $repeats   = 0 }
    if ( !$no_tables )       		{ $no_tables = 0 }
    if ( !defined $monolink )		{ $monolink  = 0 }
+   if ( !defined $decoy )		{ $decoy  = 'No' }
 
    my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $table );
 
@@ -440,29 +442,46 @@ sub print_results {
    my @mz_so_far;
    my @scan_so_far;
    my $printed_hits = 0;
+   my $fdr = 0;
+   my $fdr_non_decoy = 0;
+   my $fdr_decoy = 0;
 
    if ( $no_tables == 0 ) {
       print '<table><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td>';
       if ( $monolink == 1 ) { print '<td>Monolink Mass</td>'; }
-      print '<td>Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>MS/2</td></tr>';
+      print '<td>Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>MS/2</td>';
+      if ( $decoy eq 'Yes') {print '<td>FDR</td>'}
+      print '</tr>';
    }
 
    while (    ( my $top_hits_results = $top_hits->fetchrow_hashref )
            && ( $max_hits == 0 || $printed_hits < $max_hits ) )
    {
+      if ( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy')
+	  {
+	     $fdr_decoy = $fdr_decoy +1;
+	  }
+      else
+	  {
+ 	     $fdr_non_decoy = $fdr_non_decoy +1;     
+	  }
+	
       if (
            (
                 !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far )
              && !( grep $_ eq $top_hits_results->{'mz'},   @mz_so_far )
              && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
+	     && !( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' )
              && $repeats == 0
 	     &&    (( $top_hits_results->{'fragment'} =~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 2 ))
 		|| ( $top_hits_results->{'fragment'} !~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 1 )))
            )
            || (    $repeats == 1
                 && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
-                && $scan_repeats == 0 )
-           || ( $repeats == 1 && $scan_repeats == 1 )
+                && $scan_repeats == 0 
+		&& !( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' ))
+           || ( $repeats == 1 && $scan_repeats == 1 
+		&& !( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' ))
         )
       {
          push @hits_so_far, $top_hits_results->{'fragment'};
@@ -522,7 +541,12 @@ sub print_results {
                             $static_mod_string,                $varible_mod_string
            );
 
-           print "</td></tr>";
+           print "</td>";
+      
+
+      $fdr = sprintf( "%.2f", $fdr_decoy/($fdr_decoy+$fdr_non_decoy)*100);
+      if ( $decoy eq 'Yes') {print "<td>$fdr%</td>"}
+	   print "</tr>";
         } else {
          push @hits_so_far, $top_hits_results->{'fragment'};
          push @mz_so_far,   $top_hits_results->{'mz'};

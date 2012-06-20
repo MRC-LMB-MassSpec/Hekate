@@ -31,7 +31,7 @@ sub generate_decoy {
       my $decoy = reverse $sequence;
       $sequence_name =~ s/[^A-z1-9]//g;
       $decoy         =~ s/[^A-Z]//g;
-      $fasta = $fasta . ">r" . $sequence_name . "\r\n" . $decoy . "\n\n";
+      $fasta = $fasta . ">decoy" . $sequence_name . "\r\n" . $decoy . "\n\n";
    }
 
    return $fasta;
@@ -166,7 +166,10 @@ sub is_ready {
 						      finished,
 						      isotoptic_shift,
 						      threshold,
-						      doublets_found
+						      doublets_found,
+						      charge_match,
+						      intensity_match,
+						      scored_ions
 						) "
    );
 

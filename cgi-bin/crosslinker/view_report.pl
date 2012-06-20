@@ -68,6 +68,11 @@ my ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, 
 
 print_page_top('Report');
 
+if ($decoy eq "true") 
+  {$decoy = "Yes"}
+else
+  {$decoy = "No"}
+
 print "<Table>
 <tr><td style='font-weight: bold;'>Name:</td><td>$name</td><td style='font-weight: bold;'>Description</td><td>$desc</td></tr>
 <tr><td style='font-weight: bold;'>Cut:</td><td>$cut_residues</td><td style='font-weight: bold;'>Xlink Site</td><td>$reactive_site</td></tr>
@@ -75,8 +80,8 @@ print "<Table>
 <tr><td style='font-weight: bold;'>MS1 tollerance:</td><td>$ms1_ppm PPM</td><td style='font-weight: bold;'>MS2 tollerance</td><td>$ms2_da Da</td></tr>
 <tr><td style='font-weight: bold;'>Threshold:</td><td>$threshold %</td><td style='font-weight: bold;'>Doublets Found: </td><td>$doublets_found </td></tr>
 <tr><td style='font-weight: bold;'>Matched Charge:</td><td>$match_charge</td><td style='font-weight: bold;'>Matched Intensity: </td><td>$match_intensity</td></tr>
-<tr><td style='font-weight: bold;'>Ions Scored:</td><td>$scored_ions</td><td style='font-weight: bold;'></td><td></td></tr>
-</table><hr>";
+<tr><td style='font-weight: bold;'>Ions Scored:</td><td>$scored_ions</td><td style='font-weight: bold;'>Decoy</td><td>$decoy</td></tr>
+</table>";
 
 
 if ( $is_finished != '-1' ) {

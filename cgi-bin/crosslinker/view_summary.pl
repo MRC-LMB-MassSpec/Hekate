@@ -83,7 +83,15 @@ if ( $is_finished != '-1' ) {
    print '<div style="text-align:center"><h2 style="color:red;">Warning: Data analysis not finished</h2></div>';
 }
 
+
+
 print_heading('Settings');
+
+
+if ($decoy eq "true") 
+  {$decoy = "Yes"}
+else
+  {$decoy = "No"}
 
 print "<Table>
 <tr><td style='font-weight: bold;'>Name:</td><td>$name</td><td style='font-weight: bold;'>Description</td><td>$desc</td></tr>
@@ -92,7 +100,7 @@ print "<Table>
 <tr><td style='font-weight: bold;'>MS1 tollerance:</td><td>$ms1_ppm PPM</td><td style='font-weight: bold;'>MS2 tollerance</td><td>$ms2_da Da</td></tr>
 <tr><td style='font-weight: bold;'>Threshold:</td><td>$threshold %</td><td style='font-weight: bold;'>Doublets Found: </td><td>$doublets_found </td></tr>
 <tr><td style='font-weight: bold;'>Matched Charge:</td><td>$match_charge</td><td style='font-weight: bold;'>Matched Intensity: </td><td>$match_intensity</td></tr>
-<tr><td style='font-weight: bold;'>Ions Scored:</td><td>$scored_ions</td><td style='font-weight: bold;'></td><td></td></tr>
+<tr><td style='font-weight: bold;'>Ions Scored:</td><td>$scored_ions</td><td style='font-weight: bold;'>Decoy</td><td>$decoy</td></tr>
 </table>";
 
 my $varible_mod_string = '';
@@ -138,7 +146,7 @@ print_results(
                $top_hits,          $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues,
                $protein_sequences, $reactive_site,    $results_dbh,       $xlinker_mass,     $mono_mass_diff,   $table,
                $mass_seperation,   0,                 0,                  0,                 50 * $short,       0,
-               $static_mod_string, $varible_mod_string, 2
+               $static_mod_string, $varible_mod_string, 		  2, 		     $decoy
 );
 
 if ( $short == 1 ) {
@@ -160,7 +168,7 @@ print_results(
                $top_hits,          $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues,
                $protein_sequences, $reactive_site,    $results_dbh,       $xlinker_mass,     $mono_mass_diff,   $table,
                $mass_seperation,   0,                 0,                  0,                 50 * $short,       1,
-               $static_mod_string, $varible_mod_string, 1
+               $static_mod_string, $varible_mod_string, 1		 ,$decoy
 );
 
 print_page_bottom_fancy;
