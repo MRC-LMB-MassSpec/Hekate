@@ -211,28 +211,9 @@ sub give_permission {
 sub is_ready {
    my ($settings_dbh) = @_;
 
-   $settings_dbh->do(
-      "CREATE TABLE IF NOT EXISTS settings (
-						      name,
-						      desc,
-						      cut_residues,
-						      protein_sequences,
-						      reactive_site,
-						      mono_mass_diff,
-						      xlinker_mass,
-						      decoy,
-						      ms2_da,
-						      ms1_ppm,
-						      finished,
-						      isotoptic_shift,
-						      threshold,
-						      doublets_found,
-						      charge_match,
-						      intensity_match,
-						      scored_ions,
-						      time
-						) "
-   );
+
+   create_settings($settings_dbh);
+  
 
    my $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -2 or finished = -3 or finished > -1" );
    $settings_sql->execute();
@@ -327,28 +308,7 @@ sub save_settings {
       $conf_dbh->disconnect();
    }
 
-   $settings_dbh->do(
-      "CREATE TABLE IF NOT EXISTS settings (
-						      name,
-						      desc,
-						      cut_residues,
-						      protein_sequences,
-						      reactive_site,
-						      mono_mass_diff,
-						      xlinker_mass,
-						      decoy,
-						      ms2_da,
-						      ms1_ppm,
-						      finished,
-						      isotoptic_shift,
-						      threshold,
-						      doublets_found,
-						      charge_match,
-						      intensity_match,
-						      scored_ions,
-						      time
-						) "
-   );
+      create_settings($settings_dbh);
 
    my $settings_sql = $settings_dbh->prepare(
       "INSERT INTO settings 
@@ -579,28 +539,7 @@ sub import_mgf_doublet_query {
 sub find_free_tablename {
    my ($settings_dbh) = @_;
 
- $settings_dbh->do(
-      "CREATE TABLE IF NOT EXISTS settings (
-						      name,
-						      desc,
-						      cut_residues,
-						      protein_sequences,
-						      reactive_site,
-						      mono_mass_diff,
-						      xlinker_mass,
-						      decoy,
-						      ms2_da,
-						      ms1_ppm,
-						      finished,
-						      isotoptic_shift,
-						      threshold,
-						      doublets_found,
-						      charge_match,
-						      intensity_match,
-						      scored_ions,
-						      time
-						) "
-   );
+   create_settings($settings_dbh);
 
    my $table_list = $settings_dbh->prepare( "SELECT DISTINCT name FROM settings ORDER BY length(name) DESC, name DESC" );
    $table_list->execute();
@@ -608,9 +547,9 @@ sub find_free_tablename {
    my $results_table;
    if ( $table_name->{'name'} ) {
       my @new_table = split( 'R', $table_name->{'name'} );
-      $results_table = "R" . ( $new_table[1] + 1 );
+      $results_table = "R" . sprintf("%04d",( $new_table[1] + 1 ));
    } else {
-      $results_table = "R1";
+      $results_table = "R0001";
    }
 
    return $results_table;
