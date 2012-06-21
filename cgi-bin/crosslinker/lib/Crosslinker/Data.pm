@@ -37,10 +37,10 @@ sub generate_decoy {
    return $fasta;
 }
 
-sub connect_db {
-   my $dbh          = DBI->connect( "dbi:SQLite:dbname=:memory:",    "", "", { RaiseError => 1, AutoCommit => 1 } );
-   my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
-   my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
+sub create_results
+{
+ 
+my ($results_dbh) = @_;
 
    $results_dbh->do(
       "CREATE TABLE IF NOT EXISTS results (
@@ -77,10 +77,52 @@ sub connect_db {
 						      monolink_mass,
 						      best_alpha REAL,
 						      best_beta REAL,
-						      min_chain_score) "
+						      min_chain_score,
+						      time) "
    );
 
+
+}
+
+sub connect_db {
+   my $dbh          = DBI->connect( "dbi:SQLite:dbname=:memory:",    "", "", { RaiseError => 1, AutoCommit => 1 } );
+   my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
+   my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
+
+   create_results($results_dbh);
+
    return ( $dbh, $results_dbh, $settings_dbh );
+}
+
+
+sub create_settings
+{
+ 
+my ($settings_dbh) = @_;
+
+$settings_dbh->do(
+      "CREATE TABLE IF NOT EXISTS settings (
+						      name,
+						      desc,
+						      cut_residues,
+						      protein_sequences,
+						      reactive_site,
+						      mono_mass_diff,
+						      xlinker_mass,
+						      decoy,
+						      ms2_da,
+						      ms1_ppm,
+						      finished,
+						      isotoptic_shift,
+						      threshold,
+						      doublets_found,
+						      charge_match,
+						      intensity_match,
+						      scored_ions,
+						      time
+						) ");
+
+
 }
 
 sub connect_db_single {
@@ -88,43 +130,14 @@ sub connect_db_single {
    my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results_single",  "", "", { RaiseError => 1, AutoCommit => 1 } );
    my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings_single", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
-   $results_dbh->do(
-      "CREATE TABLE IF NOT EXISTS results (
-						      name,
-						      MSn_string,
-						      d2_MSn_string,
-						      mz,
-						      charge,
-						      fragment,    
-						      sequence1,
-						      sequence2,
-						      sequence1_name,
-						      sequence2_name,
-						      score REAL,
-						      fraction,
-						      scan,
-						      d2_scan,
-						      modification,
-						      no_of_mods,
-						      best_x,
-						      best_y,
-						      unmodified_fragment,
-						      ppm,
-						      top_10,
-						      d2_top_10,
-						      matched_abundance,
-						      d2_matched_abundance,
-						      total_abundance,
-						      d2_total_abundance,
-						      matched_common,
-     						      matched_crosslink,
-						      d2_matched_common,
-						      d2_matched_crosslink,
-						      monolink_mass,
-						      best_alpha REAL,
-						      best_beta REAL,
-						      min_chain_score) "
-   );
+   create_results($results_dbh);
+
+
+   create_settings($settings_dbh);
+   my $clean = $settings_dbh->prepare("DELETE from settings where time < ?");
+   $clean->execute(time - 84400); #Delete any scans over a day old.  
+   $clean = $results_dbh->prepare("DELETE from results where time < ?");
+   $clean->execute(time - 84400); 
 
    return ( $dbh, $results_dbh, $settings_dbh );
 }
@@ -647,7 +660,7 @@ sub matchpeaks {
    # Connect to results DB and create a table
    #
 ######
-
+   my $time = time;
    my $results_sql = $results_dbh->prepare(
       "INSERT INTO results (
 						      name,
@@ -682,8 +695,9 @@ sub matchpeaks {
 						      d2_matched_crosslink, 
 						      monolink_mass,
 						      best_alpha,
-						      best_beta
-						      )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+						      best_beta,	
+						      time
+						      )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
    );
 
 #######
@@ -695,7 +709,7 @@ sub matchpeaks {
    foreach my $peak (@peaklist) {
       $peak_no = $peak_no + 1;
       my $percent_done = sprintf( "%.2f", $peak_no / @peaklist );
-      warn $percent_done * 100, " % Peak mz = " . sprintf( "%.5f", $peak->{'mz'} ) . "\n";
+#       warn $percent_done * 100, " % Peak mz = " . sprintf( "%.5f", $peak->{'mz'} ) . "\n";
 
        if ( check_state( $settings_dbh, $results_table ) == -4 ) {
           return %fragment_score;
@@ -831,7 +845,8 @@ sub matchpeaks {
                                                   $d2_top_10,                         $matched_abundance,            $d2_matched_abundance,
                                                   $total_abundance,                   $d2_total_abundance,           $matched_common,
                                                   $matched_crosslink,                 $d2_matched_common,            $d2_matched_crosslink,
-                                                  $monolink_mass,		      $best_alpha,		     $best_beta
+                                                  $monolink_mass,		      $best_alpha,		     $best_beta,
+						  $time
                            );
 
 # 		       $results_sql->execute($d2_MSn_string,$d2_MSn_string,$peak->{'d2_mz'},$peak->{'d2_charge'},$d2_modified_fragment, @sequences[(substr($fragment_sources{$fragment},0,1)-1)],@sequences[(substr($fragment_sources{$fragment},-1,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},0,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},-1,1)-1)],$d2_ms2_score, $peak->{'fraction'},"d2_".$peak->{'scan_num'},"d2_".$peak->{'d2_scan_num'}, $modification,$n,$d2_best_x,$d2_best_y,$fragment, $d2_score, $d2_top_10);
@@ -1041,34 +1056,6 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 }
 
 
-sub create_settings
-{
- 
-my ($settings_dbh) = @_;
 
-$settings_dbh->do(
-      "CREATE TABLE IF NOT EXISTS settings (
-						      name,
-						      desc,
-						      cut_residues,
-						      protein_sequences,
-						      reactive_site,
-						      mono_mass_diff,
-						      xlinker_mass,
-						      decoy,
-						      ms2_da,
-						      ms1_ppm,
-						      finished,
-						      isotoptic_shift,
-						      threshold,
-						      doublets_found,
-						      charge_match,
-						      intensity_match,
-						      scored_ions,
-						      time
-						) ");
-
-
-}
 1;
 

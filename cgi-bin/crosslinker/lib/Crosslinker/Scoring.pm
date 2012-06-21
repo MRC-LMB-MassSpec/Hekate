@@ -1091,10 +1091,10 @@ sub calc_score {
    $dbh->disconnect();
 
     if ( $best_match > 0 ) {
-      warn "Best: $best_sequence - Score: ", sprintf( "%.0f", ($best_match) )," - Score(alpha): ", sprintf( "%.0f", ($best_alpha) ),"\n";
+#       warn "Best: $best_sequence - Score: ", sprintf( "%.0f", ($best_match) ),"\n";
     }
    my $td = tv_interval($t0);
-   warn "Time Taken = ", $td, " secs \n";
+#    warn "Time Taken = ", $td, " secs \n";
    my $returned_score = sprintf( "%.0f", ($best_match) );
    $best_alpha = sprintf( "%.0f", ($best_alpha) );
    $best_beta = sprintf( "%.0f", ($best_beta) );
