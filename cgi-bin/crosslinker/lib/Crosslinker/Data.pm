@@ -502,10 +502,10 @@ sub import_cgi_query {
       $linkspacing    = $crosslinker->{'setting5'};
    }
 
-   my $mass_seperation;
+   my $mass_seperation = 0;
    if ( $isotope eq "deuterium" ) {
       $mass_seperation = $linkspacing * ( $mass_of_deuterium - $mass_of_hydrogen );
-   } else {
+   } elsif ($isotope eq "carbon-13") {
       $mass_seperation = $linkspacing * ( $mass_of_carbon13 - $mass_of_carbon12 );
    }
 
@@ -556,10 +556,10 @@ sub import_mgf_doublet_query {
       $linkspacing    = $crosslinker->{'setting5'};
    }
 
-   my $mass_seperation;
+   my $mass_seperation = 0;
    if ( $isotope eq "deuterium" ) {
       $mass_seperation = $linkspacing * ( $mass_of_deuterium - $mass_of_hydrogen );
-   } else {
+   } elsif ($isotope eq "carbon-13") {
       $mass_seperation = $linkspacing * ( $mass_of_carbon13 - $mass_of_carbon12 );
    }
 
@@ -611,7 +611,7 @@ sub matchpeaks {
    my $seperation = 0;
    if ( $isotope eq "deuterium" ) {
       $seperation = $linkspacing * ( $mass_of_deuterium - $mass_of_hydrogen );
-   } else {
+   } elsif ($isotope eq "carbon-13") {
       $seperation = $linkspacing * ( $mass_of_carbon13 - $mass_of_carbon12 );
    }
 
@@ -956,7 +956,7 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
    my $mass_seperation = 0;
    if ( $isotope eq "deuterium" ) {
       $mass_seperation = $linkspacing * ( $mass_of_deuterium - $mass_of_hydrogen );
-   } else {
+   } elsif ($isotope eq "carbon-13") {
       $mass_seperation = $linkspacing * ( $mass_of_carbon13 - $mass_of_carbon12 );
    }
 
@@ -982,6 +982,8 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 #    );
 # 
 #    $masslist->execute();
+
+
 
    if ( $isotope ne "none" ) {
       my $charge_match_string = "";

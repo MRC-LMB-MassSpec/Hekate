@@ -88,7 +88,7 @@ if ( $is_finished != '-1' ) {
 print_heading('Settings');
 
 
-if ($decoy eq "true") 
+if (defined $decoy && $decoy eq "true") 
   {$decoy = "Yes"}
 else
   {$decoy = "No"}

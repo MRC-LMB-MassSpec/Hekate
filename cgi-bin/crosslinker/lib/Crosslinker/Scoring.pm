@@ -138,7 +138,7 @@ sub calc_score {
 
   
 
-
+if ($seperation != 0) {
    my $ion_shift_matching  = $dbh->prepare ("UPDATE ms2 SET possible_no_ion_shift = 1  WHERE mass IN (SELECT ms2.mass as mass FROM ms2 INNER JOIN ms2 d2 ON
      (d2.mass between ms2.mass -  ? and ms2.mass + ?) WHERE ms2.heavy_light = 0 AND d2.heavy_light=1 )");
 
@@ -168,8 +168,10 @@ sub calc_score {
 #     warn "d2_Records_changed: $records_changed";
 # 
       _retry 15, sub {$dbh->do("DELETE FROM ms2 WHERE possible_no_ion_shift = 0  AND possible_ion_shift = 0")};
-
-
+} else {
+ $dbh->do ("UPDATE ms2 SET possible_no_ion_shift = 1, possible_ion_shift = 1");
+}
+  
 ######
    #
    #
@@ -873,6 +875,8 @@ sub calc_score {
 
                   my $count = $dbh->prepare(
 "SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join  (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 0 ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 ON (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ? ) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
+# "SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join  (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 0 ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 ON (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ? ) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1'  "
+
                   );
                   _retry 15, sub {$count->execute( $interval,
                                    $interval + $interval_range,
@@ -1143,9 +1147,9 @@ sub calc_score {
    $matchlist->finish();
    $dbh->disconnect();
 
-    if ( $best_match > 0 ) {
-#       warn "Best: $best_sequence - Score: ", sprintf( "%.0f", ($best_match) ),"\n";
-    }
+#     if ( $best_match > 0 ) {
+       warn "Best: $best_sequence - Score: ", sprintf( "%.0f", ($best_match) ),"\n";
+#     }
    my $td = tv_interval($t0);
 #    warn "Time Taken = ", $td, " secs \n";
    my $returned_score = sprintf( "%.0f", ($best_match) );
