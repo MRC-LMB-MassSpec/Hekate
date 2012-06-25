@@ -118,14 +118,14 @@ sub calc_score {
    my $TIC             = 0;
    my $no_of_ms2_peaks = 0;
 
-   _retry 15, sub {$dbh->do("CREATE TABLE ms2  (mass REAL, abundance REAL, heavy_light REAL)")};
-   my $newline = $dbh->prepare("INSERT INTO ms2 (mass , abundance,heavy_light ) VALUES (?, ?, ?)");
+   _retry 15, sub {$dbh->do("CREATE TABLE ms2  (mass REAL, abundance REAL, heavy_light REAL, possible_ion_shift REAL, possible_no_ion_shift REAL)")};
+   my $newline = $dbh->prepare("INSERT INTO ms2 (mass , abundance,heavy_light, possible_ion_shift, possible_no_ion_shift ) VALUES (?, ?, ?, ?, ?)");
    foreach my $mass_abundance (@masses) {
       $no_of_ms2_peaks = $no_of_ms2_peaks + 1;
       my ( $mass, $abundance ) = split " ", $mass_abundance;
       if ( $abundance > $max_abundance ) { $max_abundance = $abundance }
       $ms2_masses{$mass} = $abundance;
-      _retry 15, sub {$newline->execute( $mass, $abundance, 0 )};
+      _retry 15, sub {$newline->execute( $mass, $abundance, 0,0 ,0 )};
    }
 
    foreach my $mass_abundance (@d2_masses) {
@@ -133,10 +133,42 @@ sub calc_score {
       my ( $mass, $abundance ) = split " ", $mass_abundance;
       if ( $abundance > $max_abundance_d2 ) { $max_abundance_d2 = $abundance }
       $ms2_masses{$mass} = $abundance;
-      _retry 15, sub {$newline->execute( $mass, $abundance, 1 )};
+      _retry 15, sub {$newline->execute( $mass, $abundance, 1, 0, 0 )};
    }
 
-   _retry 15, sub {$dbh->do("CREATE INDEX ms2_index ON ms2 (mass);")};
+  
+
+
+   my $ion_shift_matching  = $dbh->prepare ("UPDATE ms2 SET possible_no_ion_shift = 1  WHERE mass IN (SELECT ms2.mass as mass FROM ms2 INNER JOIN ms2 d2 ON
+     (d2.mass between ms2.mass -  ? and ms2.mass + ?) WHERE ms2.heavy_light = 0 AND d2.heavy_light=1 )");
+
+# AND d2.abundance between ms2.abundance*0.5 and ms2.abundance*2 
+
+   _retry 15, sub {$ion_shift_matching->execute($ms2_error, $ms2_error)};
+
+   $ion_shift_matching  = $dbh->prepare ("UPDATE ms2 SET possible_no_ion_shift = 1  WHERE mass IN (SELECT d2.mass as mass FROM ms2 INNER JOIN ms2 d2 ON
+     (d2.mass between ms2.mass -  ? and ms2.mass + ?) WHERE ms2.heavy_light = 0 AND d2.heavy_light=1 )");  
+
+   _retry 15, sub {$ion_shift_matching->execute($ms2_error, $ms2_error)}; 
+#     warn "d0_Records_changed: $records_changed";
+
+
+   for ( my $charge = 1 ; $charge < ( $parent_charge + 1 ) ; $charge++ ) {
+   $ion_shift_matching  = $dbh->prepare ("UPDATE ms2 SET possible_ion_shift = 1  WHERE mass IN (SELECT ms2.mass as mass FROM ms2 INNER JOIN ms2 d2 ON
+     (d2.mass between ms2.mass -  ? and ms2.mass + ?) WHERE ms2.heavy_light = 0 AND d2.heavy_light=1  AND d2.abundance between ms2.abundance*0.5*? and ms2.abundance*2*?)");
+   _retry 15, sub {$ion_shift_matching->execute($ms2_error - ($seperation/$charge) , $ms2_error + ($seperation/$charge),$max_abundance_d2/$max_abundance,$max_abundance_d2/$max_abundance)};
+
+   $ion_shift_matching  = $dbh->prepare ("UPDATE ms2 SET possible_ion_shift = 1  WHERE mass IN (SELECT d2.mass as mass FROM ms2 INNER JOIN ms2 d2 ON
+     (d2.mass between ms2.mass -  ? and ms2.mass + ?) WHERE ms2.heavy_light = 0 AND d2.heavy_light=1 AND d2.abundance between ms2.abundance*0.5*? and ms2.abundance*2*? )");
+
+    _retry 15, sub {$ion_shift_matching->execute($ms2_error - ($seperation/$charge) , $ms2_error + ($seperation/$charge),$max_abundance_d2/$max_abundance,$max_abundance_d2/$max_abundance)};
+    }
+# AND d2.abundance between ms2.abundance*0.5 and ms2.abundance*2
+
+#     warn "d2_Records_changed: $records_changed";
+# 
+      _retry 15, sub {$dbh->do("DELETE FROM ms2 WHERE possible_no_ion_shift = 0  AND possible_ion_shift = 0")};
+
 
 ######
    #
@@ -153,9 +185,9 @@ sub calc_score {
 ######
 
    $masslist = $dbh->prepare("DROP TABLE IF EXISTS theoretical;");
-   _retry 15, sub {$dbh->do( "CREATE TABLE theoretical  (mass REAL, ion_type, peptide_chain, position, x, y, sequence, charge,heavy_light, mod, crosslink_ion, is_scored)" )};
+   _retry 15, sub {$dbh->do( "CREATE TABLE theoretical  (mass REAL, ion_type, peptide_chain, position, x, y, sequence, charge,heavy_light, mod, crosslink_ion, not_crosslink_ion, is_scored)" )};
    my $new_theoretical = $dbh->prepare(
-"INSERT INTO theoretical (mass, ion_type, peptide_chain, position, x, y, sequence, charge, heavy_light,mod, crosslink_ion, is_scored) VALUES (?, ?, ?,?, ? ,?, ?,?,?,?,?,? )"
+"INSERT INTO theoretical (mass, ion_type, peptide_chain, position, x, y, sequence, charge, heavy_light,mod, crosslink_ion,not_crosslink_ion, is_scored) VALUES (?, ?, ?,?, ? ,?, ?,?,?,?,?,?,?)"
    );
    _retry 15, sub {$dbh->do("CREATE INDEX theo_index ON theoretical (mass);")};
 
@@ -297,18 +329,18 @@ sub calc_score {
                         my $seperation_mz = ( $add_isotope_to_heavy * ( $seperation / $charge ) );
                         if ( $ms2_fragmentation{'bions'} ) {
                            _retry 15, sub {$new_theoretical->execute( $mz, 'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '',
-                                                      $add_isotope_to_heavy, $ms2_fragmentation{'bions-score'}  )};    #need to calc position not needed atm.
+                                                      $add_isotope_to_heavy, 1-$add_isotope_to_heavy, $ms2_fragmentation{'bions-score'}  )};    #need to calc position not needed atm.
                            _retry 15, sub {$new_theoretical->execute( $mz + ($seperation_mz),
                                                       'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '',
-                                                      $add_isotope_to_heavy,$ms2_fragmentation{'bions-score'} )};    #heavy ions
+                                                      $add_isotope_to_heavy, 1-$add_isotope_to_heavy, $ms2_fragmentation{'bions-score'} )};    #heavy ions
                         }
                         if ( $ms2_fragmentation{'aions'} ) {
                            _retry 15, sub {$new_theoretical->execute( $mz - ( ( 26.9871 + 1.0078 ) / $charge ),
                                                       'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '',
-                                                      $add_isotope_to_heavy,$ms2_fragmentation{'aions-score'} )};    #add A ion too
+                                                      $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'aions-score'} )};    #add A ion too
                            _retry 15, sub {$new_theoretical->execute( $mz - ( ( $seperation_mz + 26.9871 + 1.0078 ) / $charge ),
                                                       'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '',
-                                                      $add_isotope_to_heavy,$ms2_fragmentation{'aions-score'} )};
+                                                      $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'aions-score'} )};
                         }
                         my $fragment_residues = substr( $peptides[$i], 0, $residue_no );
                         if ( $n == 1 && @peptides > 1 ) {
@@ -322,18 +354,18 @@ sub calc_score {
                            if ( $ms2_fragmentation{'aions'} ) {
                               _retry 15, sub {$new_theoretical->execute( $mz - ( $water / $charge ),
                                                          'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]',
-                                                         $add_isotope_to_heavy,$ms2_fragmentation{'waterloss-score'} )};
+                                                         $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'waterloss-score'} )};
                               _retry 15, sub {$new_theoretical->execute( $mz - ( ( 26.9871 + 1.0078 - $water ) / $charge ),
                                                          'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]',
-                                                         $add_isotope_to_heavy,$ms2_fragmentation{'waterloss-score'} )};
+                                                         $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'waterloss-score'} )};
                            }
                            if ( $ms2_fragmentation{'bions'} ) {
                               _retry 15, sub {$new_theoretical->execute( $mz + ( $seperation_mz - ( $water / $charge ) ),
                                                          'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-H2O]',
-                                                         $add_isotope_to_heavy,$ms2_fragmentation{'waterloss-score'} )};
+                                                         $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'waterloss-score'} )};
                               _retry 15, sub {$new_theoretical->execute( $mz - ( $seperation_mz + ( +26.9871 + 1.0078 - $water ) / $charge ),
                                                          'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-H2O]',
-                                                         $add_isotope_to_heavy,$ms2_fragmentation{'waterloss-score'} )};
+                                                         $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'waterloss-score'} )};
                            }
                         }
                         if (    $fragment_residues =~ /[NQKR]/
@@ -342,18 +374,18 @@ sub calc_score {
                            if ( $ms2_fragmentation{'aions'} ) {
                               _retry 15, sub {$new_theoretical->execute( $mz - ( $ammonia / $charge ),
                                                          'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-NH3]',
-                                                         $add_isotope_to_heavy,$ms2_fragmentation{'ammonialoss-score'} )};
+                                                         $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'ammonialoss-score'} )};
                               _retry 15, sub {$new_theoretical->execute( $mz - ( ( 26.9871 + 1.0078 - $ammonia ) / $charge ),
                                                          'A', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-NH3]',
-                                                         $add_isotope_to_heavy,$ms2_fragmentation{'ammonialoss-score'} )};
+                                                         $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'ammonialoss-score'} )};
                            }
                            if ( $ms2_fragmentation{'bions'} ) {
                               _retry 15, sub {$new_theoretical->execute( $mz + ( $seperation_mz - ( $ammonia / $charge ) ),
                                                          'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]',
-                                                         $add_isotope_to_heavy ,$ms2_fragmentation{'ammonialoss-score'})};
+                                                         $add_isotope_to_heavy ,1-$add_isotope_to_heavy, $ms2_fragmentation{'ammonialoss-score'})};
                               _retry 15, sub {$new_theoretical->execute( $mz - ( $seperation_mz + ( +26.9871 + 1.0078 - $ammonia ) / $charge ),
                                                          'B', $i, $residue_no, $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]',
-                                                         $add_isotope_to_heavy,$ms2_fragmentation{'ammonialoss-score'} )};
+                                                         $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'ammonialoss-score'} )};
                            }
                         }
 
@@ -430,13 +462,13 @@ sub calc_score {
 #                             			    warn "n:$n i:$i +:$charge x:$xlink_position[0] y:$xlink_position[1] $fragment_residues  ", "\n";
 #                                                            warn $mz, " Y $i $residue_no";
                            _retry 15, sub {$new_theoretical->execute( $mz, 'Y', $i, @residues - $residue_no,
-                                                      $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '', $add_isotope_to_heavy ,$ms2_fragmentation{'yions-score'})}
+                                                      $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '', $add_isotope_to_heavy ,1-$add_isotope_to_heavy, $ms2_fragmentation{'yions-score'})}
                              ;    #need to calc position not needed atm.
 
 #                                                             warn "Y $i", $mz;
                            _retry 15, sub {$new_theoretical->execute( $mz + ($seperation_mz),
                                                       'Y', $i, @residues - $residue_no,
-                                                      $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '', $add_isotope_to_heavy,$ms2_fragmentation{'yions-score'} )}
+                                                      $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '', $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'yions-score'} )}
                              ;    #need to calc position not needed atm.
 
 #                            				warn  "Y(H) $i", $mz+$seperation_mz ;
@@ -445,11 +477,11 @@ sub calc_score {
                            {      #WATER loss
                               _retry 15, sub {$new_theoretical->execute( $mz - ( $water / $charge ),
                                                          'Y', $i, @residues - $residue_no,
-                                                         $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]', $add_isotope_to_heavy,$ms2_fragmentation{'waterloss-score'} )}
+                                                         $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]', $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'waterloss-score'} )}
                                 ;    #need to calc position not needed atm.
                               _retry 15, sub {$new_theoretical->execute( $mz + ($seperation_mz) - ( $water / $charge ),
                                                          'Y', $i, @residues - $residue_no,
-                                                         $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]', $add_isotope_to_heavy,$ms2_fragmentation{'waterloss-score'} )}
+                                                         $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]', $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'waterloss-score'} )}
                                 ;    #need to calc position not needed atm.
                            }
                            if (    $fragment_residues =~ /[NQKR]/
@@ -457,11 +489,11 @@ sub calc_score {
                            {         #Ammonia loss
                               _retry 15, sub {$new_theoretical->execute( $mz - ( $ammonia / $charge ),
                                                          'Y', $i, @residues - $residue_no,
-                                                         $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]', $add_isotope_to_heavy ,$ms2_fragmentation{'ammonialoss-score'})}
+                                                         $xlink_position[0], $xlink_position[1], $sequence, $charge, 0, '[-H2O]', $add_isotope_to_heavy ,1-$add_isotope_to_heavy, $ms2_fragmentation{'ammonialoss-score'})}
                                 ;    #need to calc position not needed atm.
                               _retry 15, sub {$new_theoretical->execute( $mz + ($seperation_mz) - ( $ammonia / $charge ),
                                                          'Y', $i, @residues - $residue_no,
-                                                         $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]', $add_isotope_to_heavy,$ms2_fragmentation{'ammonialoss-score'} )}
+                                                         $xlink_position[0], $xlink_position[1], $sequence, $charge, 1, '[-NH3]', $add_isotope_to_heavy,1-$add_isotope_to_heavy, $ms2_fragmentation{'ammonialoss-score'} )}
                                 ;    #need to calc position not needed atm.
                            }
                         }
@@ -829,8 +861,6 @@ sub calc_score {
                _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
                my $n_beta_d2 = $count->fetchrow_array;
 
-
-
                $count = $dbh->prepare(
                          "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '1' AND is_scored = '1'" );
                _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
@@ -838,8 +868,11 @@ sub calc_score {
 
                for ( my $q = 1 ; $q <= $q_max ; $q++ ) {
 
+
+# AND ms2.possible_ion_shift >= theoretical.crosslink_ion AND ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  
+
                   my $count = $dbh->prepare(
-"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 0  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1'"
+"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join  (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 0 ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 ON (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ? ) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
                   );
                   _retry 15, sub {$count->execute( $interval,
                                    $interval + $interval_range,
@@ -849,7 +882,7 @@ sub calc_score {
 
 
          $count = $dbh->prepare(
-"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 0  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1'AND theoretical.peptide_chain = '0'"
+"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 0  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1'AND theoretical.peptide_chain = '0' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
                   );
                   _retry 15, sub {$count->execute( $interval,
                                    $interval + $interval_range,
@@ -858,7 +891,7 @@ sub calc_score {
                   my $k_alpha = $count->fetchrow_array;
 
                   $count = $dbh->prepare(
-"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' and theoretical.peptide_chain = '0'"
+"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' and theoretical.peptide_chain = '0' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
                   );
                   _retry 15, sub {$count->execute( $interval,
                                    $interval + $interval_range,
@@ -868,7 +901,7 @@ sub calc_score {
 
 
          $count = $dbh->prepare(
-"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 0  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1' AND theoretical.peptide_chain = '1'"
+"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 0  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1' AND theoretical.peptide_chain = '1' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
                   );
                   _retry 15, sub {$count->execute( $interval,
                                    $interval + $interval_range,
@@ -877,7 +910,7 @@ sub calc_score {
                   my $k_beta = $count->fetchrow_array;
 
 	$count = $dbh->prepare(
-"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' AND theoretical.peptide_chain = '1'"
+"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' AND theoretical.peptide_chain = '1' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
                   );
                   _retry 15, sub {$count->execute( $interval,
                                    $interval + $interval_range,
@@ -887,15 +920,13 @@ sub calc_score {
 
 
                   $count = $dbh->prepare(
-"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1'"
+"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
                   );
                   _retry 15, sub {$count->execute( $interval,
                                    $interval + $interval_range,
                                    ( $max_abundance_d2 * $threshold / 100 ),
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
                   my $d2_k = $count->fetchrow_array;
-
-#                  warn "$sequence k_a+b/na+b = ",$k_alpha+$k_beta,"/",$n_alpha+$n_beta,", k/n=$k/$n NEED TO TEST D2 lines";
 
                   my $d0_score = 0;
                   my $d2_score = 0;
@@ -1031,9 +1062,9 @@ sub calc_score {
       }
    }
 
-   my $matchlist = $dbh->prepare(
-"SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ? ) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '0' and theoretical.heavy_light = '0' AND abundance > ? ORDER by abundance DESC"
-   );
+#    my $matchlist = $dbh->prepare("SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ? ) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '0' and theoretical.heavy_light = '0' AND abundance > ?  ORDER by abundance DESC");
+    my $matchlist = $dbh->prepare("SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ? ) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '0' and theoretical.heavy_light = '0'  AND abundance > ? AND ms2.possible_ion_shift >= theoretical.crosslink_ion AND ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  ORDER by abundance DESC");
+
    _retry 15, sub {$matchlist->execute( $ms2_error, $ms2_error, $best_x, $best_y, $best_sequence, ( $max_abundance * $threshold / 100 ) )};
    my $chain;
    my $top_10;
@@ -1070,7 +1101,7 @@ sub calc_score {
    }
 
    $matchlist = $dbh->prepare(
-"SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '1' and theoretical.heavy_light = '1' AND abundance > ? ORDER by abundance DESC "
+"SELECT *,  ms2.abundance as abundance FROM theoretical inner join ms2 on (ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND ms2.heavy_light = '1' and theoretical.heavy_light = '1' AND abundance > ? AND ms2.possible_ion_shift >= theoretical.crosslink_ion AND ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion    ORDER by abundance DESC "
    );
    _retry 15, sub {$matchlist->execute( $ms2_error, $ms2_error, $best_x, $best_y, $best_sequence, ( $max_abundance_d2 * $threshold / 100 ) )};
 

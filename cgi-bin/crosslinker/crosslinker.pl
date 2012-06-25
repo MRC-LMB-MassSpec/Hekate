@@ -100,7 +100,7 @@ if ($child) {
                            $reactive_site,      $scan_width,       \@sequence_names,  $match_ppm,      $min_peptide_length, $mass_of_deuterium,
                            $mass_of_hydrogen,   $mass_of_carbon13, $mass_of_carbon12, \%modifications, $query,              $mono_mass_diff,
                            $xlinker_mass,       $isotope,          $seperation,       $ms2_error,      $state,              \%ms2_fragmentation,
-                           $threshold,		$n_or_c, 	   $match_charge,     $match_intensity 
+                           $threshold,		$n_or_c, 	   $match_charge,     $match_intensity, $no_xlink_at_cut_site 
    );
 
    #Tidy up
