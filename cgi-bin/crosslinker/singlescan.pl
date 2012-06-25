@@ -59,7 +59,8 @@ print <<ENDHTML;
     </select><br/>
     
      MS2 accurracy (Da) <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/><br/>
-     Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/> 
+     Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/>
+    Allow cross-linking at cut site : <input type="checkbox" name="allow_xlink_at_cut_site" value="true" ><br/> 
     </td>
   <td class="half"  >
     Max. Missed Cleavages    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="2"/><br/>

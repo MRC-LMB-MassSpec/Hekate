@@ -30,7 +30,7 @@ sub generate_page {
         $reactive_site,         $scan_width,         $sequence_names_ref, $match_ppm,         $min_peptide_length, $mass_of_deuterium,
         $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
         $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
-        $threshold,		$n_or_c,	     $match_charge,	  $match_intensity 
+        $threshold,		$n_or_c,	     $match_charge,	  $match_intensity,   $no_xlink_at_cut_site 
    ) = @_;
 
    while ( $state == -2 ) {
@@ -107,7 +107,7 @@ sub generate_page {
                                     $mass_of_carbon12,   $cut_residues,           $nocut_residues,          \@sequence_names,
                                     $mono_mass_diff,     $xlinker_mass,           $seperation,              $isotope,
                                     $reactive_site,      \%modifications,         $ms2_error,               \%protein_residuemass,
-                                    \%ms2_fragmentation, $threshold
+                                    \%ms2_fragmentation, $threshold,		  $no_xlink_at_cut_site
    );
 
    give_permission($settings_dbh);
@@ -128,7 +128,7 @@ sub generate_page_single_scan {
         $reactive_site,         $scan_width,         $sequence_names_ref, $match_ppm,         $min_peptide_length, $mass_of_deuterium,
         $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
         $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
-        $threshold,		$n_or_c,	     $match_charge,	  $match_intensity,
+        $threshold,		$n_or_c,	     $match_charge,	  $match_intensity,   $no_xlink_at_cut_site,
 	$light_scan,		$heavy_scan,	   $precursor_charge, $precursor_mass, $mass_seperation, $mass_of_proton  
    ) = @_;
 
@@ -185,7 +185,6 @@ sub generate_page_single_scan {
    my $doublets_found = @peaklist;
    set_doublets_found( $results_table, $settings_dbh, $doublets_found );
 
-
    my %fragment_score = matchpeaks(
                                     \@peaklist,          \%xlink_fragment_masses, \%xlink_fragment_sources, $protien_sequences,
                                     $match_ppm,          $dbh,                    $results_dbh,             $settings_dbh,
@@ -193,7 +192,7 @@ sub generate_page_single_scan {
                                     $mass_of_carbon12,   $cut_residues,           $nocut_residues,          \@sequence_names,
                                     $mono_mass_diff,     $xlinker_mass,           $seperation,              $isotope,
                                     $reactive_site,      \%modifications,         $ms2_error,               \%protein_residuemass,
-                                    \%ms2_fragmentation, $threshold
+                                    \%ms2_fragmentation, $threshold, $no_xlink_at_cut_site
    );
   
  

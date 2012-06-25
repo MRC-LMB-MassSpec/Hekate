@@ -18,6 +18,30 @@ our @EXPORT = (
 #
 ######
 
+
+sub _retry {
+    my ( $retrys, $func ) = @_;
+    attempt: {
+      my $result;
+
+      # if it works, return the result
+      return $result if eval { $result = $func->(); 1 };
+
+      # nah, it failed, if failure reason is not a lock, croak
+      die $@ unless $@ =~ /database is locked/;
+
+      # if we have 0 remaining retrys, stop trying.
+      last attempt if $retrys < 1;
+
+      # sleep for 0.1 seconds, and then try again.
+      sleep 0.1;
+      $retrys--;
+      redo attempt;
+    }
+
+    die "Attempts Exceeded $@";
+}
+
 sub generate_decoy {
    my ($fasta) = @_;
 
@@ -42,7 +66,7 @@ sub create_results
  
 my ($results_dbh) = @_;
 
-   $results_dbh->do(
+   _retry 15, sub {$results_dbh->do(
       "CREATE TABLE IF NOT EXISTS results (
 						      name,
 						      MSn_string,
@@ -79,7 +103,7 @@ my ($results_dbh) = @_;
 						      best_beta REAL,
 						      min_chain_score,
 						      time) "
-   );
+   )};
 
 
 }
@@ -100,7 +124,7 @@ sub create_settings
  
 my ($settings_dbh) = @_;
 
-$settings_dbh->do(
+_retry 15, sub {$settings_dbh->do(
       "CREATE TABLE IF NOT EXISTS settings (
 						      name,
 						      desc,
@@ -120,7 +144,7 @@ $settings_dbh->do(
 						      intensity_match,
 						      scored_ions,
 						      time
-						) ");
+						) ")};
 
 
 }
@@ -135,9 +159,9 @@ sub connect_db_single {
 
    create_settings($settings_dbh);
    my $clean = $settings_dbh->prepare("DELETE from settings where time < ?");
-   $clean->execute(time - 84400); #Delete any scans over a day old.  
+   _retry 15, sub {$clean->execute(time - 84400)}; #Delete any scans over a day old.  
    $clean = $results_dbh->prepare("DELETE from results where time < ?");
-   $clean->execute(time - 84400); 
+   _retry 15, sub {$clean->execute(time - 84400)}; 
 
    return ( $dbh, $results_dbh, $settings_dbh );
 }
@@ -155,7 +179,7 @@ sub set_finished {
    my ( $results_table, $settings_dbh ) = @_;
 
    my $settings_sql = $settings_dbh->prepare("UPDATE settings SET finished = -1 WHERE  name = ?;");
-   $settings_sql->execute($results_table);
+   _retry 15, sub {$settings_sql->execute($results_table)};
 
    return;
 }
@@ -164,7 +188,7 @@ sub set_doublets_found {
    my ( $results_table, $settings_dbh, $doublets_found ) = @_;
 
    my $settings_sql = $settings_dbh->prepare("UPDATE settings SET doublets_found = ? WHERE  name = ?;");
-   $settings_sql->execute( $doublets_found, $results_table );
+   _retry 15, sub {$settings_sql->execute( $doublets_found, $results_table )};
 
    return;
 }
@@ -175,7 +199,7 @@ sub update_state {
 
    my $settings_sql = $settings_dbh->prepare("UPDATE settings SET finished =? WHERE name=?;");
 
-   $settings_sql->execute( $state, $results_table );
+   _retry 15, sub {$settings_sql->execute( $state, $results_table )};
 
    return;
 }
@@ -184,7 +208,7 @@ sub check_state {
    my ( $settings_dbh, $results_table ) = @_;
 
    my $settings_sql = $settings_dbh->prepare("SELECT finished FROM settings WHERE name = ?");
-   $settings_sql->execute($results_table);
+   _retry 15, sub {$settings_sql->execute($results_table)};
    my @data  = $settings_sql->fetchrow_array();
    my $state = $data[0];
 
@@ -195,7 +219,7 @@ sub give_permission {
    my ($settings_dbh) = @_;
 
    my $settings_sql = $settings_dbh->prepare( "SELECT name, finished FROM  settings WHERE finished = '-2' ORDER BY length(name) DESC, name ASC " );
-   $settings_sql->execute();
+   _retry 15, sub {$settings_sql->execute()};
    my @data = $settings_sql->fetchrow_array();
    if ( defined $data[0] ) {
       my $results_table = $data[0];
@@ -216,7 +240,7 @@ sub is_ready {
   
 
    my $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -2 or finished = -3 or finished > -1" );
-   $settings_sql->execute();
+   _retry 15, sub {$settings_sql->execute()};
    my @data = $settings_sql->fetchrow_array();
 
    my $state;
@@ -240,7 +264,7 @@ sub save_settings {
 
    if ( defined $fixed_mods_ref ) {
       my $conf_dbh = connect_conf_db;
-      $settings_dbh->do(
+      _retry 15, sub {$settings_dbh->do(
          "CREATE TABLE IF NOT EXISTS modifications (
 						      run_id,
 						      mod_id,
@@ -249,7 +273,7 @@ sub save_settings {
 						      mod_residue,
 						      mod_type
 						) "
-      );
+      )};
       my $settings_sql = $settings_dbh->prepare(
          "INSERT INTO modifications 
 						(
@@ -265,7 +289,7 @@ sub save_settings {
       foreach my $mod (@fixed_mods) {
          my $fixed_mod = get_conf_value( $conf_dbh, $mod );
          my $fixed_mod_data = $fixed_mod->fetchrow_hashref();
-         $settings_sql->execute( $results_table, $mod, $fixed_mod_data->{'name'}, $fixed_mod_data->{'setting1'}, $fixed_mod_data->{'setting2'}, 'fixed' );
+         _retry 15, sub {$settings_sql->execute( $results_table, $mod, $fixed_mod_data->{'name'}, $fixed_mod_data->{'setting1'}, $fixed_mod_data->{'setting2'}, 'fixed' )};
          $fixed_mod->finish;
       }
       $conf_dbh->disconnect();
@@ -273,7 +297,7 @@ sub save_settings {
 
    if ( defined $dynamic_mods_ref ) {
       my $conf_dbh = connect_conf_db;
-      $settings_dbh->do(
+      _retry 15, sub {$settings_dbh->do(
          "CREATE TABLE IF NOT EXISTS modifications (
 						      run_id,
 						      mod_id,
@@ -282,7 +306,7 @@ sub save_settings {
 						      mod_residue,
 						      mod_type
 						) "
-      );
+      )};
       my $settings_sql = $settings_dbh->prepare(
          "INSERT INTO modifications 
 						(
@@ -298,10 +322,12 @@ sub save_settings {
       foreach my $mod (@dynamic_mods) {
          my $dynamic_mod = get_conf_value( $conf_dbh, $mod );
          my $dynamic_mod_data = $dynamic_mod->fetchrow_hashref();
-         $settings_sql->execute( $results_table, $mod,
+         _retry 15, sub {
+	  $settings_sql->execute( $results_table, $mod,
                                  $dynamic_mod_data->{'name'},
                                  $dynamic_mod_data->{'setting1'},
-                                 $dynamic_mod_data->{'setting2'}, 'dynamic' );
+                                 $dynamic_mod_data->{'setting2'}, 'dynamic' )
+	};
 #          warn "Dynamic mod selected: $mod: $dynamic_mod_data->{'name'} \n";
          $dynamic_mod->finish;
       }
@@ -336,10 +362,11 @@ sub save_settings {
    if ($match_charge == '1') {$match_charge = 'Yes'} else {$match_charge = 'No'};
    if ($match_intensity == '1') {$match_intensity = 'Yes'} else {$match_intensity = 'No'};
 
+   _retry 15, sub {
    $settings_sql->execute( $results_table, $desc,   $cut_residues, $protien_sequences, $reactive_site,   $mono_mass_diff, $xlinker_mass,
                            $decoy,         $ms2_da, $ms1_ppm,      $state,             $mass_seperation, $threshold, 	$match_charge,
 			   $match_intensity, $scored_ions, time );
-
+   };
    return;
 }
 
@@ -415,11 +442,15 @@ sub import_cgi_query {
    my $match_charge   =  0;
    my $match_intensity=  0; 
    my $scored_ions    =  '';
+   my $no_xlink_at_cut_site = 1;
 
    if   ( defined $query->param('charge_match') ) { $match_charge = '1' }
    else                          	          { $match_charge = '0' }
    if   ( defined $query->param('intensity_match') ) 	{ $match_intensity = '1' }
    else                          	          	{ $match_intensity = '0' }
+
+ if   ( defined $query->param('allow_xlink_at_cut_site') ) { $no_xlink_at_cut_site = '0' }
+   else                          	         	   { $no_xlink_at_cut_site = '1' }
 
    my %ms2_fragmentation;
    if   ( defined $query->param('aions') ) { $ms2_fragmentation{'aions'} = '1';}
@@ -484,7 +515,7 @@ sub import_cgi_query {
             $cut_residues,      $nocut_residues,  $fasta,              $desc,               $decoy,           $match_ppm,
             $ms2_error,         $mass_seperation, $isotope,            $linkspacing,        $mono_mass_diff,  $xlinker_mass,
             \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c,	      $scan_width,
-	    $match_charge,	$match_intensity, $scored_ions 
+	    $match_charge,	$match_intensity, $scored_ions,	       $no_xlink_at_cut_site
    );
 }
 
@@ -542,7 +573,7 @@ sub find_free_tablename {
    create_settings($settings_dbh);
 
    my $table_list = $settings_dbh->prepare( "SELECT DISTINCT name FROM settings ORDER BY length(name) DESC, name DESC" );
-   $table_list->execute();
+  _retry 15, sub { $table_list->execute()};
    my $table_name = $table_list->fetchrow_hashref;
    my $results_table;
    if ( $table_name->{'name'} ) {
@@ -561,7 +592,7 @@ sub matchpeaks {
         $results_dbh,           $settings_dbh,        $results_table,        $mass_of_deuterium,  $mass_of_hydrogen, $mass_of_carbon13,
         $mass_of_carbon12,      $cut_residues,        $nocut_residues,       $sequence_names_ref, $mono_mass_diff,   $xlinker_mass,
         $linkspacing,           $isotope,             $reactive_site,        $modifications_ref,  $ms2_error,        $protein_residuemass_ref,
-        $ms2_fragmentation_ref, $threshold
+        $ms2_fragmentation_ref, $threshold, 	      $no_xlink_at_cut_site
    ) = @_;
    my %fragment_masses     = %{$fragment_masses_ref};
    my %fragment_sources    = %{$fragment_sources_ref};
@@ -763,7 +794,7 @@ sub matchpeaks {
                                            \%protein_residuemass, $MSn_string,    $d2_MSn_string,      $fragment,
                                            \%modifications,       $n,             $modification,       $mass_of_hydrogen,
                                            $xlinker_mass,         $monolink_mass, $seperation,         $reactive_site,
-                                           $peak->{'charge'},     $ms2_error,     \%ms2_fragmentation, $threshold
+                                           $peak->{'charge'},     $ms2_error,     \%ms2_fragmentation, $threshold,  $no_xlink_at_cut_site
                              );
 
 # 		       my ($d2_ms2_score,$d2_modified_fragment,$d2_best_x,$d2_best_y, $d2_top_10) = calc_score($d2_MSn_string,$d2_MSn_string,$fragment, \%modifications, $n,$modification, $mass_of_hydrogen,$xlinker_mass+$seperation,$mono_mass_diff,  $seperation, $reactive_site,$peak->{'charge'}, $best_x, $best_y);
@@ -773,7 +804,8 @@ sub matchpeaks {
                            if ( $fragment !~ m/[-]/ ) {
                               $fragment2_source = "0";
                            }
-                           $results_sql->execute(
+                          _retry 15, sub {
+			    $results_sql->execute(
                                                   $results_table,                     $MSn_string,                   $d2_MSn_string,
                                                   $peak->{'mz'},                      $peak->{'charge'},             $modified_fragment,
                                                   $sequences[$fragment1_source],      $sequences[$fragment2_source], $sequence_names[$fragment1_source],
@@ -786,7 +818,7 @@ sub matchpeaks {
                                                   $matched_crosslink,                 $d2_matched_common,            $d2_matched_crosslink,
                                                   $monolink_mass,		      $best_alpha,		     $best_beta,
 						  $time
-                           );
+                           )};
 
 # 		       $results_sql->execute($d2_MSn_string,$d2_MSn_string,$peak->{'d2_mz'},$peak->{'d2_charge'},$d2_modified_fragment, @sequences[(substr($fragment_sources{$fragment},0,1)-1)],@sequences[(substr($fragment_sources{$fragment},-1,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},0,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},-1,1)-1)],$d2_ms2_score, $peak->{'fraction'},"d2_".$peak->{'scan_num'},"d2_".$peak->{'d2_scan_num'}, $modification,$n,$d2_best_x,$d2_best_y,$fragment, $d2_score, $d2_top_10);
                         };
@@ -810,10 +842,10 @@ sub create_table    #Creates the working table in the SQLite database
    my ($dbh) = @_;
 
    my $masslist = $dbh->prepare("DROP TABLE IF EXISTS msdata;");
-   $masslist->execute();
-   $dbh->do(
+   _retry 15, sub {$masslist->execute()};
+   _retry 15, sub {$dbh->do(
             "CREATE TABLE msdata (scan_num number,fraction, title, charge number, mz number, monoisotopic_mw number, abundance number, MSn_string, msorder) " );
-
+   };
    #  $masslist=  $dbh->prepare("DROP TABLE IF EXISTS scans;");
    #  $masslist->execute();
    #  $dbh->do("CREATE TABLE scans (scan_num number, mz float, abundance float) ");
@@ -864,8 +896,8 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
          $line{'monoisoptic_mw'} = $line{'mz'} * $line{'charge'} - ( $line{'charge'} * 1.00728 );
          my $newline = $dbh->prepare(
              "INSERT INTO msdata (scan_num, fraction, title, charge, mz, abundance, monoisotopic_mw, MSn_string, msorder) VALUES (? , ?, ?, ?, ?, ?, ?,?, 2)" );
-         $newline->execute( $line{'scan_num'}, $line{'fraction'}, $line{'title'}, $line{'charge'}, $line{'mz'}, $line{'abundance'}, $line{'monoisoptic_mw'},
-                            $MSn_string );
+         _retry 15, sub {$newline->execute( $line{'scan_num'}, $line{'fraction'}, $line{'title'}, $line{'charge'}, $line{'mz'}, $line{'abundance'}, $line{'monoisoptic_mw'},
+                            $MSn_string )};
 
          $line{'scan_num'} = $line{'monoisoptic_mw'} = $line{'abundance'} = $MSn_string = '';
          $MSn_count = 0;
@@ -886,8 +918,8 @@ sub import_scan    #Enters the uploaded MGF into a SQLite database
 
  my $newline = $dbh->prepare(
    "INSERT INTO msdata (scan_num, fraction, title, charge, mz, abundance, monoisotopic_mw, MSn_string, msorder) VALUES (? , ?, ?, ?, ?, ?, ?,?, 2)" );
-         $newline->execute( -1, 1, 'Light Scan', $precursor_charge, $precursor_mass, 1, ($precursor_mass*$precursor_charge) - ($mass_of_proton*$precursor_charge), $light_scan );
-         $newline->execute( -1, 1, 'Heavy Scan', $precursor_charge, 1, 1, ($precursor_mass*$precursor_charge)+$mass_seperation - ($mass_of_proton*$precursor_charge), $heavy_scan );
+        _retry 15, sub { $newline->execute( -1, 1, 'Light Scan', $precursor_charge, $precursor_mass, 1, ($precursor_mass*$precursor_charge) - ($mass_of_proton*$precursor_charge), $light_scan )};
+        _retry 15, sub { $newline->execute( -1, 1, 'Heavy Scan', $precursor_charge, 1, 1, ($precursor_mass*$precursor_charge)+$mass_seperation - ($mass_of_proton*$precursor_charge), $heavy_scan )};
 
 # warn '1461.7439788'," ",$precursor_mass, " ", ($precursor_mass*$precursor_charge) - ($mass_of_proton*$precursor_charge)
 
@@ -908,7 +940,7 @@ sub import_csv    #Enters the uploaded CSV into a SQLite database
       my @columns = split( ",", $line );
       my $monoisoptic_mw = $columns[3] * $columns[1] - ( $columns[1] * 1.00728 );
       if ( $columns[1] > 1 ) {
-         $newline->execute( $columns[0], $fraction, $columns[1], $columns[3], $columns[2], $columns[6] );
+         _retry 15, sub {$newline->execute( $columns[0], $fraction, $columns[1], $columns[3], $columns[2], $columns[6] )};
       }
    }
 }
@@ -935,9 +967,9 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
    my @peaklist;
 
    my $masslist = $dbh->prepare("DROP INDEX IF EXISTS mz_data;");
-   $masslist->execute();
+   _retry 15, sub {$masslist->execute()};
    $masslist = $dbh->prepare("CREATE INDEX mz_data ON msdata ( monoisotopic_mw);");
-   $masslist->execute();
+   _retry 15, sub {$masslist->execute()};
 
 #    $masslist = $dbh->prepare(
 #       "DELETE from msdata where msdata.msorder =1 and  exists (SELECT d1.*
@@ -977,7 +1009,7 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 			  ORDER BY d1.scan_num ASC "
       );
 #       warn "Exceuting Doublet Search\n";
-      $masslist->execute( $mass_seperation_lower, $mass_seperation_upper, $scan_width, $scan_width );
+      _retry 15, sub {$masslist->execute( $mass_seperation_lower, $mass_seperation_upper, $scan_width, $scan_width )};
 #       warn "Finished Doublet Search\n";
    } else {
       $masslist = $dbh->prepare(
@@ -985,7 +1017,7 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
   			  FROM msdata 
   			  ORDER BY scan_num ASC "
       );
-      $masslist->execute();
+      _retry 15, sub {$masslist->execute()};
    }
    while ( my $searchmass = $masslist->fetchrow_hashref ) {
       push( @peaklist, $searchmass );
