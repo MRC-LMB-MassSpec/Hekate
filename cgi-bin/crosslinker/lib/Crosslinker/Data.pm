@@ -783,7 +783,7 @@ sub matchpeaks {
 
 #                                                            warn $fragment, $modifications{$modification}{Name}, "\n";
                            # 				if ( $modifications{$modification}{Name} eq "loop link" ) { warn "loop link ";	}
-
+			   my $abundance_ratio = $peak->{'abundance'}/$peak->{'d2_abundance'};
                            my (
                                 $ms2_score,      $modified_fragment, $best_x,               $best_y,          $top_10,
                                 $d2_top_10,      $matched_abundance, $d2_matched_abundance, $total_abundance, $d2_total_abundance,
@@ -794,7 +794,8 @@ sub matchpeaks {
                                            \%protein_residuemass, $MSn_string,    $d2_MSn_string,      $fragment,
                                            \%modifications,       $n,             $modification,       $mass_of_hydrogen,
                                            $xlinker_mass,         $monolink_mass, $seperation,         $reactive_site,
-                                           $peak->{'charge'},     $ms2_error,     \%ms2_fragmentation, $threshold,  $no_xlink_at_cut_site
+                                           $peak->{'charge'},     $ms2_error,     \%ms2_fragmentation, $threshold,  $no_xlink_at_cut_site,
+					   $abundance_ratio
                              );
 
 # 		       my ($d2_ms2_score,$d2_modified_fragment,$d2_best_x,$d2_best_y, $d2_top_10) = calc_score($d2_MSn_string,$d2_MSn_string,$fragment, \%modifications, $n,$modification, $mass_of_hydrogen,$xlinker_mass+$seperation,$mono_mass_diff,  $seperation, $reactive_site,$peak->{'charge'}, $best_x, $best_y);
@@ -1001,7 +1002,8 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 				  d2.MSn_string as d2_MSn_string,
 				  d2.charge as d2_charge,
 				  d2.monoisotopic_mw as d2_monoisotopic_mw,
-				  d2.title as d2_title 
+				  d2.title as d2_title,
+				  d2.abundance as d2_abundance
 			  FROM msdata d1 inner join msdata d2 on (d2.monoisotopic_mw between d1.monoisotopic_mw + ? and d1.monoisotopic_mw + ? )
 				  and d2.scan_num between d1.scan_num - ? 
 				  and d1.scan_num + ? " . 

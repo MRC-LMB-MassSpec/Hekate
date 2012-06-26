@@ -74,7 +74,8 @@ sub calc_score {
    my (
         $protein_residuemass_ref, $MSn_string,       $d2_MSn_string,         $sequence,      $modifications_ref, $no_of_mods,
         $modification,            $mass_of_hydrogen, $xlinker_mass,          $monolink_mass, $seperation,        $reactive_site,
-        $parent_charge,           $ms2_error,        $ms2_fragmentation_ref, $threshold,     $no_xlink_at_cut_site
+        $parent_charge,           $ms2_error,        $ms2_fragmentation_ref, $threshold,     $no_xlink_at_cut_site,
+        $abundance_ratio,
    ) = @_;
    my %residuemass       = %{$protein_residuemass_ref};
    my $data              = $MSn_string;
@@ -151,23 +152,24 @@ if ($seperation != 0) {
 
    _retry 15, sub {$ion_shift_matching->execute($ms2_error, $ms2_error)}; 
 #     warn "d0_Records_changed: $records_changed";
-
+my $max_intensity_ratio = 0.60 ;
+# $max_abundance_d2/$max_abundance
 
    for ( my $charge = 1 ; $charge < ( $parent_charge + 1 ) ; $charge++ ) {
    $ion_shift_matching  = $dbh->prepare ("UPDATE ms2 SET possible_ion_shift = 1  WHERE mass IN (SELECT ms2.mass as mass FROM ms2 INNER JOIN ms2 d2 ON
-     (d2.mass between ms2.mass -  ? and ms2.mass + ?) WHERE ms2.heavy_light = 0 AND d2.heavy_light=1  AND d2.abundance between ms2.abundance*0.5*? and ms2.abundance*2*?)");
-   _retry 15, sub {$ion_shift_matching->execute($ms2_error - ($seperation/$charge) , $ms2_error + ($seperation/$charge),$max_abundance_d2/$max_abundance,$max_abundance_d2/$max_abundance)};
+     (d2.mass between ms2.mass -  ? and ms2.mass + ?) WHERE ms2.heavy_light = 0 AND d2.heavy_light=1  AND d2.abundance between ms2.abundance*(?)*? and ms2.abundance*(1/?)*?)");
+   _retry 15, sub {$ion_shift_matching->execute($ms2_error - ($seperation/$charge) , $ms2_error + ($seperation/$charge),$max_intensity_ratio,1/$abundance_ratio,$max_intensity_ratio,1/$abundance_ratio)};
 
    $ion_shift_matching  = $dbh->prepare ("UPDATE ms2 SET possible_ion_shift = 1  WHERE mass IN (SELECT d2.mass as mass FROM ms2 INNER JOIN ms2 d2 ON
-     (d2.mass between ms2.mass -  ? and ms2.mass + ?) WHERE ms2.heavy_light = 0 AND d2.heavy_light=1 AND d2.abundance between ms2.abundance*0.5*? and ms2.abundance*2*? )");
+     (d2.mass between ms2.mass -  ? and ms2.mass + ?) WHERE ms2.heavy_light = 0 AND d2.heavy_light=1 AND d2.abundance between ms2.abundance*(?)*? and ms2.abundance*(1/?)*? )");
 
-    _retry 15, sub {$ion_shift_matching->execute($ms2_error - ($seperation/$charge) , $ms2_error + ($seperation/$charge),$max_abundance_d2/$max_abundance,$max_abundance_d2/$max_abundance)};
+    _retry 15, sub {$ion_shift_matching->execute($ms2_error - ($seperation/$charge) , $ms2_error + ($seperation/$charge),$max_intensity_ratio,1/$abundance_ratio,$max_intensity_ratio,1/$abundance_ratio)};
     }
 # AND d2.abundance between ms2.abundance*0.5 and ms2.abundance*2
 
 #     warn "d2_Records_changed: $records_changed";
 # 
-      _retry 15, sub {$dbh->do("DELETE FROM ms2 WHERE possible_no_ion_shift = 0  AND possible_ion_shift = 0")};
+#       _retry 15, sub {$dbh->do("DELETE FROM ms2 WHERE possible_no_ion_shift = 0  AND possible_ion_shift = 0")};
 } else {
  $dbh->do ("UPDATE ms2 SET possible_no_ion_shift = 1, possible_ion_shift = 1");
 }
