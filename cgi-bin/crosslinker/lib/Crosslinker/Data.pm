@@ -677,6 +677,8 @@ sub matchpeaks {
 #######
 
    foreach my $peak (@peaklist) {
+      warn $peak->{'scan_num'};
+      warn $peak->{'d2_scan_num'};
       $peak_no = $peak_no + 1;
       my $percent_done = sprintf( "%.2f", $peak_no / @peaklist );
 #       warn $percent_done * 100, " % Peak mz = " . sprintf( "%.5f", $peak->{'mz'} ) . "\n";
