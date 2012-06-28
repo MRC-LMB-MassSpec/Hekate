@@ -452,6 +452,8 @@ sub import_cgi_query {
    my $match_intensity=  0; 
    my $scored_ions    =  '';
    my $no_xlink_at_cut_site = 1;
+   my $ms1_intensity_ratio =1;
+   if (defined $query->param('ms1_intensity_ratio')) {$ms1_intensity_ratio= $query->param('ms1_intensity_ratio')}
 
    if   ( defined $query->param('charge_match') ) { $match_charge = '1' }
    else                          	          { $match_charge = '0' }
@@ -524,7 +526,7 @@ sub import_cgi_query {
             $cut_residues,      $nocut_residues,  $fasta,              $desc,               $decoy,           $match_ppm,
             $ms2_error,         $mass_seperation, $isotope,            $linkspacing,        $mono_mass_diff,  $xlinker_mass,
             \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c,	      $scan_width,
-	    $match_charge,	$match_intensity, $scored_ions,	       $no_xlink_at_cut_site
+	    $match_charge,	$match_intensity, $scored_ions,	       $no_xlink_at_cut_site, $ms1_intensity_ratio
    );
 }
 
@@ -572,8 +574,13 @@ sub import_mgf_doublet_query {
       $mass_seperation = $linkspacing * ( $mass_of_carbon13 - $mass_of_carbon12 );
    }
 
+
+ my $ms1_intensity_ratio =1;
+ if (defined $query->param('ms1_intensity_ratio')) {$ms1_intensity_ratio= $query->param('ms1_intensity_ratio')}
+     
+
    $conf_dbh->disconnect();
-   return (\@upload_filehandle, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width, $match_charge, $output_format, $match_intensity   );
+   return (\@upload_filehandle, $doublet_tolerance,  $mass_seperation, $isotope, $linkspacing, $scan_width, $match_charge, $output_format, $match_intensity, $ms1_intensity_ratio   );
 }
 
 sub find_free_tablename {
@@ -795,7 +802,8 @@ sub matchpeaks {
 #                                                            warn $fragment, $modifications{$modification}{Name}, "\n";
                            # 				if ( $modifications{$modification}{Name} eq "loop link" ) { warn "loop link ";	}
 			   my $abundance_ratio = -1;
-			   if ($peak->{'abundance'} > 0 && $peak->{'d2_abundance'} > 0) {$peak->{'abundance'}/$peak->{'d2_abundance'}};
+			   if ($peak->{'abundance'} > 0 && $peak->{'d2_abundance'} > 0) {$abundance_ratio = $peak->{'abundance'}/$peak->{'d2_abundance'}};
+
                            my (
                                 $ms2_score,      $modified_fragment, $best_x,               $best_y,          $top_10,
                                 $d2_top_10,      $matched_abundance, $d2_matched_abundance, $total_abundance, $d2_total_abundance,
@@ -961,7 +969,7 @@ sub import_csv    #Enters the uploaded CSV into a SQLite database
 sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 {
 
-   my ( $doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge, $match_intensity ) = @_;
+   my ( $doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge, $match_intensity, $ms1_intensity_ratio ) = @_;
 
 
 #   warn "$doublet_ppm_err, $linkspacing, $isotope, $dbh, $scan_width, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge";
@@ -972,6 +980,8 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
    } elsif ($isotope eq "carbon-13") {
       $mass_seperation = $linkspacing * ( $mass_of_carbon13 - $mass_of_carbon12 );
    }
+
+
 
    my $average_peptide_mass  = 750;
    my $mass_seperation_upper = $mass_seperation + $average_peptide_mass * ( 0 + ( $doublet_ppm_err / 1000000 ) );
@@ -1005,7 +1015,7 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
       }
       my $intensity_match_string = "";
       if ($match_intensity == "1") {
-	$intensity_match_string = "and d1.abundance = d2.abundance ";
+	$intensity_match_string = "and (d1.abundance > d2.abundance * ? and d1.abundance < d2.abundance * ?)  ";
       }
       $masslist = $dbh->prepare(
          "SELECT d1.*,
@@ -1025,7 +1035,13 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 			  ORDER BY d1.scan_num ASC "
       );
 #       warn "Exceuting Doublet Search\n";
+      if ($match_intensity == "1") {
+	if ($ms1_intensity_ratio == '0' or !defined $ms1_intensity_ratio) {$ms1_intensity_ratio = 1}
+#         warn "intensity match:   $ms1_intensity_ratio"; 
+      _retry 15, sub {$masslist->execute( $mass_seperation_lower, $mass_seperation_upper, $scan_width, $scan_width, $ms1_intensity_ratio, 1/$ms1_intensity_ratio )};
+      } else { 
       _retry 15, sub {$masslist->execute( $mass_seperation_lower, $mass_seperation_upper, $scan_width, $scan_width )};
+      }
 #       warn "Finished Doublet Search\n";
    } else {
       $masslist = $dbh->prepare(

@@ -62,7 +62,8 @@ print <<ENDHTML;
         MS2 accurracy (Da) <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/><br/>
      Doublet Spacing Tollerance (ppm) <input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/><br/>
      Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/> 
-    Intensity Match : <input type="checkbox" name="intensity_match" value="true" ><br/>
+    Intensity Match (MS1) : <input type="checkbox" name="intensity_match" value="true" >
+    Max-ratio:<input type="text" name="ms1_intensity_ratio" size="4" maxlength="4" value="0.8"/><br/>
     Allow cross-linking at cut site : <input type="checkbox" name="allow_xlink_at_cut_site" value="true" ><br/>
     </td>
   <td class="half"  >

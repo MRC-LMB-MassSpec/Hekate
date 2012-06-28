@@ -62,7 +62,8 @@ value="4"/>
 </td>
 <tr>
 <td> Require Charge Match: <input type="checkbox" name="charge_match"  checked="checked" value="true"></td>
-<td> Intensity Match: <input type="checkbox" name="intensity_match" value="true"></td>
+<td> Intensity Match: <input type="checkbox" name="intensity_match" value="true">
+Max-ratio:<input type="text" name="ms1_intensity_ratio" size="4" maxlength="4" value="0.8"/></td>
 </tr>
 <tr>
 <td colspan="2"> Output Format:  HTML <input type="radio" name="output_format" value="HTML" checked="yes">

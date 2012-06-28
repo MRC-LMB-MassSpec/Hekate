@@ -154,7 +154,7 @@ if ($seperation != 0) {
 
    _retry 15, sub {$ion_shift_matching->execute($ms2_error, $ms2_error)}; 
 #     warn "d0_Records_changed: $records_changed";
-my $max_intensity_ratio = 0.60 ;
+my $max_intensity_ratio = 0.40 ;
 # $max_abundance_d2/$max_abundance
 
 
