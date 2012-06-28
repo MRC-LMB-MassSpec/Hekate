@@ -108,7 +108,7 @@ while ( ( my $fixed_mod = $fixed_mods->fetchrow_hashref ) ) {
 
 
 
-   my $top_hits = $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC" );  
+   my $top_hits = $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND score > 0 and mz != '1' ORDER BY score DESC" );  
    $top_hits->execute($results_table);
 
 print_heading('Results');

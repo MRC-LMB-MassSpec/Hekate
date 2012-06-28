@@ -850,8 +850,24 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
                _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
                my $n = $count->fetchrow_array;
 
-
                $count = $dbh->prepare(
+                         "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '1' AND is_scored = '1'" );
+               _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
+               my $d2_n = $count->fetchrow_array;
+
+
+
+	      my $fast_mode = 1;
+	      my $n_alpha;
+	      my $n_alpha_d2;
+	      my $n_beta;
+	      my $n_beta_d2;
+
+
+      
+	       if ($fast_mode == 0)
+	       {
+	       $count = $dbh->prepare(
                           "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '0' AND peptide_chain ='0'  AND is_scored = '1'" );
                _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
                my $n_alpha = $count->fetchrow_array;
@@ -871,10 +887,7 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
                _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
                my $n_beta_d2 = $count->fetchrow_array;
 
-               $count = $dbh->prepare(
-                         "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '1' AND is_scored = '1'" );
-               _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
-               my $d2_n = $count->fetchrow_array;
+		}
 
                for ( my $q = 1 ; $q <= $q_max ; $q++ ) {
 
@@ -892,7 +905,23 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
                   my $k = $count->fetchrow_array;
 
+		  $count = $dbh->prepare(
+"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
+                  );
+                  _retry 15, sub {$count->execute( $interval,
+                                   $interval + $interval_range,
+                                   ( $max_abundance_d2 * $threshold / 100 ),
+                                   $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
+                  my $d2_k = $count->fetchrow_array;
 
+		  my $k_alpha;
+		  my $k_alpha_d2;		
+		  my $k_beta;
+		  my $k_beta_d2;
+
+
+		  if ($fast_mode == 0)
+		  {
          $count = $dbh->prepare(
 "SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 0  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '0' AND theoretical.is_scored = '1'AND theoretical.peptide_chain = '0' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
                   );
@@ -929,23 +958,16 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
                                    ( $max_abundance * $threshold / 100 ),
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
                   my $k_beta_d2 = $count->fetchrow_array;
-
-
-                  $count = $dbh->prepare(
-"SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
-                  );
-                  _retry 15, sub {$count->execute( $interval,
-                                   $interval + $interval_range,
-                                   ( $max_abundance_d2 * $threshold / 100 ),
-                                   $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
-                  my $d2_k = $count->fetchrow_array;
+		  }
+                  
+                  
 
                   my $d0_score = 0;
                   my $d2_score = 0;
-		  my $score_alpha= 0;
-		  my $score_beta = 0;
-		  my $score_alpha_d2 = 0;
-		  my $score_beta_d2  = 0;
+		  my $score_alpha= 1;
+		  my $score_beta = 1;
+		  my $score_alpha_d2 = 1;
+		  my $score_beta_d2  = 1;
 
 		  for ( my $j = $k ; $j <= $n ; $j++ ) {
                      my $binomial_coefficient;
@@ -962,6 +984,26 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
 
                   }
 
+
+                  for ( my $j = $d2_k ; $j <= $d2_n ; $j++ ) {
+                     my $binomial_coefficient;
+                     if ( $d2_n > 150 ) {
+                        my $binomial = Math::BigRat->new( scalar($d2_n) );
+                        $binomial->bnok($j);
+                        $binomial_coefficient = $binomial->as_float();
+                     } else {
+                        $binomial_coefficient = $nCr[ $d2_n - 1 ][$j];
+                     }
+                     $d2_score = $d2_score + ( scalar $binomial_coefficient * ( ( $q / 100 )**$j ) * ( ( 1 - ( $q / 100 ) )**( $d2_n - $j ) ) );
+
+                  }
+
+	      	 if ($fast_mode == 0)
+		  {
+		  $score_alpha= 0;
+		  $score_beta = 0;
+		  $score_alpha_d2 = 0;
+		  $score_beta_d2  = 0;
                  for ( my $j = $k_alpha ; $j <= $n_alpha ; $j++ ) {
                       my $binomial_coefficient;
                       if ( $n_alpha > 150 ) {
@@ -1023,19 +1065,8 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
  
                    }
 
-
-                  for ( my $j = $d2_k ; $j <= $d2_n ; $j++ ) {
-                     my $binomial_coefficient;
-                     if ( $d2_n > 150 ) {
-                        my $binomial = Math::BigRat->new( scalar($d2_n) );
-                        $binomial->bnok($j);
-                        $binomial_coefficient = $binomial->as_float();
-                     } else {
-                        $binomial_coefficient = $nCr[ $d2_n - 1 ][$j];
-                     }
-                     $d2_score = $d2_score + ( scalar $binomial_coefficient * ( ( $q / 100 )**$j ) * ( ( 1 - ( $q / 100 ) )**( $d2_n - $j ) ) );
-
-                  }
+		  }
+ 
                   my $score = $d0_score * $d2_score;
 
                   if ( $best_score > $score ) {

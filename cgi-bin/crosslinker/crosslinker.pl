@@ -94,7 +94,7 @@ if ($child) {
 
    #Output page
 
-   eval {$state = generate_page(
+   eval { $state = generate_page  (
                            $protien_sequences,  $dbh,              $results_dbh,      $settings_dbh,   $results_table,      $no_of_fractions,
                            \@upload_filehandle, \@csv_filehandle,  $missed_clevages,  $cut_residues,   $nocut_residues,     \%protein_residuemass,
                            $reactive_site,      $scan_width,       \@sequence_names,  $match_ppm,      $min_peptide_length, $mass_of_deuterium,
@@ -103,9 +103,10 @@ if ($child) {
                            $threshold,		$n_or_c, 	   $match_charge,     $match_intensity, $no_xlink_at_cut_site, $ms1_intensity_ratio 
    )};
    if ($@) { 
+	warn $@;
 	set_failed ( $results_table, $settings_dbh );
         $state = -5;
-	give_permission($settings_dbh);
+	give_permission($settings_dbh);	 
      };
 
    #Tidy up
