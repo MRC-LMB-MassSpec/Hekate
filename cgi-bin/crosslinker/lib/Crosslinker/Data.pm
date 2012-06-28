@@ -21,6 +21,7 @@ our @EXPORT = (
 
 sub _retry {
     my ( $retrys, $func ) = @_;
+
     attempt: {
       my $result;
 
@@ -34,7 +35,7 @@ sub _retry {
       last attempt if $retrys < 1;
 
       # sleep for 0.1 seconds, and then try again.
-      sleep 0.1;
+      sleep 100/$retrys;
       $retrys--;
       redo attempt;
     }

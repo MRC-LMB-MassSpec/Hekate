@@ -26,8 +26,7 @@ sub _retry {
       # if we have 0 remaining retrys, stop trying.
       last attempt if $retrys < 1;
 
-      # sleep for 0.1 seconds, and then try again.
-      sleep 0.1;
+      sleep 100/$retrys;
       $retrys--;
       redo attempt;
     }

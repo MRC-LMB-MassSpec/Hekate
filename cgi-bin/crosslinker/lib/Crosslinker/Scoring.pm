@@ -30,7 +30,7 @@ sub _retry {
       last attempt if $retrys < 1;
 
       # sleep for 0.1 seconds, and then try again.
-      sleep 0.1;
+      sleep 100/$retrys;
       $retrys--;
       redo attempt;
     }
@@ -1190,7 +1190,7 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
 #        warn "Best: $best_sequence - Score: ", sprintf( "%.0f", ($best_match) ),"\n";
 #     }
    my $td = tv_interval($t0);
-#    warn "Time Taken = ", $td, " secs \n";
+#     warn "Time Taken = ", $td, " secs \n";
    my $returned_score = sprintf( "%.0f", ($best_match) );
    $best_alpha = sprintf( "%.0f", ($best_alpha) );
    $best_beta = sprintf( "%.0f", ($best_beta) );
