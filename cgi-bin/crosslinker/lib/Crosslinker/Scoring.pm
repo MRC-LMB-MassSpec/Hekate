@@ -68,6 +68,8 @@ sub NextPermute(\@)    #From Algorithm::Loops
 
 sub calc_score {
 
+
+
    use Time::HiRes 'gettimeofday', 'tv_interval';
    use Math::BigRat;
 
@@ -159,7 +161,7 @@ my $max_intensity_ratio = 0.60 ;
 
 if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundance};
    for ( my $charge = 1 ; $charge < ( $parent_charge + 1 ) ; $charge++ ) {
-warn "Charge - $charge,  Abundance:$abundance_ratio";
+# warn "Charge - $charge,  Abundance:$abundance_ratio";
    $ion_shift_matching  = $dbh->prepare ("UPDATE ms2 SET possible_ion_shift = 1  WHERE mass IN (SELECT ms2.mass as mass FROM ms2 INNER JOIN ms2 d2 ON
      (d2.mass between ms2.mass -  ? and ms2.mass + ?) WHERE ms2.heavy_light = 0 AND d2.heavy_light=1  AND d2.abundance between ms2.abundance*(?)*? and ms2.abundance*(1/?)*?)");
    _retry 15, sub {$ion_shift_matching->execute($ms2_error - ($seperation/$charge) , $ms2_error + ($seperation/$charge),$max_intensity_ratio,1/$abundance_ratio,$max_intensity_ratio,1/$abundance_ratio)};
@@ -1154,7 +1156,7 @@ warn "Charge - $charge,  Abundance:$abundance_ratio";
    $dbh->disconnect();
 
 #     if ( $best_match > 0 ) {
-       warn "Best: $best_sequence - Score: ", sprintf( "%.0f", ($best_match) ),"\n";
+#        warn "Best: $best_sequence - Score: ", sprintf( "%.0f", ($best_match) ),"\n";
 #     }
    my $td = tv_interval($t0);
 #    warn "Time Taken = ", $td, " secs \n";

@@ -94,14 +94,19 @@ if ($child) {
 
    #Output page
 
-   $state = generate_page(
+   eval {$state = generate_page(
                            $protien_sequences,  $dbh,              $results_dbh,      $settings_dbh,   $results_table,      $no_of_fractions,
                            \@upload_filehandle, \@csv_filehandle,  $missed_clevages,  $cut_residues,   $nocut_residues,     \%protein_residuemass,
                            $reactive_site,      $scan_width,       \@sequence_names,  $match_ppm,      $min_peptide_length, $mass_of_deuterium,
                            $mass_of_hydrogen,   $mass_of_carbon13, $mass_of_carbon12, \%modifications, $query,              $mono_mass_diff,
                            $xlinker_mass,       $isotope,          $seperation,       $ms2_error,      $state,              \%ms2_fragmentation,
                            $threshold,		$n_or_c, 	   $match_charge,     $match_intensity, $no_xlink_at_cut_site 
-   );
+   )};
+   if ($@) { 
+	set_failed ( $results_table, $settings_dbh );
+        $state = -5;
+	give_permission($settings_dbh);
+     };
 
    #Tidy up
    if ( $state == -1 ) { set_finished( $results_table, $settings_dbh ) }

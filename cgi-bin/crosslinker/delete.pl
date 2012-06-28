@@ -29,7 +29,14 @@ my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { Rais
 
 print_page_top_fancy('Delete');
 
-if ( defined $areyousure && $areyousure eq 'yes' ) {
+
+my $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -1 and name = ?" );
+$settings_sql->execute($table);
+my @data = $settings_sql->fetchrow_array();
+
+if ( $data[0] != 1 ) {
+print "<p>Cannot currently delete that search as it is currently in progress. If you wish to delete this search then please abort it first.</p>";
+} elsif ( defined $areyousure && $areyousure eq 'yes' ) {
    my $drop_table = $settings_dbh->prepare("DELETE FROM settings WHERE name = ?");
    $drop_table->execute($table);
    $drop_table = $settings_dbh->prepare("DELETE FROM modifications WHERE run_id = ?");
@@ -39,6 +46,7 @@ if ( defined $areyousure && $areyousure eq 'yes' ) {
    print_heading("Deleting $table ...");
    print "<p>Sucess: Results '$table' deleted.</p>";
 } else {
+#    print $data[0];
    print "<p>Are you sure you want to delete $table?</p>";
    print "<p><a href='delete.pl?table=$table&areyousure=yes'>Yes</a>  or <a href='results.pl'>No</a></p>";
 }

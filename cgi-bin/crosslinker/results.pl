@@ -35,7 +35,10 @@ while ( my $table_name = $table_list->fetchrow_hashref ) {
       $state = 'Starting...';
    } elsif ( $table_name->{'finished'} == -4 ) {
       $state = 'Aborted';
+   } elsif ( $table_name->{'finished'} == -5 ) {
+      $state = 'Failed';
    }
+
 
    else {
       $state = $table_name->{'finished'} * 100 . "%";
