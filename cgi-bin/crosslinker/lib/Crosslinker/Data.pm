@@ -709,13 +709,18 @@ sub matchpeaks {
 #       warn $peak->{'scan_num'};
 #       warn $peak->{'d2_scan_num'};
       $peak_no = $peak_no + 1;
-      my $percent_done = sprintf( "%.2f", $peak_no / @peaklist );
+      my $percent_done = 0;
 #       warn $percent_done * 100, " % Peak mz = " . sprintf( "%.5f", $peak->{'mz'} ) . "\n";
 
        if ( check_state( $settings_dbh, $results_table ) == -4 ) {
           return %fragment_score;
        }
-      update_state( $settings_dbh, $results_table, $percent_done );
+
+      if ($percent_done != sprintf( "%.2f", $peak_no / @peaklist ))
+      {
+	  $percent_done = sprintf( "%.2f", $peak_no / @peaklist );
+	  update_state( $settings_dbh, $results_table, $percent_done );
+      }
       my $MSn_string    = "";
       my $d2_MSn_string = "";
       my $round         = sprintf( "%.5f", $peak->{'mz'} );
