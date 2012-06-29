@@ -42,6 +42,8 @@ sub generate_page {
       return $state;
    }
 
+#     die;
+   
    my %protein_residuemass = %{$protein_residuemass_ref};
    my @csv_filehandle      = @{$csv_filehandle_ref};
    my @upload_filehandle   = @{$upload_filehandle_ref};

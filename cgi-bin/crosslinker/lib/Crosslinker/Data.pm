@@ -127,7 +127,7 @@ my ($settings_dbh) = @_;
 
 _retry 15, sub {$settings_dbh->do(
       "CREATE TABLE IF NOT EXISTS settings (
-						      name,
+						      name INTEGER PRIMARY KEY,
 						      desc,
 						      cut_residues,
 						      protein_sequences,
@@ -243,20 +243,29 @@ sub give_permission {
 }
 
 sub is_ready {
-   my ($settings_dbh) = @_;
+   my ($settings_dbh, $ignore_waiting_searches) = @_;
 
+   if (!defined $ignore_waiting_searches) {$ignore_waiting_searches = 0};
 
    create_settings($settings_dbh);
   
 
-   my $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -2 or finished = -3 or finished > -1" );
+   my $settings_sql;
+
+   if ($ignore_waiting_searches == 0) {
+       $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -2 or finished = -3 or finished > -1" );
+   } else {
+       $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -3 or finished > -1" );
+   }
    _retry 15, sub {$settings_sql->execute()};
    my @data = $settings_sql->fetchrow_array();
 
    my $state;
 
-   if ( $data[0] > 0 ) {
+   if ( $data[0] > 0 && $ignore_waiting_searches == 0 ) {
       $state = -2;
+   } elsif ( $data[0] > 1 && $ignore_waiting_searches == 1 ) {
+      $state = 0;
    } else {
       $state = 0;
    }
@@ -266,11 +275,46 @@ sub is_ready {
 sub save_settings {
 
    my (
-        $settings_dbh,    $results_table,    $cut_residues,   $protien_sequences, $reactive_site, $mono_mass_diff,
+        $settings_dbh,       $cut_residues,   $protien_sequences, $reactive_site, $mono_mass_diff,
         $xlinker_mass,    $state,            $desc,           $decoy,             $ms2_da,        $ms1_ppm,
         $mass_seperation, $dynamic_mods_ref, $fixed_mods_ref, $threshold, 	  $match_charge,  $match_intensity,
         $scored_ions
    ) = @_;
+
+      create_settings($settings_dbh);
+
+   my $settings_sql = $settings_dbh->prepare(
+      "INSERT INTO settings 
+						(
+						      desc,
+						      cut_residues,
+						      protein_sequences,
+						      reactive_site,
+						      mono_mass_diff,
+						      xlinker_mass,
+						      decoy,
+						      ms2_da,
+						      ms1_ppm,
+						      finished,
+						      isotoptic_shift,	     
+						      threshold,
+						      charge_match,
+						      intensity_match,
+						      scored_ions,
+						      time
+						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?)"
+   );
+
+   if ($match_charge == '1') {$match_charge = 'Yes'} else {$match_charge = 'No'};
+   if ($match_intensity == '1') {$match_intensity = 'Yes'} else {$match_intensity = 'No'};
+
+   _retry 15, sub {
+   $settings_sql->execute(  $desc,   $cut_residues, $protien_sequences, $reactive_site,   $mono_mass_diff, $xlinker_mass,
+                           $decoy,         $ms2_da, $ms1_ppm,      $state,             $mass_seperation, $threshold, 	$match_charge,
+			   $match_intensity, $scored_ions, time );
+   };
+
+   my $results_table = $settings_dbh->func('last_insert_rowid');
 
    if ( defined $fixed_mods_ref ) {
       my $conf_dbh = connect_conf_db;
@@ -344,40 +388,8 @@ sub save_settings {
       $conf_dbh->disconnect();
    }
 
-      create_settings($settings_dbh);
 
-   my $settings_sql = $settings_dbh->prepare(
-      "INSERT INTO settings 
-						(
-						      name,
-						      desc,
-						      cut_residues,
-						      protein_sequences,
-						      reactive_site,
-						      mono_mass_diff,
-						      xlinker_mass,
-						      decoy,
-						      ms2_da,
-						      ms1_ppm,
-						      finished,
-						      isotoptic_shift,	     
-						      threshold,
-						      charge_match,
-						      intensity_match,
-						      scored_ions,
-						      time
-						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?)"
-   );
-
-   if ($match_charge == '1') {$match_charge = 'Yes'} else {$match_charge = 'No'};
-   if ($match_intensity == '1') {$match_intensity = 'Yes'} else {$match_intensity = 'No'};
-
-   _retry 15, sub {
-   $settings_sql->execute( $results_table, $desc,   $cut_residues, $protien_sequences, $reactive_site,   $mono_mass_diff, $xlinker_mass,
-                           $decoy,         $ms2_da, $ms1_ppm,      $state,             $mass_seperation, $threshold, 	$match_charge,
-			   $match_intensity, $scored_ions, time );
-   };
-   return;
+   return $results_table;
 }
 
 sub import_cgi_query {

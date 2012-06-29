@@ -62,7 +62,7 @@ print_heading('Scan Search');
    my $precursor_mass = $query->param("precursor_mass");
 
   # Generate Results Name
-  my $results_table = find_free_tablename $settings_dbh;
+# = find_free_tablename $settings_dbh;
 
 #   my $link_code = md5_hex( $results_table );
   my $time = time;
@@ -70,7 +70,7 @@ print_heading('Scan Search');
 
    # Save Settings
    my $state = is_ready($settings_dbh);
-   save_settings( $settings_dbh, $results_table, $cut_residues, $fasta,     $reactive_site,   $mono_mass_diff, $xlinker_mass, $state,
+     my $results_table =  save_settings( $settings_dbh,  $cut_residues, $fasta,     $reactive_site,   $mono_mass_diff, $xlinker_mass, $state,
                   $desc,         $decoy,         $ms2_error,    $match_ppm, $mass_seperation, \@dynamic_mods,  \@fixed_mods,  $threshold,
 		  $match_charge, $match_intensity, $scored_ions);
 

@@ -79,11 +79,11 @@ if ($child) {
    my %ms2_fragmentation = %{$ms2_fragmentation_ref};
 
    # Generate Results Name
-   my $results_table = find_free_tablename $settings_dbh;
+#    my $results_table = find_free_tablename $settings_dbh;
 
    # Save Settings
    my $state = is_ready($settings_dbh);
-   save_settings( $settings_dbh, $results_table, $cut_residues, $fasta,     $reactive_site,   $mono_mass_diff, $xlinker_mass, $state,
+   my $results_table = save_settings( $settings_dbh, $cut_residues, $fasta,     $reactive_site,   $mono_mass_diff, $xlinker_mass, $state,
                   $desc,         $decoy,         $ms2_error,    $match_ppm, $mass_seperation, \@dynamic_mods,  \@fixed_mods,  $threshold,
 		  $match_charge, $match_intensity, $scored_ions);
 
@@ -106,7 +106,8 @@ if ($child) {
 	warn $@;
 	set_failed ( $results_table, $settings_dbh );
         $state = -5;
-	give_permission($settings_dbh);	 
+	warn is_ready($settings_dbh, 1);
+	if (is_ready($settings_dbh, 1) == 0) {give_permission($settings_dbh)};	 
      };
 
    #Tidy up
