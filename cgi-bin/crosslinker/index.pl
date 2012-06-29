@@ -57,11 +57,10 @@ while ( ( my $enzyme = $enzymes->fetchrow_hashref ) ) {
 $enzymes->finish();
 
 print <<ENDHTML;
-    </select><br/>
-    
-        MS2 accurracy (Da) <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/><br/>
-     Doublet Spacing Tollerance (ppm) <input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/><br/>
-     Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/> 
+    </select><br/>    
+    MS2 accurracy (Da) <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/><br/>
+    Doublet Spacing Tollerance (ppm) <input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/><br/>
+    Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/> 
     Intensity Match (MS1) : <input type="checkbox" name="intensity_match" value="true" >
     Max-ratio:<input type="text" name="ms1_intensity_ratio" size="4" maxlength="4" value="0.8"/><br/>
     Allow cross-linking at cut site : <input type="checkbox" name="allow_xlink_at_cut_site" value="true" ><br/>
@@ -71,7 +70,8 @@ print <<ENDHTML;
     MS1 accurracy (ppm) <input type="text" name="ms1_ppm" size="2" maxlength="2" value="2"/><br/>
      Max scan seperation<input type="text" name="scan_width" size="4" maxlength="4" value="60"/><br/>
     Decoy Search: <input type="checkbox" name="decoy" value="true"><br/>       
-    Require Charge Match: <input type="checkbox" name="charge_match"  checked="checked" value="true"><br/>    
+    Require Charge Match: <input type="checkbox" name="charge_match"  checked="checked" value="true"><br/>  
+    Detailed Score results (CSV only): <input type="checkbox" name="detailed_scoring"  value="true"><br/>    
   </td>
 </tr>
 <tr>

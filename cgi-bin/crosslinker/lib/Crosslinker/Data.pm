@@ -466,7 +466,10 @@ sub import_cgi_query {
    my $scored_ions    =  '';
    my $no_xlink_at_cut_site = 1;
    my $ms1_intensity_ratio =1;
+   my $fast_mode  = 1;
    if (defined $query->param('ms1_intensity_ratio')) {$ms1_intensity_ratio= $query->param('ms1_intensity_ratio')}
+   if (defined $query->param('detailed_scoring')) {$fast_mode = 0}
+
 
    if   ( defined $query->param('charge_match') ) { $match_charge = '1' }
    else                          	          { $match_charge = '0' }
@@ -539,7 +542,7 @@ sub import_cgi_query {
             $cut_residues,      $nocut_residues,  $fasta,              $desc,               $decoy,           $match_ppm,
             $ms2_error,         $mass_seperation, $isotope,            $linkspacing,        $mono_mass_diff,  $xlinker_mass,
             \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c,	      $scan_width,
-	    $match_charge,	$match_intensity, $scored_ions,	       $no_xlink_at_cut_site, $ms1_intensity_ratio
+	    $match_charge,	$match_intensity, $scored_ions,	       $no_xlink_at_cut_site, $ms1_intensity_ratio, $fast_mode
    );
 }
 
@@ -621,7 +624,7 @@ sub matchpeaks {
         $results_dbh,           $settings_dbh,        $results_table,        $mass_of_deuterium,  $mass_of_hydrogen, $mass_of_carbon13,
         $mass_of_carbon12,      $cut_residues,        $nocut_residues,       $sequence_names_ref, $mono_mass_diff,   $xlinker_mass,
         $linkspacing,           $isotope,             $reactive_site,        $modifications_ref,  $ms2_error,        $protein_residuemass_ref,
-        $ms2_fragmentation_ref, $threshold, 	      $no_xlink_at_cut_site
+        $ms2_fragmentation_ref, $threshold, 	      $no_xlink_at_cut_site, $fast_mode
    ) = @_;
    my %fragment_masses     = %{$fragment_masses_ref};
    my %fragment_sources    = %{$fragment_sources_ref};
@@ -833,7 +836,7 @@ sub matchpeaks {
                                            \%modifications,       $n,             $modification,       $mass_of_hydrogen,
                                            $xlinker_mass,         $monolink_mass, $seperation,         $reactive_site,
                                            $peak->{'charge'},     $ms2_error,     \%ms2_fragmentation, $threshold,  $no_xlink_at_cut_site,
-					   $abundance_ratio
+					   $abundance_ratio,      $fast_mode
                              );
 
 # 		       my ($d2_ms2_score,$d2_modified_fragment,$d2_best_x,$d2_best_y, $d2_top_10) = calc_score($d2_MSn_string,$d2_MSn_string,$fragment, \%modifications, $n,$modification, $mass_of_hydrogen,$xlinker_mass+$seperation,$mono_mass_diff,  $seperation, $reactive_site,$peak->{'charge'}, $best_x, $best_y);

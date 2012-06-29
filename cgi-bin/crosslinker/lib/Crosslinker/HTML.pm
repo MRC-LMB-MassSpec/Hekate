@@ -30,7 +30,8 @@ sub generate_page {
         $reactive_site,         $scan_width,         $sequence_names_ref, $match_ppm,         $min_peptide_length, $mass_of_deuterium,
         $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
         $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
-        $threshold,		$n_or_c,	     $match_charge,	  $match_intensity,   $no_xlink_at_cut_site, $ms1_intensity_ratio 
+        $threshold,		$n_or_c,	     $match_charge,	  $match_intensity,   $no_xlink_at_cut_site, $ms1_intensity_ratio,
+        $fast_mode
    ) = @_;
 
    while ( $state == -2 ) {
@@ -109,7 +110,7 @@ sub generate_page {
                                     $mass_of_carbon12,   $cut_residues,           $nocut_residues,          \@sequence_names,
                                     $mono_mass_diff,     $xlinker_mass,           $seperation,              $isotope,
                                     $reactive_site,      \%modifications,         $ms2_error,               \%protein_residuemass,
-                                    \%ms2_fragmentation, $threshold,		  $no_xlink_at_cut_site
+                                    \%ms2_fragmentation, $threshold,		  $no_xlink_at_cut_site,    $fast_mode
    );
 
    give_permission($settings_dbh);

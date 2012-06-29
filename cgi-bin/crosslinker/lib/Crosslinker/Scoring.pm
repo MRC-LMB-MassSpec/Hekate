@@ -77,7 +77,7 @@ sub calc_score {
         $protein_residuemass_ref, $MSn_string,       $d2_MSn_string,         $sequence,      $modifications_ref, $no_of_mods,
         $modification,            $mass_of_hydrogen, $xlinker_mass,          $monolink_mass, $seperation,        $reactive_site,
         $parent_charge,           $ms2_error,        $ms2_fragmentation_ref, $threshold,     $no_xlink_at_cut_site,
-        $abundance_ratio,
+        $abundance_ratio,	  $fast_mode
    ) = @_;
    my %residuemass       = %{$protein_residuemass_ref};
    my $data              = $MSn_string;
@@ -856,8 +856,8 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
                my $d2_n = $count->fetchrow_array;
 
 
-
-	      my $fast_mode = 1;
+# 	      warn "Fast mode? $fast_mode";
+	      if (!defined $fast_mode) {$fast_mode = 1};
 	      my $n_alpha;
 	      my $n_alpha_d2;
 	      my $n_beta;
@@ -870,22 +870,22 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
 	       $count = $dbh->prepare(
                           "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '0' AND peptide_chain ='0'  AND is_scored = '1'" );
                _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
-               my $n_alpha = $count->fetchrow_array;
+               $n_alpha = $count->fetchrow_array;
 
                $count = $dbh->prepare(
                           "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '1' AND peptide_chain ='0'  AND is_scored = '1'" );
                _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
-               my $n_alpha_d2 = $count->fetchrow_array;
+               $n_alpha_d2 = $count->fetchrow_array;
 
                $count = $dbh->prepare(
                           "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '0' AND peptide_chain ='1' AND is_scored = '1'" );
                _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
-               my $n_beta = $count->fetchrow_array;
+               $n_beta = $count->fetchrow_array;
 
             $count = $dbh->prepare(
                           "SELECT COUNT(theoretical.mass)  FROM theoretical WHERE x=? AND y=? AND sequence=? AND mass > ? AND mass <= ? AND heavy_light = '1' AND peptide_chain ='1' AND is_scored = '1'" );
                _retry 15, sub {$count->execute( $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
-               my $n_beta_d2 = $count->fetchrow_array;
+               $n_beta_d2 = $count->fetchrow_array;
 
 		}
 
@@ -929,7 +929,7 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
                                    $interval + $interval_range,
                                    ( $max_abundance * $threshold / 100 ),
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
-                  my $k_alpha = $count->fetchrow_array;
+                  $k_alpha = $count->fetchrow_array;
 
                   $count = $dbh->prepare(
 "SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ? AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' and theoretical.peptide_chain = '0' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
@@ -938,7 +938,7 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
                                    $interval + $interval_range,
                                    ( $max_abundance_d2 * $threshold / 100 ),
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
-                   my $k_alpha_d2 = $count->fetchrow_array;
+                   $k_alpha_d2 = $count->fetchrow_array;
 
 
          $count = $dbh->prepare(
@@ -948,7 +948,7 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
                                    $interval + $interval_range,
                                    ( $max_abundance * $threshold / 100 ),
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
-                  my $k_beta = $count->fetchrow_array;
+                  $k_beta = $count->fetchrow_array;
 
 	$count = $dbh->prepare(
 "SELECT COUNT(DISTINCT theoretical.mass)  FROM theoretical inner join (select  * from ms2 WHERE mass > ? AND mass <= ?  AND ms2.abundance > ?  AND ms2.heavy_light = 1  ORDER BY ms2.abundance+0 DESC LIMIT ?) as top_ms2 on (top_ms2.mass between theoretical.mass -  ? and theoretical.mass + ?) WHERE x=? AND y=? and sequence=? AND theoretical.mass > ? AND theoretical.mass <= ? AND theoretical.heavy_light = '1' AND theoretical.is_scored = '1' AND theoretical.peptide_chain = '1' AND top_ms2.possible_ion_shift >= theoretical.crosslink_ion AND top_ms2.possible_no_ion_shift >= theoretical.not_crosslink_ion  "
@@ -957,7 +957,7 @@ if ($abundance_ratio == -1) { $abundance_ratio = $max_abundance_d2/$max_abundanc
                                    $interval + $interval_range,
                                    ( $max_abundance * $threshold / 100 ),
                                    $q, $ms2_error, $ms2_error, $xlink_position[0], $xlink_position[1], $sequence, $interval, $interval + $interval_range )};
-                  my $k_beta_d2 = $count->fetchrow_array;
+                  $k_beta_d2 = $count->fetchrow_array;
 		  }
                   
                   
