@@ -67,7 +67,7 @@ my ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, 
 
 print_page_top_fancy('All Results');
 
-if ($decoy eq "true") 
+if (defined $decoy && $decoy eq "true") 
   {$decoy = "Yes"}
 else
   {$decoy = "No"}

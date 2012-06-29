@@ -287,7 +287,12 @@ sub print_results_text {
             print "$new_division$top_hits_results->{'charge'}$finish_division";
             print "$new_division$top_hits_results->{'name'}$finish_division";
             print "$new_division$top_hits_results->{'fraction'}$finish_division";
-            print "$new_division$top_hits_results->{'scan'}$finish_division$new_division$top_hits_results->{'d2_scan'}$finish_division";
+            print "$new_division$top_hits_results->{'scan'}$finish_division";
+	    if (defined $top_hits_results->{'d2_scan'}) {
+	      print "$new_division$top_hits_results->{'d2_scan'}$finish_division";
+	    } else {
+	      print "$new_division$finish_division";
+	    }
             print $new_division;
 
             print $new_division, $top_hits_results->{'monolink_mass'}, $finish_division;
@@ -342,12 +347,23 @@ sub print_results_text {
             print $new_division . $unmodified_fragments[0] . $finish_division;
             print "$new_division", "N/A", $finish_division;
 	    print "$top_hits_results->{'score'}$finish_division$new_division";
-	    print "$top_hits_results->{'best_alpha'}$finish_division$new_division$top_hits_results->{'best_beta'}$finish_division$new_division";
+	    print "$top_hits_results->{'best_alpha'}$finish_division$new_division";
+	    if (defined $top_hits_results->{'best_beta'}) {
+	    print "$top_hits_results->{'best_beta'}$finish_division$new_division";
+	    } else {
+	      print "$finish_division$new_division";
+	    }
 	    print "$rounded$finish_division";
             print "$new_division$top_hits_results->{'charge'}$finish_division";
             print "$new_division$top_hits_results->{'name'}$finish_division";
             print "$new_division$top_hits_results->{'fraction'}$finish_division";
-            print "$new_division$top_hits_results->{'scan'}$finish_division$new_division$top_hits_results->{'d2_scan'}$finish_division";
+            print "$new_division$top_hits_results->{'scan'}$finish_division$new_division";
+	    if (defined $top_hits_results->{'d2_scan'}) {
+		print "$new_division$top_hits_results->{'d2_scan'}$finish_division";
+	      } else {
+		print "$new_division$finish_division";
+	      }
+
             print $new_division;
 
             print $new_division, $top_hits_results->{'monolink_mass'}, $finish_division;
@@ -553,8 +569,12 @@ sub print_results {
 	      print "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>Light Scan</a>";
 	    }
 	   } else {
-           print "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>$top_hits_results->{'scan'}</a>";
-	   if (defined $top_hits_results->{'d2_scan'}) {print " <br/><a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1'>$top_hits_results->{'d2_scan'}</a>"};
+	      if (defined $top_hits_results->{'d2_scan'}) {
+	         print "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>$top_hits_results->{'scan'}</a>";
+                 print " <br/><a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1'>$top_hits_results->{'d2_scan'}</a>";
+	     } else {
+	         print "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>$top_hits_results->{'scan'}</a>";
+	     }
            }
              print "</td><td>";
            print_ms2_link(
@@ -676,8 +696,13 @@ sub print_results_combined {
          print "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>Light Scan</a>";
 	 print " <br/><a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1'>Heavy Scan</a>";
 	 } else {
+	 if (defined $top_hits_results->{'d2_scan'})
+	  {
          print "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>$top_hits_results->{'scan'}</a>";
 	 print " <br/><a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=1'>$top_hits_results->{'d2_scan'}</a>";
+	  } else {
+	  print "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>$top_hits_results->{'scan'}</a>";
+	  }
          }
          print "</td><td>";
          print_ms2_link(
@@ -751,9 +776,14 @@ sub print_report {
         )
       {
          print '<div style="page-break-inside: avoid; page-break-after: always;">';
-         print
+	 if (defined $top_hits_results->{'d2_scan'}) 
+	  {
+	    print
 "<img src='view_img.pl?table=$table&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}'/><br/><br/>";
-         push @hits_so_far, $top_hits_results->{'fragment'};
+         } else {
+	  print "<img src='view_img.pl?table=$table&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}'/><br/><br/>";
+	 }
+	 push @hits_so_far, $top_hits_results->{'fragment'};
          push @mz_so_far,   $top_hits_results->{'mz'};
          push @scan_so_far, $top_hits_results->{'scan'};
          my $rounded = sprintf( "%.3f", $top_hits_results->{'ppm'} );
