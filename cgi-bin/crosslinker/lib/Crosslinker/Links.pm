@@ -16,8 +16,11 @@ sub print_ms2_link    #Creates link to ms/2
 
    print '
 <form method="post" target="_blank"  action="ms2.pl" enctype="multipart/form-data">
-<input type="hidden" name="data" value="',         $MSn_string,     '"  />
-<input type="hidden" name="data2"  value="',       $d2_MSn_string,  '">
+<input type="hidden" name="data" value="',         $MSn_string,     '"  />';
+if (defined $d2_MSn_string) {
+ print '<input type="hidden" name="data2"  value="',       $d2_MSn_string,  '">';
+}
+  print '
 <input type="hidden" name="sequence" value="',     $sequence,       '" />
 <input type="hidden" name="modification" value="', $modification,   '" />
 <input type="hidden" name="xlinkermw" value="',    $xlinker_mass,   '" size="10" maxlength="15" />
@@ -75,15 +78,15 @@ sub print_xquest_link    #Creates link to Xquest
 <input type="hidden" name="pastedatabase" value="',    $user_protein_sequence, '">
 <input type="hidden" name="pastedta1"  value="',       $MSn_string,            '">';
 
-   #if ($isotope ne "none")
-   #{
+   if (defined $d2_MSn_string)
+   {
    print '<input type="hidden" name="pastedta2"  value="', $d2_MSn_string, '">';
 
-   #}
-   #else
-   #{
-   #	print '<input type="hidden" name="pastedta2"  value="">';
-   #}
+   }
+   else
+   {
+   	print '<input type="hidden" name="pastedta2"  value="">';
+   }
 
    print
 '<input type="hidden" name=".cgifields" value="dataupload"  /><input type="hidden" name=".cgifields" value="ionseries_a"  /><input type="hidden" name=".cgifields" value="tolerancemeasure"  /><input type="hidden" name=".cgifields" value="decoy"  />

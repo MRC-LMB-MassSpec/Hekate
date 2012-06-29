@@ -823,7 +823,9 @@ sub matchpeaks {
 #                                                            warn $fragment, $modifications{$modification}{Name}, "\n";
                            # 				if ( $modifications{$modification}{Name} eq "loop link" ) { warn "loop link ";	}
 			   my $abundance_ratio = -1;
-			   if ($peak->{'abundance'} > 0 && $peak->{'d2_abundance'} > 0) {$abundance_ratio = $peak->{'abundance'}/$peak->{'d2_abundance'}};
+			   if (defined  $peak->{'d2_abundance'} > 0) {
+			      if ($peak->{'abundance'} > 0 && $peak->{'d2_abundance'} > 0) {$abundance_ratio = $peak->{'abundance'}/$peak->{'d2_abundance'}};
+			      }
 
                            my (
                                 $ms2_score,      $modified_fragment, $best_x,               $best_y,          $top_10,

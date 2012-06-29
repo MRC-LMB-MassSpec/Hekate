@@ -90,7 +90,7 @@ my ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, 
 print "Content-Type: image/png\n\n";
 
 my $top_hits;
-if ( $d2_scan ne '' ) {
+if ( defined $d2_scan && $d2_scan ne '' ) {
    $top_hits = $results_dbh->prepare( "SELECT * FROM results WHERE name=? AND scan = ? AND d2_scan = ? AND fraction = ? AND score = ?  " )
      ;    #nice injection problem here, need to sort
    $top_hits->execute( $table, $scan, $d2_scan, $fraction, $score );

@@ -35,7 +35,8 @@ my $top_10       = $query->param('top_10');
 my $table        = $query->param('table');
 my $xlink_res    = $query->param('xlink_res');
 my @masses       = split "\n", $data;
-my @d2_masses    = split "\n", $data2;
+my  @d2_masses;
+if (defined $data2) { @d2_masses    = split "\n", $data2};
 my %ms2_masses;
 my $data_java     = "";
 my $data_green    = "";
@@ -242,7 +243,7 @@ foreach my $mass_abundance (@masses) {
    $data_java         = $data_java . '[' . $mass . ',' . $abundance . '],';
 }
 
-if ( $data2 ne "" ) {
+if ( defined $data2 && $data2 ne "" ) {
    $dbh->do("CREATE TABLE d2_masses  (mass REAL, abundance REAL)");
    my $newline = $dbh->prepare("INSERT INTO d2_masses (mass, abundance) VALUES (?, ?)");
    my %pre_normalised_d2_data;
