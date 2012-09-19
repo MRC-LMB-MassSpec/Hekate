@@ -504,6 +504,7 @@ sub print_results {
 		&& !( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' ))
         )
       {
+
          push @hits_so_far, $top_hits_results->{'fragment'};
          push @mz_so_far,   $top_hits_results->{'mz'};
          push @scan_so_far, $top_hits_results->{'scan'};

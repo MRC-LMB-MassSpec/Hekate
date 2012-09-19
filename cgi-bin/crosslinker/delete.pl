@@ -30,11 +30,11 @@ my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { Rais
 print_page_top_fancy('Delete');
 
 
-my $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -1 and name = ?" );
+my $settings_sql = $settings_dbh->prepare( "SELECT finished FROM settings WHERE name = ?" );
 $settings_sql->execute($table);
 my @data = $settings_sql->fetchrow_array();
 
-if ( $data[0] != 1 ) {
+if ( $data[0] != -1 &&  $data[0] !=  -4  && $data[0] != -5) {
 print "<p>Cannot currently delete that search as it is currently in progress. If you wish to delete this search then please abort it first.</p>";
 } elsif ( defined $areyousure && $areyousure eq 'yes' ) {
    my $drop_table = $settings_dbh->prepare("DELETE FROM settings WHERE name = ?");
