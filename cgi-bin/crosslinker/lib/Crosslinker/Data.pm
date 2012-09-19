@@ -10,7 +10,8 @@ our @EXPORT = (
                 'connect_db',    'check_state',  'give_permission',    'is_ready',            'disconnect_db', 'set_finished',
                 'save_settings', 'update_state', 'import_cgi_query',   'find_free_tablename', 'matchpeaks',    'create_table',
                 'import_mgf',    'import_csv',   'loaddoubletlist_db', 'generate_decoy',      'set_doublets_found',
-		'import_mgf_doublet_query',	 'connect_db_single', 'import_scan', 'create_settings', 'set_failed'
+		'import_mgf_doublet_query',	 'connect_db_single', 'import_scan', 'create_settings', 'set_failed',
+		'connect_db_results'
 );
 ######
 #
@@ -111,12 +112,18 @@ my ($results_dbh) = @_;
 
 sub connect_db {
    my $dbh          = DBI->connect( "dbi:SQLite:dbname=:memory:",    "", "", { RaiseError => 1, AutoCommit => 1 } );
-   my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
+#    my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
    my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
+   return ( $dbh, $settings_dbh );
+}
+
+sub connect_db_results {
+   my ($name) = @_;
+   my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results-$name",  "", "", { RaiseError => 1, AutoCommit => 1 } ); 
    create_results($results_dbh);
 
-   return ( $dbh, $results_dbh, $settings_dbh );
+   return ( $results_dbh );
 }
 
 

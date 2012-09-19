@@ -38,7 +38,6 @@ if ( defined $query->param('order') ) {
 #                      #
 ########################
 
-my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
 my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
 ########################
@@ -70,9 +69,14 @@ while ( ( my $data_set = $settings->fetchrow_hashref ) ) {
    }
 }
 
+my $results_dbh;
+
 my $SQL_query;
 for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
    $SQL_query = $SQL_query . "SELECT * FROM settings WHERE name = ? UNION ";
+  if (!defined $results_dbh) {  $results_dbh= DBI->connect( "dbi:SQLite:dbname=db/results-$table[$table_no]",  "", "", { RaiseError => 1, AutoCommit => 1 } )}
+   my $sql_attach_command =  "attach database './db/results-$table[$table_no]' as db$table[$table_no]";
+   $results_dbh->do ( $sql_attach_command);
 }
 $SQL_query = substr( $SQL_query, 0, -6 );
 
@@ -84,7 +88,7 @@ my %names;
 
 foreach my $table_name (@table) {
    my $sequences = $results_dbh->prepare(
-"SELECT DISTINCT seq FROM (Select distinct sequence1_name as seq, name from results where name=? union select distinct sequence2_name, name as seq from results WHERE name=?)"
+"SELECT DISTINCT seq FROM (Select distinct sequence1_name as seq, name from db$table_name.results where name=? union select distinct sequence2_name, name as seq from results WHERE name=?)"
    );
    $sequences->execute( $table_name, $table_name );
    while ( ( my $sequences_results = $sequences->fetchrow_hashref ) ) {
@@ -150,13 +154,13 @@ $SQL_query = "";
 
 if ( defined $order ) {
    for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
-      $SQL_query = $SQL_query . "SELECT * FROM (SELECT * FROM results WHERE name=? ORDER BY score DESC) UNION ALL ";
+      $SQL_query = $SQL_query . "SELECT * FROM (SELECT * FROM db$table[$table_no].results WHERE name=? ORDER BY score DESC) UNION ALL ";
    }
    $SQL_query = substr( $SQL_query, 0, -10 );
    $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY sequence1_name, sequence2_name LIMIT 50" );    #nice injection problem here, need to sort
 } else {
    for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
-      $SQL_query = $SQL_query . "SELECT * FROM results WHERE name=? AND fragment LIKE '%-%' UNION ALL ";
+      $SQL_query = $SQL_query . "SELECT * FROM db$table[$table_no].results WHERE name=? AND fragment LIKE '%-%' UNION ALL ";
    }
    $SQL_query = substr( $SQL_query, 0, -10 );
    $top_hits = $results_dbh->prepare( "SELECT * FROM (" . $SQL_query . ") ORDER BY score DESC " );    #nice injection problem here, need to sort

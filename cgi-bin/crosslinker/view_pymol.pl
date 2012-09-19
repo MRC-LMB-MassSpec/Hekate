@@ -38,7 +38,7 @@ if ( defined $query->param('order') ) {
 #                      #
 ########################
 
-my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
+my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results-$table",  "", "", { RaiseError => 1, AutoCommit => 1 } );
 my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
 ########################

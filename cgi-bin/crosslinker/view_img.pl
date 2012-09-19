@@ -45,7 +45,7 @@ if ($scan == -1) {
   $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results_single",  "", "", { RaiseError => 1, AutoCommit => 1 } );
   $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings_single", "", "", { RaiseError => 1, AutoCommit => 1 } );
 } else {
-  $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
+  $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results-$table",  "", "", { RaiseError => 1, AutoCommit => 1 } );
   $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 }
 

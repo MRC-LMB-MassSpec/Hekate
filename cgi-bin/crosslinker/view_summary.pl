@@ -43,8 +43,8 @@ if ( defined $query->param('more') ) {
 #                      #
 ########################
 
-my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
 my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
+
 
 ########################
 #                      #
@@ -61,6 +61,16 @@ my (
 ) = $settings->fetchrow_array;
 $settings->finish();
 $settings_dbh->disconnect();
+
+########################
+#                      #
+# Connect to results DB#
+#                      #
+########################
+
+
+my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results-$name",  "", "", { RaiseError => 1, AutoCommit => 1 } );
+
 
 ########################
 #                      #

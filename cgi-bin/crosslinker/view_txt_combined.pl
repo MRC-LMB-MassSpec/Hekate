@@ -38,7 +38,6 @@ if ( defined $query->param('order') ) {
 #                      #
 ########################
 
-my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
 my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
 ########################
@@ -70,8 +69,13 @@ while ( ( my $data_set = $settings->fetchrow_hashref ) ) {
    }
 }
 
+my $results_dbh;
+
 my $SQL_query;
 for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
+  if (!defined $results_dbh) {  $results_dbh= DBI->connect( "dbi:SQLite:dbname=db/results-$table[$table_no]",  "", "", { RaiseError => 1, AutoCommit => 1 } )}
+   my $sql_attach_command =  "attach database './db/results-$table[$table_no]' as db$table[$table_no]";
+   $results_dbh->do ( $sql_attach_command);
    $SQL_query = $SQL_query . "SELECT * FROM settings WHERE name = ? UNION ";
 }
 $SQL_query = substr( $SQL_query, 0, -6 );
@@ -96,7 +100,7 @@ my $top_hits;
 $SQL_query = "";
 
 for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
-   $SQL_query = $SQL_query . "SELECT * FROM results WHERE name=? AND score > 0 UNION ALL ";
+   $SQL_query = $SQL_query . "SELECT * FROM db$table[$table_no].results WHERE name=? AND score > 0 UNION ALL ";
 }
 $SQL_query = substr( $SQL_query, 0, -10 );
 $top_hits = $results_dbh->prepare( "SELECT * FROM (" . $SQL_query . ") ORDER BY score DESC " );    #nice injection problem here, need to sort

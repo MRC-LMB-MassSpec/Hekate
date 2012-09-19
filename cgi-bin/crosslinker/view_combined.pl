@@ -38,7 +38,6 @@ if ( defined $query->param('order') ) {
 #                      #
 ########################
 
-my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
 my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
 ########################
@@ -69,8 +68,14 @@ while ( ( my $data_set = $settings->fetchrow_hashref ) ) {
    }
 }
 
+
+my $results_dbh;
+
 my $SQL_query;
 for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
+   if (!defined $results_dbh) {  $results_dbh= DBI->connect( "dbi:SQLite:dbname=db/results-$table[$table_no]",  "", "", { RaiseError => 1, AutoCommit => 1 } )}
+   my $sql_attach_command =  "attach database './db/results-$table[$table_no]' as db$table[$table_no]";
+   $results_dbh->do ( $sql_attach_command);
    $SQL_query = $SQL_query . "SELECT * FROM settings WHERE name = ? UNION ";
 }
 $SQL_query = substr( $SQL_query, 0, -6 );
@@ -123,16 +128,16 @@ $SQL_query = "";
 
 if ( defined $order ) {
    for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
-      $SQL_query = $SQL_query . "SELECT * FROM (SELECT * FROM results WHERE name=?  ORDER BY score DESC) UNION ALL ";
+      $SQL_query = $SQL_query . "SELECT * FROM (SELECT * FROM db$table[$table_no].results WHERE name=?  ORDER BY score DESC) UNION ALL ";
    }
    $SQL_query = substr( $SQL_query, 0, -10 );
-   $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY sequence1_name, sequence2_name LIMIT 50" );    #nice injection problem here, need to sort
+   $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY sequence1_name, sequence2_name LIMIT 50" );     
 } else {
    for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
-      $SQL_query = $SQL_query . "SELECT * FROM results WHERE name=?  UNION ALL ";
+      $SQL_query = $SQL_query . "SELECT * FROM db$table[$table_no].results WHERE name=?  UNION ALL ";
    }
    $SQL_query = substr( $SQL_query, 0, -10 );
-   $top_hits = $results_dbh->prepare( "SELECT * FROM (" . $SQL_query . ") ORDER BY score DESC " );    #nice injection problem here, need to sort
+   $top_hits = $results_dbh->prepare( "SELECT * FROM (" . $SQL_query . ") ORDER BY score DESC " );   
 }
 $top_hits->execute(@table);
 print_results_combined( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined,
@@ -142,16 +147,16 @@ $SQL_query = "";
 print_heading('Top Scoring Monolink Matches');
 if ( defined $order ) {
    for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
-      $SQL_query = $SQL_query . "SELECT * FROM (SELECT * FROM results WHERE name=?  ORDER BY score DESC) UNION ALL ";
+      $SQL_query = $SQL_query . "SELECT * FROM (SELECT * FROM db$table[$table_no].results WHERE name=?  ORDER BY score DESC) UNION ALL ";
    }
    $SQL_query = substr( $SQL_query, 0, -10 );
-   $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY sequence1_name, sequence2_name" );    #nice injection problem here, need to sort
+   $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY sequence1_name, sequence2_name" );     
 } else {
    for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
-      $SQL_query = $SQL_query . "SELECT * FROM results WHERE name=?  UNION ALL ";
+      $SQL_query = $SQL_query . "SELECT * FROM db$table[$table_no].results WHERE name=?  UNION ALL ";
    }
    $SQL_query = substr( $SQL_query, 0, -10 );
-   $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY score DESC" );    #nice injection problem here, need to sort
+   $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY score DESC" );    
 }
 $top_hits->execute(@table);
 print_results_combined( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined,

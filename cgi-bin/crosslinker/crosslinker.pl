@@ -62,7 +62,7 @@ if ($child) {
      constants;
 
    # Connect to databases
-   my ( $dbh, $results_dbh, $settings_dbh ) = connect_db;
+   my ( $dbh, $settings_dbh ) = connect_db;
 
    my (
         $protien_sequences, $sequence_names_ref, $missed_clevages,       $upload_filehandle_ref, $csv_filehandle_ref, $reactive_site,
@@ -87,11 +87,12 @@ if ($child) {
                   $desc,         $decoy,         $ms2_error,    $match_ppm, $mass_seperation, \@dynamic_mods,  \@fixed_mods,  $threshold,
 		  $match_charge, $match_intensity, $scored_ions);
 
+   my ( $results_dbh ) = connect_db_results($results_table);
    # Setup Modifications
+   my %protein_residuemass = protein_residuemass($results_table, $settings_dbh);
+   my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $results_table, $settings_dbh );
 
-   my %protein_residuemass = protein_residuemass($results_table);
-   my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $results_table );
-
+  
    #Output page
 
    eval { $state = generate_page  (
