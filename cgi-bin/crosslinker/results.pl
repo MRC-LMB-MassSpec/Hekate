@@ -45,8 +45,8 @@ while ( my $table_name = $table_list->fetchrow_hashref ) {
    print '<tr><td><input type="checkbox" name="' . $table_name->{'name'} . '" value="true"></input></td><td>', $table_name->{'name'},
      '</td><td><a href="rename.pl?table=' . $table_name->{'name'} . '">' . $table_name->{'desc'} . "</td><td>";
 
-      if ( $table_name->{'finished'} >= 0 || $table_name->{'finished'} <= -4) {
-	print '<iframe style="border: 0px; width:5em; height:1.1em; overflow-y: hidden;" src="status-iframe.pl?table=',$table_name->{'name'},'">',$state,'</iframe>',
+      if ( $table_name->{'finished'} != -1 && $table_name->{'finished'} != -4  && $table_name->{'finished'} != -5 ) {
+	print '<iframe style="border: 0px; width:5em; height:1.25em; overflow-y: hidden;" src="status-iframe.pl?table=',$table_name->{'name'},'">',$state,'</iframe>',
       } else { print $state}
 
       print "</td><td> <a href='view_summary.pl?table=$table_name->{'name'}'>Summary</a> </td><td> <a href='view_pymol.pl?table=$table_name->{'name'}'>Pymol</a> </td><td> <a href='view_paper.pl?table=$table_name->{'name'}'>Sorted</a> </td><td> <a href='view_all.pl?table=$table_name->{'name'}' >Full</a> </td><td> <a href='view_report.pl?table=$table_name->{'name'}' >Report</a></td><td><a href='view_txt.pl?table=$table_name->{'name'}'>CSV</a></td><td><a href='delete.pl?table=$table_name->{'name'}' >Delete</a>/<a href='abort.pl?table=$table_name->{'name'}' >Abort</a></td></tr>";
