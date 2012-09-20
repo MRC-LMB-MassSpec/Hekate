@@ -112,48 +112,48 @@ sub digest_proteins    #Digest a string into an array of peptides
 	   }
         }
       }
-     }
-     elsif ($n_or_c eq 'C..N') {
-#      warn "Protease type:", $n_or_c, "\n";   
-     my $cut_residues_c = chop $cut_residues;
-#       $cut_residues = 'RK';
-
-     @digest = $protein =~ m/(?:(?:[$cut_residues_c](?!$nocut_residues)|^.)(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*){1}/g;
-     my @single_digest = @digest;
-      for ( my $i = 2 ; $i < ($missed_clevages*2+1)+2 ; $i++ ) {
-         my @single_digest_trimmed = @single_digest;   
-         my @parts = $protein =~ m/(?:(?:[$cut_residues_c](?!$nocut_residues)|^.)(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*){1}/g;                                           
-	    push( @digest, @parts );
-         for ( my $j = 1 ; $j < $i ; $j++ ) {
-            shift @single_digest_trimmed;
-            @parts =
-              join( "", @single_digest_trimmed ) =~ m/(?:(?:[$cut_residues_c](?!$nocut_residues)|^.)(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*){1}/g;
-	      push( @digest, @parts );
-         }
-       }
-
-     my @double_digest = @digest;
- 
-      foreach my $double_digest_peptide (@double_digest) { 
-      my @single_digest = $double_digest_peptide =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){1}/g;            
-#       foreach (@single_digest)
-#       {
-#  	warn $_;
-#       }
-
-      push @digest, @single_digest;
-      for ( my $i = 2 ; $i < ($missed_clevages*2+1)+2 ; $i++ ) {
-         my @single_digest_trimmed = @single_digest;    #need to include missed cleavages for each possible missed position
-         my @parts = $protein =~ m/(?:(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*(?:[$cut_residues_c](?!$nocut_residues)|.(?=$))){$i}/g;                                           
-#          push( @digest, @parts );
-         for ( my $j = 1 ; $j < $i ; $j++ ) {
-            shift @single_digest_trimmed;
-            @parts =
-              join( "", @single_digest_trimmed ) =~ m/(?:(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*(?:[$cut_residues_c](?!$nocut_residues)|.(?=$))){$i}/g;
-#            push( @digest, @parts );
-         }
-       }
-       }
+#      }
+#      elsif ($n_or_c eq 'C..N') {
+# #      warn "Protease type:", $n_or_c, "\n";   
+#      my $cut_residues_c = chop $cut_residues;
+# #       $cut_residues = 'RK';
+# 
+#      @digest = $protein =~ m/(?:(?:[$cut_residues_c](?!$nocut_residues)|^.)(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*){1}/g;
+#      my @single_digest = @digest;
+#       for ( my $i = 2 ; $i < ($missed_clevages*2+1)+2 ; $i++ ) {
+#          my @single_digest_trimmed = @single_digest;   
+#          my @parts = $protein =~ m/(?:(?:[$cut_residues_c](?!$nocut_residues)|^.)(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*){1}/g;                                           
+# 	    push( @digest, @parts );
+#          for ( my $j = 1 ; $j < $i ; $j++ ) {
+#             shift @single_digest_trimmed;
+#             @parts =
+#               join( "", @single_digest_trimmed ) =~ m/(?:(?:[$cut_residues_c](?!$nocut_residues)|^.)(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*){1}/g;
+# 	      push( @digest, @parts );
+#          }
+#        }
+# 
+#      my @double_digest = @digest;
+#  
+#       foreach my $double_digest_peptide (@double_digest) { 
+#       my @single_digest = $double_digest_peptide =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){1}/g;            
+# #       foreach (@single_digest)
+# #       {
+# #  	warn $_;
+# #       }
+# 
+#       push @digest, @single_digest;
+#       for ( my $i = 2 ; $i < ($missed_clevages*2+1)+2 ; $i++ ) {
+#          my @single_digest_trimmed = @single_digest;    #need to include missed cleavages for each possible missed position
+#          my @parts = $protein =~ m/(?:(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*(?:[$cut_residues_c](?!$nocut_residues)|.(?=$))){$i}/g;                                           
+# #          push( @digest, @parts );
+#          for ( my $j = 1 ; $j < $i ; $j++ ) {
+#             shift @single_digest_trimmed;
+#             @parts =
+#               join( "", @single_digest_trimmed ) =~ m/(?:(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*(?:[$cut_residues_c](?!$nocut_residues)|.(?=$))){$i}/g;
+# #            push( @digest, @parts );
+#          }
+#        }
+#        }
    } else {
   
 #      warn "Protease type:", $n_or_c, "\n";

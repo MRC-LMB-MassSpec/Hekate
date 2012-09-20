@@ -58,7 +58,7 @@ ENDHTML
    }
 
    print
-"<tr><td><input type='hidden' name='type' size='10' maxlength='10' value='enzyme'/><input type='text' name='name' size='10' maxlength='20' value='Name'/></td><td><input type='text' name='setting1' size='10' maxlength='25' value='KR'/></td><td><input type='text' name='setting2' size='5' maxlength='1' value='P'/></td><td><select name='setting3'><option>C</option><option>N</option><option>C..N</option></select></td><td><input type='submit' value='Add' /></td></tr>";
+"<tr><td><input type='hidden' name='type' size='10' maxlength='10' value='enzyme'/><input type='text' name='name' size='10' maxlength='20' value='Name'/></td><td><input type='text' name='setting1' size='10' maxlength='25' value='KR'/></td><td><input type='text' name='setting2' size='5' maxlength='1' value='P'/></td><td><select name='setting3'><option>C</option><option>N</option></select></td><td><input type='submit' value='Add' /></td></tr>";
    print "</table></form>";
    $enzymes->finish;
    $dbh->disconnect;
