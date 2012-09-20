@@ -31,11 +31,9 @@ print_heading('Results');
      constants;
 
    # Connect to databases
-   my ( $dbh, $results_dbh, $settings_dbh ) = connect_db;
+   my ( $dbh, $results_dbh, $settings_dbh ) = connect_db_single;
 
-   # Generate Results Name
-   my $results_table = find_free_tablename $dbh; #No need to use settings_dbh as we can just dump it at the end of the run
-  
+ 
 
    my (
         $protien_sequences, $sequence_names_ref, $missed_clevages,       $upload_filehandle_ref, $csv_filehandle_ref, $reactive_site,
@@ -51,8 +49,10 @@ print_heading('Results');
    my @fixed_mods        = @{$fixed_mods_ref};
    my %ms2_fragmentation = %{$ms2_fragmentation_ref};
 
-   save_settings( $dbh, $results_table, $cut_residues, $fasta,     $reactive_site,   $mono_mass_diff, $xlinker_mass, 1,
-                  $desc,         $decoy,         $ms2_error,    $match_ppm, $mass_seperation, \@dynamic_mods,  \@fixed_mods,  $threshold );
+   my $results_table = save_settings( $dbh, $cut_residues, $fasta,     $reactive_site,   $mono_mass_diff, $xlinker_mass, 1,
+                  $desc,         $decoy,         $ms2_error,    $match_ppm, $mass_seperation, \@dynamic_mods,  \@fixed_mods,  $threshold,
+		  0, 0, 0);
+
 
    my %protein_residuemass = protein_residuemass($results_table);
    my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $results_table, $dbh );

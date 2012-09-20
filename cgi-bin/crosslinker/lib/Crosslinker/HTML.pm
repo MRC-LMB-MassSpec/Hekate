@@ -302,11 +302,15 @@ sub crosslink_digest {
       }
       }
      $n=0;
-     foreach (sort keys %line)
+     foreach (sort { $a <=> $b } keys %line)
       { $n++; print "<tr><td>$n.".$line{$_}; }
      print "</table>";
 
 
+for (keys %line)
+    {
+        delete $line{$_};
+    }
 
 my @monolink_masses = split( ",", $mono_mass_diff );
 $n = 1;
@@ -318,12 +322,13 @@ print "<h2>Monolinks</h2>";
 	    foreach my $modification ( reverse sort( keys %modifications ) ) {
 		my $location = $modifications{$modification}{Location};
 		my $rxn_residues = @{ [ $_ =~ /$location/g ] };
-	    if (    !( $modifications{$modification}{Name} eq "loop link" && @{ [ substr($_,-1) =~ /$location/g ] }< 2 )
-                 && !( $modifications{$modification}{Name} eq "mono link" )
+	    if (     !( $modifications{$modification}{Name} eq "mono link" )
 		)   
             {
 	  if ($location eq $reactive_site)
 		  { $rxn_residues = $rxn_residues - 1};
+	  if ($modifications{$modification}{Name} eq "loop link")
+		  { $rxn_residues = $rxn_residues / 2};
 	      if ($_ !~ /-/ && substr($_,0,-1) =~ /$reactive_site/  )
 	      {
 	      for ( my $x = 1 ; $x <=  $rxn_residues  ; $x++ ) {
@@ -354,7 +359,7 @@ print "<h2>Monolinks</h2>";
 	  }
          }
      $n=0;
-     foreach (sort keys %line)
+     foreach (sort { $a <=> $b }  keys %line)
       { $n++; print "<tr><td>$n.".$line{$_}; }
      print "</table>";
 
