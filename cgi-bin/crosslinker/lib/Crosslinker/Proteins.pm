@@ -88,19 +88,28 @@ sub digest_proteins    #Digest a string into an array of peptides
    ;                   #Numbers don't appear in sequences so this just works, easier than having a second regex
 #    warn "No Cut:", $nocut_residues, "\n";   
    my @digest;
+   my @digest_not_for_crosslinking;
    if ($n_or_c eq 'C') {
 #      warn "Protease type:", $n_or_c, "\n";
      @digest = $protein =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){1}/g;            
      my @single_digest = @digest;
-     for ( my $i = 2 ; $i < $missed_clevages + 2 ; $i++ ) {
+     for ( my $i = 2 ; $i < ($missed_clevages*2+1) + 2 ; $i++ ) {
         my @single_digest_trimmed = @single_digest;    #need to include missed cleavages for each possible missed position
         my @parts = $protein =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){$i}/g;                                           
-        push( @digest, @parts );
+	if ($i < $missed_clevages + 2) {
+	    push( @digest, @parts );
+	} else {
+	    push( @digest_not_for_crosslinking, @parts );
+	}
         for ( my $j = 1 ; $j < $i ; $j++ ) {
            shift @single_digest_trimmed;
            @parts =
              join( "", @single_digest_trimmed ) =~ m/(?:(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*(?:[$cut_residues](?!$nocut_residues)|.(?=$))){$i}/g;
-           push( @digest, @parts );
+	   if ($i < $missed_clevages + 2) {
+	      push( @digest, @parts );
+	   } else {
+	      push( @digest_not_for_crosslinking, @parts );
+	   }
         }
       }
      }
@@ -111,15 +120,15 @@ sub digest_proteins    #Digest a string into an array of peptides
 
      @digest = $protein =~ m/(?:(?:[$cut_residues_c](?!$nocut_residues)|^.)(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*){1}/g;
      my @single_digest = @digest;
-      for ( my $i = 2 ; $i < $missed_clevages + 2 ; $i++ ) {
+      for ( my $i = 2 ; $i < ($missed_clevages*2+1)+2 ; $i++ ) {
          my @single_digest_trimmed = @single_digest;   
          my @parts = $protein =~ m/(?:(?:[$cut_residues_c](?!$nocut_residues)|^.)(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*){1}/g;                                           
-         push( @digest, @parts );
+	    push( @digest, @parts );
          for ( my $j = 1 ; $j < $i ; $j++ ) {
             shift @single_digest_trimmed;
             @parts =
               join( "", @single_digest_trimmed ) =~ m/(?:(?:[$cut_residues_c](?!$nocut_residues)|^.)(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*){1}/g;
-            push( @digest, @parts );
+	      push( @digest, @parts );
          }
        }
 
@@ -133,7 +142,7 @@ sub digest_proteins    #Digest a string into an array of peptides
 #       }
 
       push @digest, @single_digest;
-      for ( my $i = 2 ; $i < $missed_clevages + 2 ; $i++ ) {
+      for ( my $i = 2 ; $i < ($missed_clevages*2+1)+2 ; $i++ ) {
          my @single_digest_trimmed = @single_digest;    #need to include missed cleavages for each possible missed position
          my @parts = $protein =~ m/(?:(?:[^$cut_residues_c]|[$cut_residues_c]$nocut_residues)*(?:[$cut_residues_c](?!$nocut_residues)|.(?=$))){$i}/g;                                           
 #          push( @digest, @parts );
@@ -150,19 +159,27 @@ sub digest_proteins    #Digest a string into an array of peptides
 #      warn "Protease type:", $n_or_c, "\n";
      @digest = $protein =~ m/(?:(?:[$cut_residues](?!$nocut_residues)|^.)(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*){1}/g;
      my @single_digest = @digest;
-      for ( my $i = 2 ; $i < $missed_clevages + 2 ; $i++ ) {
+      for ( my $i = 2 ; $i < ($missed_clevages*2+1) + 2 ; $i++ ) {
          my @single_digest_trimmed = @single_digest;   
          my @parts = $protein =~ m/(?:(?:[$cut_residues](?!$nocut_residues)|^.)(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*){1}/g;                                           
-         push( @digest, @parts );
+	if ($i < $missed_clevages + 2) {
+	    push( @digest, @parts );
+	} else {
+	    push( @digest_not_for_crosslinking, @parts );
+	}
          for ( my $j = 1 ; $j < $i ; $j++ ) {
             shift @single_digest_trimmed;
             @parts =
               join( "", @single_digest_trimmed ) =~ m/(?:(?:[$cut_residues](?!$nocut_residues)|^.)(?:[^$cut_residues]|[$cut_residues]$nocut_residues)*){1}/g;
-            push( @digest, @parts );
+	      if ($i < $missed_clevages + 2) {
+		push( @digest, @parts );
+	      } else {
+		 push( @digest_not_for_crosslinking, @parts );
+	      }
          }
        }
    }
-   return @digest;
+   return \@digest, \@digest_not_for_crosslinking;
 }
 
 sub digest_proteins_masses    #Calculates the mass of a list of peptides
@@ -214,9 +231,10 @@ sub crosslink_peptides                                                          
                  && defined $xlink_fragment_masses{ $peptide_1 . '-' . $peptide_2 } == 0
                  && defined $xlink_fragment_masses{ $peptide_2 . '-' . $peptide_1 } == 0 )
             {
-               $xlink                          = $peptide_1 . '-' . $peptide_2;
+               $xlink                          = $peptide_1 . '-' . $peptide_2;	 
                $xlink_fragment_masses{$xlink}  = $peptides{$peptide_1} + $peptides{$peptide_2} + $xlinker_mass;
                $xlink_fragment_sources{$xlink} = $fragment_source{$peptide_1} . "-" . $fragment_source{$peptide_2};
+
 #    	 warn "," ,$xlink," , " ,$xlink_fragment_masses{$xlink} ," , " ,$xlink_fragment_masses{$xlink}/2 , ",",$xlink_fragment_masses{$xlink}/3 , "\n";
             }
          }

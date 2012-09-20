@@ -716,11 +716,11 @@ sub matchpeaks {
 #######
 
    foreach my $peak (@peaklist) {
-#       warn $peak->{'scan_num'};
-#       warn $peak->{'d2_scan_num'};
+#        warn $peak->{'scan_num'};
+#        warn $peak->{'d2_scan_num'};
       $peak_no = $peak_no + 1;
       my $percent_done = 0;
-#       warn $percent_done * 100, " % Peak mz = " . sprintf( "%.5f", $peak->{'mz'} ) . "\n";
+#        warn $percent_done * 100, " % Peak mz = " . sprintf( "%.5f", $peak->{'mz'} ) . "\n";
 
        if ( check_state( $settings_dbh, $results_table ) == -4 ) {
           return %fragment_score;

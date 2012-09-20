@@ -54,7 +54,9 @@ sub generate_page {
 
    my $fragment;
    my @fragments;
+   my @fragments_linear_only;
    my %fragment_source;
+   my %fragment_source_linear_only;
    my @sequence_fragments;
    my @sequences = split '>', $protien_sequences;
    my $count = 0;
@@ -70,8 +72,12 @@ sub generate_page {
    }
 
    foreach my $sequence (@sequences) {
-      @sequence_fragments = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
+      my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
+      my @sequence_fragments = @{$sequence_fragments_ref};
+      my @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
+  
       @fragments = ( @fragments, @sequence_fragments );
+      @fragments_linear_only = ( @fragments_linear_only, @sequence_fragments_linear_only );
       warn "Sequence $count = $sequence_names[$count] \n";
       warn "Digested peptides:", scalar(@fragments), " \n";
 
@@ -81,18 +87,20 @@ sub generate_page {
       #    }
 
       %fragment_source = ( ( map { $_ => $count } @fragments ), %fragment_source );
+      %fragment_source_linear_only = ( ( map { $_ => $count } @fragments_linear_only ), %fragment_source_linear_only );
       $count++;
    }
 
    warn "Calulating masses...  \n";
-   my %fragment_masses = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
+   my %fragment_masses 		   = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
+   my %fragment_masses_linear_only = digest_proteins_masses( \@fragments_linear_only, \%protein_residuemass, \%fragment_source_linear_only );   
 
    warn "Crosslinking peptides...  \n";
    my ( $xlink_fragment_masses_ref, $xlink_fragment_sources_ref ) =
      crosslink_peptides( \%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
    my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
-   %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses );
-   my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source );
+   %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses, %fragment_masses_linear_only );
+   my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only );
 
    warn "Finding doublets...  \n";
    my @peaklist = loaddoubletlist_db( $query->param('ms_ppm'), $seperation,       $isotope,          $dbh, $scan_width,
@@ -145,7 +153,9 @@ sub generate_page_single_scan {
 
    my $fragment;
    my @fragments;
+   my @fragments_linear_only;
    my %fragment_source;
+   my %fragment_source_linear_only;
    my @sequence_fragments;
    my @sequences = split '>', $protien_sequences;
    my $count = 0;
@@ -155,30 +165,27 @@ sub generate_page_single_scan {
    
     import_scan( $light_scan,		$heavy_scan,	   $precursor_charge, $precursor_mass, $mass_seperation, $mass_of_proton  , $dbh );
    
-   foreach my $sequence (@sequences) {
-      @sequence_fragments = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
+ foreach my $sequence (@sequences) {
+      my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
+      my @sequence_fragments = @{$sequence_fragments_ref};
+      my @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
+  
       @fragments = ( @fragments, @sequence_fragments );
-#       warn "Sequence $count = $sequence_names[$count] \n";
-#       warn "Digested peptides:", scalar(@fragments), " \n";
-
-      #  foreach (@sequence_fragments) {
-      #	if ($_ eq "YSALFLGMAYGAKR"){ warn "YSALFLGMAYGAKR , $_ , $sequence_names[$count]"; }
-      #        $fragment_source{$_} = $sequence_names[$count];
-      #    }
-
+      @fragments_linear_only = ( @fragments_linear_only, @sequence_fragments_linear_only );
       %fragment_source = ( ( map { $_ => $count } @fragments ), %fragment_source );
+      %fragment_source_linear_only = ( ( map { $_ => $count } @fragments_linear_only ), %fragment_source_linear_only );
       $count++;
    }
 
-#    warn "Calulating masses...  \n";
-   my %fragment_masses = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
+   my %fragment_masses 		   = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
+   my %fragment_masses_linear_only = digest_proteins_masses( \@fragments_linear_only, \%protein_residuemass, \%fragment_source_linear_only );   
 
-#    warn "Crosslinking peptides...  \n";
    my ( $xlink_fragment_masses_ref, $xlink_fragment_sources_ref ) =
      crosslink_peptides( \%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
    my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
-   %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses );
-   my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source );
+   %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses, %fragment_masses_linear_only );
+   my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only );
+
 
 #    warn "Finding doublets...  \n";
    my @peaklist = loaddoubletlist_db( 10, $seperation,       $isotope,          $dbh, $scan_width,
@@ -222,7 +229,9 @@ sub crosslink_digest {
 
    my $fragment;
    my @fragments;
+   my @fragments_linear_only;
    my %fragment_source;
+   my %fragment_source_linear_only;
    my @sequence_fragments;
    my @sequences = split '>', $protien_sequences;
    my $count = 0;
@@ -237,23 +246,28 @@ sub crosslink_digest {
       #   	import_csv($n,$csv_filehandle[$n], $dbh);
    }
 
-   foreach my $sequence (@sequences) {
-      @sequence_fragments = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
+
+ foreach my $sequence (@sequences) {
+      my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
+      my @sequence_fragments = @{$sequence_fragments_ref};
+      my @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
+  
       @fragments = ( @fragments, @sequence_fragments );
-
-    
-
+      @fragments_linear_only = ( @fragments_linear_only, @sequence_fragments_linear_only );
       %fragment_source = ( ( map { $_ => $count } @fragments ), %fragment_source );
+      %fragment_source_linear_only = ( ( map { $_ => $count } @fragments_linear_only ), %fragment_source_linear_only );
       $count++;
    }
 
-   my %fragment_masses = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
+   my %fragment_masses 		   = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
+   my %fragment_masses_linear_only = digest_proteins_masses( \@fragments_linear_only, \%protein_residuemass, \%fragment_source_linear_only );   
 
    my ( $xlink_fragment_masses_ref, $xlink_fragment_sources_ref ) =
      crosslink_peptides( \%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
    my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
-   %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses );
-   my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source );
+   %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses, %fragment_masses_linear_only );
+   my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only );
+
 
   my $n = 1;
   print "<h2>Crosslinks</h2>";

@@ -66,7 +66,7 @@ print <<ENDHTML;
     Allow cross-linking at cut site : <input type="checkbox" name="allow_xlink_at_cut_site" value="true" ><br/>
     </td>
   <td class="half"  >
-    Max. Missed Cleavages    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="2"/><br/>
+    Max. Missed Cleavages    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="3"/><br/>
     MS1 accurracy (ppm) <input type="text" name="ms1_ppm" size="2" maxlength="2" value="2"/><br/>
      Max scan seperation<input type="text" name="scan_width" size="4" maxlength="4" value="60"/><br/>
     Decoy Search: <input type="checkbox" name="decoy" value="true"><br/>       
