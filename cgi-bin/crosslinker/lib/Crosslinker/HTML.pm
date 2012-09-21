@@ -31,17 +31,10 @@ sub generate_page {
         $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
         $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
         $threshold,		$n_or_c,	     $match_charge,	  $match_intensity,   $no_xlink_at_cut_site, $ms1_intensity_ratio,
-        $fast_mode
+        $fast_mode,		$doublet_tolerance
    ) = @_;
 
-   while ( $state == -2 ) {
-      sleep(10);
-      $state = check_state( $settings_dbh, $results_table );
-   }
 
-   if ( $state == -4 ) {
-      return $state;
-   }
 
 #     die;
    
@@ -61,15 +54,7 @@ sub generate_page {
    my @sequences = split '>', $protien_sequences;
    my $count = 0;
 
-   create_table($dbh);
-
-   for ( my $n = 1 ; $n <= $no_of_fractions ; $n++ ) {
-      if ( defined( $upload_filehandle[$n] ) ) {
-         import_mgf( $n, $upload_filehandle[$n], $dbh );
-      }
-
-      #   	import_csv($n,$csv_filehandle[$n], $dbh);
-   }
+  
 
    foreach my $sequence (@sequences) {
       my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
@@ -103,7 +88,7 @@ sub generate_page {
    my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only );
 
    warn "Finding doublets...  \n";
-   my @peaklist = loaddoubletlist_db( $query->param('ms_ppm'), $seperation,       $isotope,          $dbh, $scan_width,
+   my @peaklist = loaddoubletlist_db( $doublet_tolerance,      $seperation,       $isotope,          $results_dbh, $scan_width,
                                       $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12,
 				      $match_charge, 	       $match_intensity,  $ms1_intensity_ratio );
 
@@ -113,7 +98,7 @@ sub generate_page {
    warn "Starting Peak Matches...\n";
    my %fragment_score = matchpeaks(
                                     \@peaklist,          \%xlink_fragment_masses, \%xlink_fragment_sources, $protien_sequences,
-                                    $match_ppm,          $dbh,                    $results_dbh,             $settings_dbh,
+                                    $match_ppm,          $results_dbh,            $results_dbh,             $settings_dbh,
                                     $results_table,      $mass_of_deuterium,      $mass_of_hydrogen,        $mass_of_carbon13,
                                     $mass_of_carbon12,   $cut_residues,           $nocut_residues,          \@sequence_names,
                                     $mono_mass_diff,     $xlinker_mass,           $seperation,              $isotope,

@@ -23,6 +23,9 @@ if ($child) {
    print_heading('File Upload');
 #    print "<p>Parent $$ has finished, Child's PID: $child\n</p>";
   print "<p>File upload complete, your search has been added to the queue and should appear on the results page soon.</p>";
+
+
+
   print_page_bottom_fancy;
 } else {
 
@@ -69,7 +72,8 @@ if ($child) {
         $cut_residues,      $nocut_residues,     $fasta,                 $desc,                  $decoy,              $match_ppm,
         $ms2_error,         $mass_seperation,    $isotope,               $seperation,            $mono_mass_diff,     $xlinker_mass,
         $dynamic_mods_ref,  $fixed_mods_ref,     $ms2_fragmentation_ref, $threshold,		 $n_or_c,	      $scan_width,
-	$match_charge,	    $match_intensity,    $scored_ions,           $no_xlink_at_cut_site,  $ms1_intensity_ratio,$fast_mode
+	$match_charge,	    $match_intensity,    $scored_ions,           $no_xlink_at_cut_site,  $ms1_intensity_ratio,$fast_mode,
+        $doublet_tolerance
    ) = import_cgi_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
    my @sequence_names    = @{$sequence_names_ref};
    my @upload_filehandle = @{$upload_filehandle_ref};
@@ -78,16 +82,40 @@ if ($child) {
    my @fixed_mods        = @{$fixed_mods_ref};
    my %ms2_fragmentation = %{$ms2_fragmentation_ref};
 
-   # Generate Results Name
-#    my $results_table = find_free_tablename $settings_dbh;
-
-   # Save Settings
    my $state = is_ready($settings_dbh);
-   my $results_table = save_settings( $settings_dbh, $cut_residues, $fasta,     $reactive_site,   $mono_mass_diff, $xlinker_mass, $state,
-                  $desc,         $decoy,         $ms2_error,    $match_ppm, $mass_seperation, \@dynamic_mods,  \@fixed_mods,  $threshold,
-		  $match_charge, $match_intensity, $scored_ions);
+
+   my $results_table = save_settings( $settings_dbh, 
+
+		  $cut_residues, $fasta,     	$reactive_site, $mono_mass_diff, 	$xlinker_mass, 	  $state,
+                  $desc,         $decoy,        $ms2_error,    	$match_ppm, 		$mass_seperation, \@dynamic_mods,  
+		 \@fixed_mods,   $threshold,	$match_charge, 	$match_intensity, 	$scored_ions);
 
    my ( $results_dbh ) = connect_db_results($results_table);
+
+    
+  #Save Query data
+
+  open (OUT,'>',"query_data/query-$results_table.txt");
+  $query->save(\*OUT);
+  close OUT;
+
+   create_table($results_dbh);
+
+   for ( my $n = 1 ; $n <= $no_of_fractions ; $n++ ) {
+      if ( defined( $upload_filehandle[$n] ) ) {
+         import_mgf( $n, $upload_filehandle[$n], $results_dbh );
+      }
+    }
+  
+   while ( $state == -2 ) {
+      sleep(100);
+      $state = check_state( $settings_dbh, $results_table );
+   }
+
+   if ( $state == -4 ) {
+      return $state;
+   }
+  
    # Setup Modifications
    my %protein_residuemass = protein_residuemass($results_table, $settings_dbh);
    my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $results_table, $settings_dbh );
@@ -99,10 +127,10 @@ if ($child) {
                            $protien_sequences,  $dbh,              $results_dbh,      $settings_dbh,   $results_table,      $no_of_fractions,
                            \@upload_filehandle, \@csv_filehandle,  $missed_clevages,  $cut_residues,   $nocut_residues,     \%protein_residuemass,
                            $reactive_site,      $scan_width,       \@sequence_names,  $match_ppm,      $min_peptide_length, $mass_of_deuterium,
-                           $mass_of_hydrogen,   $mass_of_carbon13, $mass_of_carbon12, \%modifications, $query,              $mono_mass_diff,
+                           $mass_of_hydrogen,   $mass_of_carbon13, $mass_of_carbon12, \%modifications, 1,      		    $mono_mass_diff,
                            $xlinker_mass,       $isotope,          $seperation,       $ms2_error,      $state,              \%ms2_fragmentation,
                            $threshold,		$n_or_c, 	   $match_charge,     $match_intensity, $no_xlink_at_cut_site, $ms1_intensity_ratio,
-			   $fast_mode,
+			   $fast_mode,		$doublet_tolerance,
    )};
    if ($@) { 
 	warn $@;

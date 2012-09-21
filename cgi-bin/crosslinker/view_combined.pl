@@ -73,6 +73,19 @@ my $results_dbh;
 
 my $SQL_query;
 for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
+
+
+   my $settings_sql = $settings_dbh->prepare( "SELECT name FROM settings WHERE name = ?" );
+   $settings_sql->execute($table[$table_no]);
+   my @data = $settings_sql->fetchrow_array();
+   if (@data[0] != $table[$table_no])
+   {
+    print "Content-Type: text/plain\n\n";
+    print "Cannont find results database";
+    exit;
+    }
+
+
    if (!defined $results_dbh) {  $results_dbh= DBI->connect( "dbi:SQLite:dbname=db/results-$table[$table_no]",  "", "", { RaiseError => 1, AutoCommit => 1 } )}
    my $sql_attach_command =  "attach database './db/results-$table[$table_no]' as db$table[$table_no]";
    $results_dbh->do ( $sql_attach_command);

@@ -45,9 +45,24 @@ if ($scan == -1) {
   $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results_single",  "", "", { RaiseError => 1, AutoCommit => 1 } );
   $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings_single", "", "", { RaiseError => 1, AutoCommit => 1 } );
 } else {
-  $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results-$table",  "", "", { RaiseError => 1, AutoCommit => 1 } );
-  $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
+ 
+   $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );  
+
+   my $settings_sql = $settings_dbh->prepare( "SELECT name FROM settings WHERE name = ?" );
+   $settings_sql->execute($table);
+   my @data = $settings_sql->fetchrow_array();
+   if (@data[0] != $table)
+   {
+    print "Content-Type: text/plain\n\n";
+    print "Cannont find results database";
+    exit;
+    }
+    $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results-$table",  "", "", { RaiseError => 1, AutoCommit => 1 } );
+
 }
+
+
+
 
 #######################
 #                     #

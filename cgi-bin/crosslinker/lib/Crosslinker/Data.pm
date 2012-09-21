@@ -287,6 +287,7 @@ sub is_ready {
    return $state;
 }
 
+
 sub save_settings {
 
    my (
@@ -475,6 +476,7 @@ sub import_cgi_query {
    my $reactive_site  = $query->param('reactive_site');
    my $isotope        = $query->param("isotope");
    my $linkspacing    = $query->param('seperation');
+   my $doublet_tolerance = $query->param("ms_ppm");
    my $threshold      = $query->param('threshold');
    my $match_charge   =  0;
    my $match_intensity=  0; 
@@ -557,7 +559,8 @@ sub import_cgi_query {
             $cut_residues,      $nocut_residues,  $fasta,              $desc,               $decoy,           $match_ppm,
             $ms2_error,         $mass_seperation, $isotope,            $linkspacing,        $mono_mass_diff,  $xlinker_mass,
             \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c,	      $scan_width,
-	    $match_charge,	$match_intensity, $scored_ions,	       $no_xlink_at_cut_site, $ms1_intensity_ratio, $fast_mode
+	    $match_charge,	$match_intensity, $scored_ions,	       $no_xlink_at_cut_site, $ms1_intensity_ratio, $fast_mode,
+	    $doublet_tolerance
    );
 }
 

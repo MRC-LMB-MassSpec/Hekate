@@ -18,7 +18,7 @@ my $query    = new CGI;
 my $table    = $query->param('table');
 my $new_name = $query->param('name');
 
-my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
+
 my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
 print_page_top_fancy('Rename');
@@ -48,6 +48,6 @@ if ( defined $new_name ) {
        <input type='submit' value='Submit'></form></p>"
 }
 print_page_bottom_fancy;
-$results_dbh->disconnect();
+
 exit;
 
