@@ -43,8 +43,10 @@ my $state;
    }
 
 
-if ( $table_name->{'finished'} != -1 && $table_name->{'finished'} != -4  && $table_name->{'finished'} != -5  ) {
-   print "Refresh: 10\n";
+if ( $table_name->{'finished'} > 0   ) {
+   print "Refresh: 30\n";
+} elsif ( $table_name->{'finished'} != -1 && $table_name->{'finished'} != -4  && $table_name->{'finished'} != -5){
+   print "Refresh: 600\n";
 }
 
 print "Content-type: text/html\n\n";

@@ -24,7 +24,7 @@ my $areyousure = $query->param('areyousure');
 #                      #
 ########################
 
-my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 } );
+my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results-$table ",  "", "", { RaiseError => 1, AutoCommit => 1 } );
 my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
 print_page_top_fancy('Delete');

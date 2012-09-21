@@ -21,7 +21,7 @@ our @EXPORT = (
 
 
 sub _retry {
-    my ( $retrys, $func ) = @_;
+    my ( $retrys, $func, $ignore_if_fail ) = @_;
 
     attempt: {
       my $result;
@@ -40,8 +40,13 @@ sub _retry {
       $retrys--;
       redo attempt;
     }
-
-    die "Attempts Exceeded $@";
+   if (defined $ignore_if_fail)
+    {
+      return -1;
+    } else
+    {
+      die "Attempts Exceeded $@";
+    }
 }
 
 sub generate_decoy {
@@ -216,7 +221,7 @@ sub update_state {
 
    my $settings_sql = $settings_dbh->prepare("UPDATE settings SET finished =? WHERE name=?;");
 
-   _retry 15, sub {$settings_sql->execute( $state, $results_table )};
+   _retry 15, sub {$settings_sql->execute( $state, $results_table )}, 1;
 
    return;
 }
@@ -225,11 +230,14 @@ sub check_state {
    my ( $settings_dbh, $results_table ) = @_;
 
    my $settings_sql = $settings_dbh->prepare("SELECT finished FROM settings WHERE name = ?");
-   _retry 15, sub {$settings_sql->execute($results_table)};
+   my $success = _retry 15, sub {$settings_sql->execute($results_table)}, 1;
+   if ($succes != -1) {
    my @data  = $settings_sql->fetchrow_array();
    my $state = $data[0];
-
    return $state;
+   }
+
+   return -2;
 }
 
 sub give_permission {
