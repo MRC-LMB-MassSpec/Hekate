@@ -231,7 +231,7 @@ sub check_state {
 
    my $settings_sql = $settings_dbh->prepare("SELECT finished FROM settings WHERE name = ?");
    my $success = _retry 15, sub {$settings_sql->execute($results_table)}, 1;
-   if ($succes != -1) {
+   if ($success != -1) {
    my @data  = $settings_sql->fetchrow_array();
    my $state = $data[0];
    return $state;
