@@ -106,7 +106,7 @@ sub generate_page {
                                     \%ms2_fragmentation, $threshold,		  $no_xlink_at_cut_site,    $fast_mode
    );
 
-   give_permission($settings_dbh);
+#    give_permission($settings_dbh);
    if ( check_state( $settings_dbh, $results_table ) == -4 ) {
       return '-4';
    }
@@ -146,6 +146,11 @@ sub generate_page_single_scan {
    my $count = 0;
 
    create_table($dbh);
+
+     
+   if ( $state == -4 ) { 
+      return $state;
+   }
 
    
     import_scan( $light_scan,		$heavy_scan,	   $precursor_charge, $precursor_mass, $mass_seperation, $mass_of_proton  , $dbh );

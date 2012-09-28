@@ -254,7 +254,13 @@ sub give_permission {
    } else {
       warn "Queue empty", "\n";
    }
-   return;
+
+   if (defined $data[0])
+    {
+	return $data[0];
+     } 
+
+   return -1;
 }
 
 sub is_ready {
@@ -268,9 +274,9 @@ sub is_ready {
    my $settings_sql;
 
    if ($ignore_waiting_searches == 0) {
-       $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -2 or finished = -3 or finished > -1" );
+       $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -2  or finished = -3  or finished > -1" );
    } else {
-       $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -3 or finished > -1" );
+       $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE  finished = -3  or finished > -1" );
    }
    _retry 15, sub {$settings_sql->execute()};
    my @data = $settings_sql->fetchrow_array();

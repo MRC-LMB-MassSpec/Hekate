@@ -43,7 +43,7 @@ if ($child) {
    local $| = 1;
    select $oldfh;
 
-   warn "Started\n";
+#    warn "Started\n";
 
    # do something time-consuming
    #      warn "Parent Completed\n";
@@ -92,7 +92,8 @@ if ($child) {
 
    my ( $results_dbh ) = connect_db_results($results_table);
 
-    
+ warn "Run $results_table: Started \n";    
+
   #Save Query data
 
   open (OUT,'>',"query_data/query-$results_table.txt");
@@ -106,16 +107,21 @@ if ($child) {
          import_mgf( $n, $upload_filehandle[$n], $results_dbh );
       }
     }
-  
-   while ( $state == -2 ) {
-      sleep(100);
-      $state = check_state( $settings_dbh, $results_table );
+    
+
+   my $next_run = -1;
+
+   $state = check_state( $settings_dbh, $results_table );
+   if ( $state == -2 ) {
+      warn "Run $results_table: terminating as another in progress.\n";
+      $next_run = 0;
    }
 
-   if ( $state == -4 ) {
-      return $state;
-   }
+
   
+   while ($next_run != 0)
+   { 
+
    # Setup Modifications
    my %protein_residuemass = protein_residuemass($results_table, $settings_dbh);
    my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $results_table, $settings_dbh );
@@ -132,18 +138,51 @@ if ($child) {
                            $threshold,		$n_or_c, 	   $match_charge,     $match_intensity, $no_xlink_at_cut_site, $ms1_intensity_ratio,
 			   $fast_mode,		$doublet_tolerance,
    )};
-   if ($@) { 
-	warn $@;
+   
+   if  ($@) { 
+	warn "Run " , $results_table, ":", $@;
 	set_failed ( $results_table, $settings_dbh );
         $state = -5;
-	warn is_ready($settings_dbh, 1);
-	if (is_ready($settings_dbh, 1) == 0) {give_permission($settings_dbh)};	 
-     };
+   };
+    
+    $next_run = 0;
 
+    if ( $state == -1 ) { set_finished( $results_table, $settings_dbh ) } 
+
+    if (is_ready($settings_dbh, 1) == 0 && is_ready($settings_dbh, 0) == -2) {
+      $next_run = give_permission($settings_dbh);		      
+      warn "Run " , $results_table, ": - picking up data to process from Run $next_run. \n";
+      open (OUT,'<',"query_data/query-$next_run.txt");
+	$query = CGI->new(\*OUT);
+      close OUT;
+      
+	(
+        $protien_sequences, $sequence_names_ref, $missed_clevages,       $upload_filehandle_ref, $csv_filehandle_ref, $reactive_site,
+        $cut_residues,      $nocut_residues,     $fasta,                 $desc,                  $decoy,              $match_ppm,
+        $ms2_error,         $mass_seperation,    $isotope,               $seperation,            $mono_mass_diff,     $xlinker_mass,
+        $dynamic_mods_ref,  $fixed_mods_ref,     $ms2_fragmentation_ref, $threshold,		 $n_or_c,	      $scan_width,
+	$match_charge,	    $match_intensity,    $scored_ions,           $no_xlink_at_cut_site,  $ms1_intensity_ratio,$fast_mode,
+        $doublet_tolerance
+	) = import_cgi_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
+        @sequence_names    = @{$sequence_names_ref};
+	@upload_filehandle = @{$upload_filehandle_ref};
+	@csv_filehandle    = @{$csv_filehandle_ref};
+	@dynamic_mods      = @{$dynamic_mods_ref};
+	@fixed_mods        = @{$fixed_mods_ref};
+	%ms2_fragmentation = %{$ms2_fragmentation_ref};
+
+	warn "Run " , $results_table, ":$cut_residues";
+
+	  $results_dbh->disconnect();
+	  $results_table = $next_run;
+          $results_dbh = connect_db_results($results_table);
+      }
+
+    }
    #Tidy up
-   if ( $state == -1 ) { set_finished( $results_table, $settings_dbh ) }
+ 
    disconnect_db( $dbh, $settings_dbh, $results_dbh );
-   warn "completed\n";
+   warn "Run " , $results_table, ": Process complete\n";
    CORE::exit(0);    # terminate the forked process cleanly
 }
 exit;
