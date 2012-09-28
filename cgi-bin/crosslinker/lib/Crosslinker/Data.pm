@@ -254,7 +254,7 @@ sub check_state {
 sub give_permission {
    my ($settings_dbh) = @_;
 
-   my $settings_sql = $settings_dbh->prepare( "SELECT name, finished FROM  settings WHERE finished = '-2' ORDER BY length(name) DESC, name ASC " );
+   my $settings_sql = $settings_dbh->prepare( "SELECT name, finished FROM  settings WHERE finished = '-2' ORDER BY length(name) ASC, name ASC " );
    _retry 15, sub {$settings_sql->execute()};
    my @data = $settings_sql->fetchrow_array();
    if ( defined $data[0] ) {
