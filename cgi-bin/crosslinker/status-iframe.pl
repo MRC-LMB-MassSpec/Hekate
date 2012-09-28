@@ -25,6 +25,7 @@ my $table_name = $table_list->fetchrow_hashref;
 my $state;
 
 
+   
    if ( $table_name->{'finished'} == -1 ) {
       $state = 'Done';
    } elsif ( $table_name->{'finished'} == -2 ) {
@@ -35,6 +36,8 @@ my $state;
       $state = 'Aborted';
    } elsif ( $table_name->{'finished'} == -5 ) {
       $state = 'Failed';
+   } elsif ( $table_name->{'finished'} == -6 ) {
+      $state = 'Importing...';
    }
 
 

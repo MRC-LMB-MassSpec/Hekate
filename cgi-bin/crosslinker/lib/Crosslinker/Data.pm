@@ -11,7 +11,7 @@ our @EXPORT = (
                 'save_settings', 'update_state', 'import_cgi_query',   'find_free_tablename', 'matchpeaks',    'create_table',
                 'import_mgf',    'import_csv',   'loaddoubletlist_db', 'generate_decoy',      'set_doublets_found',
 		'import_mgf_doublet_query',	 'connect_db_single', 'import_scan', 'create_settings', 'set_failed',
-		'connect_db_results'
+		'connect_db_results',	'set_state'
 );
 ######
 #
@@ -151,7 +151,7 @@ _retry 15, sub {$settings_dbh->do(
 						      decoy,
 						      ms2_da,
 						      ms1_ppm,
-						      finished,
+						      finished NUMERIC,
 						      isotoptic_shift,
 						      threshold,
 						      doublets_found,
@@ -188,6 +188,15 @@ sub disconnect_db {
    $settings_dbh->disconnect();
    $dbh->disconnect();
    $results_dbh->disconnect();
+}
+
+sub set_state {
+   my ( $results_table, $settings_dbh, $state ) = @_;
+
+   my $settings_sql = $settings_dbh->prepare("UPDATE settings SET finished = ? WHERE  name = ?;");
+   _retry 15, sub {$settings_sql->execute($state, $results_table)};
+
+   return;
 }
 
 sub set_finished {
@@ -276,9 +285,9 @@ sub is_ready {
    my $settings_sql;
 
    if ($ignore_waiting_searches == 0) {
-       $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -2  or finished = -3  or finished > -1" );
+       $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE finished = -2  or finished = -3   or finished > -1" );
    } else {
-       $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE  finished = -3  or finished > -1" );
+       $settings_sql = $settings_dbh->prepare( "SELECT count(finished) FROM settings WHERE  finished = -3 or finished > -1" );
    }
    _retry 15, sub {$settings_sql->execute()};
    my @data = $settings_sql->fetchrow_array();
@@ -286,7 +295,8 @@ sub is_ready {
    my $state;
 
    if ( $data[0] > 0 && $ignore_waiting_searches == 0 ) {
-      $state = -2;
+#      warn $data[0], $data[1], $data[2];
+     $state = -2;
    } elsif ( $data[0] > 1 && $ignore_waiting_searches == 1 ) {
       $state = 0;
    } else {
@@ -968,7 +978,7 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
              "INSERT INTO msdata (scan_num, fraction, title, charge, mz, abundance, monoisotopic_mw, MSn_string, msorder) VALUES (? , ?, ?, ?, ?, ?, ?,?, 2)" );
          _retry 15, sub {$newline->execute( $line{'scan_num'}, $line{'fraction'}, $line{'title'}, $line{'charge'}, $line{'mz'}, $line{'abundance'}, $line{'monoisoptic_mw'},
                             $MSn_string )};
-	 warn "Scan imported \n";
+# 	 warn "Scan imported \n";
 
          $line{'scan_num'} = $line{'monoisoptic_mw'} = $line{'abundance'} = $MSn_string = '';
          $MSn_count = 0;

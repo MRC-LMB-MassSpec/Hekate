@@ -82,11 +82,9 @@ if ($child) {
    my @fixed_mods        = @{$fixed_mods_ref};
    my %ms2_fragmentation = %{$ms2_fragmentation_ref};
 
-   my $state = is_ready($settings_dbh);
-
    my $results_table = save_settings( $settings_dbh, 
 
-		  $cut_residues, $fasta,     	$reactive_site, $mono_mass_diff, 	$xlinker_mass, 	  $state,
+		  $cut_residues, $fasta,     	$reactive_site, $mono_mass_diff, 	$xlinker_mass, 	  -6,
                   $desc,         $decoy,        $ms2_error,    	$match_ppm, 		$mass_seperation, \@dynamic_mods,  
 		 \@fixed_mods,   $threshold,	$match_charge, 	$match_intensity, 	$scored_ions);
 
@@ -118,7 +116,11 @@ if ($child) {
 
    my $next_run = -1;
 
-   $state = check_state( $settings_dbh, $results_table );
+   my $state = is_ready($settings_dbh);
+   set_state ( $results_table, $settings_dbh, $state );
+#    warn $state;
+
+#    $state = check_state( $settings_dbh, $results_table );
    if ( $state == -2 ) {
       warn "Run $results_table: terminating as another in progress.\n";
       $next_run = 0;
