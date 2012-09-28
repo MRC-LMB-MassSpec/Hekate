@@ -966,6 +966,7 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
              "INSERT INTO msdata (scan_num, fraction, title, charge, mz, abundance, monoisotopic_mw, MSn_string, msorder) VALUES (? , ?, ?, ?, ?, ?, ?,?, 2)" );
          _retry 15, sub {$newline->execute( $line{'scan_num'}, $line{'fraction'}, $line{'title'}, $line{'charge'}, $line{'mz'}, $line{'abundance'}, $line{'monoisoptic_mw'},
                             $MSn_string )};
+	 warn "Scan imported \n";
 
          $line{'scan_num'} = $line{'monoisoptic_mw'} = $line{'abundance'} = $MSn_string = '';
          $MSn_count = 0;

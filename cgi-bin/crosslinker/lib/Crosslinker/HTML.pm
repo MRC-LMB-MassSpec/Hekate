@@ -54,6 +54,8 @@ sub generate_page {
    my @sequences = split '>', $protien_sequences;
    my $count = 0;
 
+
+      warn "Run $results_table: Generating page \n"; 
   
 
    foreach my $sequence (@sequences) {
@@ -63,8 +65,8 @@ sub generate_page {
   
       @fragments = ( @fragments, @sequence_fragments );
       @fragments_linear_only = ( @fragments_linear_only, @sequence_fragments_linear_only );
-      warn "Sequence $count = $sequence_names[$count] \n";
-      warn "Digested peptides:", scalar(@fragments), " \n";
+      warn "Run $results_table: Sequence $count = $sequence_names[$count] \n";
+      warn "Run $results_table: Digested peptides:", scalar(@fragments), " \n";
 
       #  foreach (@sequence_fragments) {
       #	if ($_ eq "YSALFLGMAYGAKR"){ warn "YSALFLGMAYGAKR , $_ , $sequence_names[$count]"; }
@@ -76,18 +78,18 @@ sub generate_page {
       $count++;
    }
 
-   warn "Calulating masses...  \n";
+   warn "Run $results_table: Calulating masses...  \n";
    my %fragment_masses 		   = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
    my %fragment_masses_linear_only = digest_proteins_masses( \@fragments_linear_only, \%protein_residuemass, \%fragment_source_linear_only );   
 
-   warn "Crosslinking peptides...  \n";
+   warn "Run $results_table: Crosslinking peptides...  \n";
    my ( $xlink_fragment_masses_ref, $xlink_fragment_sources_ref ) =
      crosslink_peptides( \%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
    my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
    %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses, %fragment_masses_linear_only );
    my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only );
 
-   warn "Finding doublets...  \n";
+   warn "Run $results_table: Finding doublets...  \n";
    my @peaklist = loaddoubletlist_db( $doublet_tolerance,      $seperation,       $isotope,          $results_dbh, $scan_width,
                                       $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12,
 				      $match_charge, 	       $match_intensity,  $ms1_intensity_ratio );
@@ -95,7 +97,7 @@ sub generate_page {
    my $doublets_found = @peaklist;
    set_doublets_found( $results_table, $settings_dbh, $doublets_found );
 
-   warn "Starting Peak Matches...\n";
+   warn "Run $results_table: Starting Peak Matches...\n";
    my %fragment_score = matchpeaks(
                                     \@peaklist,          \%xlink_fragment_masses, \%xlink_fragment_sources, $protien_sequences,
                                     $match_ppm,          $results_dbh,            $results_dbh,             $settings_dbh,

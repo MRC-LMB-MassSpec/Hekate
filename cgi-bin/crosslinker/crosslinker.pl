@@ -100,7 +100,11 @@ if ($child) {
   $query->save(\*OUT);
   close OUT;
 
+  warn "Run $results_table: Query saved \n"; 
+  
    create_table($results_dbh);
+
+  warn "Run $results_table: Table created for results \n"; 
 
    for ( my $n = 1 ; $n <= $no_of_fractions ; $n++ ) {
       if ( defined( $upload_filehandle[$n] ) ) {
@@ -108,6 +112,7 @@ if ($child) {
       }
     }
     
+  warn "Run $results_table: Data Imported \n"; 
 
    my $next_run = -1;
 
