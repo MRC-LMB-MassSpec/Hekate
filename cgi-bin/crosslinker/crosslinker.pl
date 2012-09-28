@@ -90,7 +90,7 @@ if ($child) {
                   $desc,         $decoy,        $ms2_error,    	$match_ppm, 		$mass_seperation, \@dynamic_mods,  
 		 \@fixed_mods,   $threshold,	$match_charge, 	$match_intensity, 	$scored_ions);
 
-   my ( $results_dbh ) = connect_db_results($results_table);
+   my ( $results_dbh ) = connect_db_results($results_table, 0);
 
  warn "Run $results_table: Started \n";    
 
@@ -111,6 +111,8 @@ if ($child) {
          import_mgf( $n, $upload_filehandle[$n], $results_dbh );
       }
     }
+   $results_dbh->disconnect;
+   ( $results_dbh ) = connect_db_results($results_table);
     
   warn "Run $results_table: Data Imported \n"; 
 

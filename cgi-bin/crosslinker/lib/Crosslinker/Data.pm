@@ -124,8 +124,10 @@ sub connect_db {
 }
 
 sub connect_db_results {
-   my ($name) = @_;
-   my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results-$name",  "", "", { RaiseError => 1, AutoCommit => 1 } ); 
+   my ($name, $autocommit) = @_;
+   
+   if  (!defined $autocommit) {$autocommit = 1}
+   my $results_dbh  = DBI->connect( "dbi:SQLite:dbname=db/results-$name",  "", "", { RaiseError => 1, AutoCommit => $autocommit } ); 
    create_results($results_dbh);
 
    return ( $results_dbh );
@@ -972,6 +974,8 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
          $MSn_count = 0;
       }
    }
+
+  $dbh->commit;
 }
 
 
