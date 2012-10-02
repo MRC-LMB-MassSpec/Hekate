@@ -16,6 +16,7 @@ use Crosslinker::HTML;
 use Crosslinker::Results;
 use Crosslinker::Constants;
 use Crosslinker::Config;
+use Crosslinker::Data;
 
 ########################
 #                      #
@@ -70,9 +71,13 @@ while ( ( my $data_set = $settings->fetchrow_hashref ) ) {
 
 
 my $results_dbh;
+my $dbh          = DBI->connect( "dbi:SQLite:dbname=:memory:",    "", "", { RaiseError => 1, AutoCommit => 1 } );
+create_results ($dbh);
+
 
 my $SQL_query;
 for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
+
 
 
    my $settings_sql = $settings_dbh->prepare( "SELECT name FROM settings WHERE name = ?" );
@@ -86,10 +91,14 @@ for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
     }
 
 
-   if (!defined $results_dbh) {  $results_dbh= DBI->connect( "dbi:SQLite:dbname=db/results-$table[$table_no]",  "", "", { RaiseError => 1, AutoCommit => 1 } )}
    my $sql_attach_command =  "attach database './db/results-$table[$table_no]' as db$table[$table_no]";
-   $results_dbh->do ( $sql_attach_command);
+   $dbh->do ( $sql_attach_command);
+   my $merge_data = $dbh->prepare ( "INSERT into results select * from db$table[$table_no].results");
+   $merge_data->execute();
+   $sql_attach_command =  "detach database  db$table[$table_no]";
+   $dbh->do ( $sql_attach_command);
    $SQL_query = $SQL_query . "SELECT * FROM settings WHERE name = ? UNION ";
+
 }
 $SQL_query = substr( $SQL_query, 0, -6 );
 
@@ -150,9 +159,9 @@ if ( defined $order ) {
       $SQL_query = $SQL_query . "SELECT * FROM db$table[$table_no].results WHERE name=?  UNION ALL ";
    }
    $SQL_query = substr( $SQL_query, 0, -10 );
-   $top_hits = $results_dbh->prepare( "SELECT * FROM (" . $SQL_query . ") ORDER BY score DESC " );   
+   $top_hits = $dbh->prepare( "SELECT * FROM results ORDER BY score DESC " );   
 }
-$top_hits->execute(@table);
+$top_hits->execute();
 print_results_combined( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined,
                         $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table', 0, 0, 0, 2 );
 
@@ -169,13 +178,13 @@ if ( defined $order ) {
       $SQL_query = $SQL_query . "SELECT * FROM db$table[$table_no].results WHERE name=?  UNION ALL ";
    }
    $SQL_query = substr( $SQL_query, 0, -10 );
-   $top_hits = $results_dbh->prepare( $SQL_query . " ORDER BY score DESC" );    
+   $top_hits = $dbh->prepare( "SELECT * FROM results ORDER BY score DESC" );    
 }
-$top_hits->execute(@table);
+$top_hits->execute();
 print_results_combined( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined,
                         $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, \%mass_seperation_hash, 'table', 0, 0, 0, 1 );
 
 print_page_bottom_fancy;
 $top_hits->finish();
-$results_dbh->disconnect();
+$dbh->disconnect();
 exit;

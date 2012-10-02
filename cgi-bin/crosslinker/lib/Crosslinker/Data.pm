@@ -11,7 +11,7 @@ our @EXPORT = (
                 'save_settings', 'update_state', 'import_cgi_query',   'find_free_tablename', 'matchpeaks',    'create_table',
                 'import_mgf',    'import_csv',   'loaddoubletlist_db', 'generate_decoy',      'set_doublets_found',
 		'import_mgf_doublet_query',	 'connect_db_single', 'import_scan', 'create_settings', 'set_failed',
-		'connect_db_results',	'set_state'
+		'connect_db_results',	'set_state', 'create_results'
 );
 ######
 #
