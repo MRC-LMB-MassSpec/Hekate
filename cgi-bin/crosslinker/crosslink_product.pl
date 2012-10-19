@@ -72,7 +72,7 @@ print <<ENDHTML;
 </tr>
 <tr><td  style="background: white;">
 
-    <center><input type="submit" value="Perform Digest" /></center>
+    <center><input type="submit" value="Perform Fragmentation" /></center>
 </td>
 </tr>
 

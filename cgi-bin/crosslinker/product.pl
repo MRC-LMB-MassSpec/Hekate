@@ -27,15 +27,11 @@ use Crosslinker::Scoring;
 
 my $query        = new CGI;
 my $sequence     = $query->param('sequence');
-# my $xlink        = $query->param('xlinkermw');
-# my $modification = $query->param('modification');
-# my $xlink_res    = $query->param('xlink_res');
-# my @masses       = split "\n", $data;
+my $xlink        = $query->param('xlinker_mass');
+my $xlink_res    = $query->param('reactive_site');
 
-# my $sequence = "KKPEEMAK-TAPLVKK";
-my $xlink = 96;
+
 my $modification;
-my $xlink_res = 'K';
 my $monolink =0;
 
 my $path = installed;

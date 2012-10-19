@@ -62,8 +62,8 @@ my $xlink_d      = 4;
 my $match_tol    = 0.5;                              #used for finding pairs between spectra in Daltons
 my @xlink_pos;
 
-# my@xlink_pos[0];	#alpha chain xlink position
-# my @xlink_pos[1];	#beta chain xlink position
+$xlink_pos[0] = $query->param('best_x');	#alpha chain xlink position
+$xlink_pos[1] = $query->param('best_y');	#beta chain xlink position
 
 ########################
 #                      #
@@ -193,19 +193,25 @@ ENDHTML
 #
 #######
 
+
+
 my @peptides = split /-/, $sequence;
 for ( my $i = 0 ; $i < @peptides ; $i++ ) {
    my $peptide = $peptides[$i];
    my @residues = split //, $peptide;
    my @tmp;
+   if (!defined $xlink_pos[0] ) {
    for ( my $n = 0 ; $n < @residues ; $n++ ) {
       if ( $residues[$n] eq $xlink_res ) {
          $xlink_pos[$i] = $n;
          last;
       }
    }
+   }
 
 }
+
+
 
 ######
 #
