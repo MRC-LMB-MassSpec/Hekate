@@ -615,8 +615,7 @@ Content-type: text/html\n\n
         <li id="results"><a id="results" href="/cgi-bin/$path/singlescan.pl">Score Scan</a></li>
         <li id="results"><a id="results" href="/cgi-bin/$path/doublet_search.pl">Doublet</a></li>
         <li id="results"><a id="results" href="/cgi-bin/$path/crosslink_digest.pl">Digest</a></li>
- <!--       <li id="results"><a id="results" href="/cgi-bin/$path/crosslink_fragment.pl">Fragment</a></li>
-       <li id="results"><a id="results" href="/cgi-bin/$path/crosslink_score.pl">Score</a></li> -->
+	<li id="results"><a id="results" href="/cgi-bin/$path/crosslink_product.pl">Fragment</a></li>
         <li id="results"><a id="results" href="/cgi-bin/$path/settings.pl">Settings</a></li>
    </ul>
 </div>
