@@ -477,32 +477,15 @@ sub print_results {
    while (    ( my $top_hits_results = $top_hits->fetchrow_hashref )
            && ( $max_hits == 0 || $printed_hits < $max_hits ) )
    {
-   
-
-    if (
-           (
-                !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far )
-             && !( grep $_ eq $top_hits_results->{'mz'},   @mz_so_far )
-             && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
-	     && ( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' )
-             && $repeats == 0
-
-           )
-           || (    $repeats == 1
-                && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
-                && $scan_repeats == 0 
-		&& ( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' ))
-           || ( $repeats == 1 && $scan_repeats == 1 
-		&& ( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' ))
-        )
-      {
-	   $fdr_decoy = $fdr_decoy +1;
-      }
-      else {
-	 $fdr_non_decoy = $fdr_non_decoy +1;  
-      }
-	  
-
+      if ( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy')
+	  {
+	     $fdr_decoy = $fdr_decoy +1;
+	  }
+      else
+	  {
+ 	     $fdr_non_decoy = $fdr_non_decoy +1;     
+	  }
+	
       if (
            (
                 !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far )
@@ -522,9 +505,7 @@ sub print_results {
         )
       {
 
-
-
-	 push @hits_so_far, $top_hits_results->{'fragment'};
+         push @hits_so_far, $top_hits_results->{'fragment'};
          push @mz_so_far,   $top_hits_results->{'mz'};
          push @scan_so_far, $top_hits_results->{'scan'};
          my $rounded = sprintf( "%.3f", $top_hits_results->{'ppm'} );
