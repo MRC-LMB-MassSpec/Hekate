@@ -70,7 +70,7 @@ if ($scan == -1) {
 #                     #
 #######################
 
-my ( $fh, $filename ) = tempfile();
+# my ( $fh, $filename ) = tempfile();
 
 ########################
 #                      #
@@ -144,13 +144,15 @@ if ( !defined $query->param('heavy') || $query->param('heavy') == 0 ) {
 
 # Chart object
 my $chart = Chart::Gnuplot->new(
-                                 terminal  => 'svg',
-                                 output    => $filename,
-                                 imagesize => '1024, 768',
-                                 xlabel    => "m/z",
-                                 ylabel    => "relative abundance",
-                                 tmargin   => "5",
-                                 title     => "$title"
+                                 terminal   => 'svg',
+				 encoding   => 'utf8',
+#                                  output    => $filename,
+                                 imagesize  => '1024, 768',
+                                 xlabel     => "m/z",
+                                 ylabel     => "relative abundance",
+                                 tmargin    => "5",
+                                 title      => "$title",
+				 termoption => 'enhanced'
 );
 
 $chart->gnuplot('/usr/bin/gnuplot');
@@ -171,12 +173,13 @@ foreach my $mass_abundance (@masses) {
       my $chain;
       if ( defined $1 ) {
 
-         if   ( $1 eq '5' ) { $chain = 'a' }
-         else               { $chain = 'b' }
+         if   ( $1 eq '5' ) { $chain = 'α' }
+         else               { $chain = 'β' }
          if ( $2 eq 'Y' ) {
+	    my $ion_type ='y';
             push( @yions, [ $mass, $abundance ] );
             $chart->label(
-               text     => "$chain$2$3($4+) = $mass Th",
+               text     => "$chain$ion_type$3($4+) = $mass Th",
                position => "$mass, $abundance",
                offset   => "-1.5,-6",
 
@@ -188,9 +191,11 @@ foreach my $mass_abundance (@masses) {
             push( @bions, [ $mass, $abundance ] );    #a-ions get stuck with b-ions
 
             #  		print  "$chain $mass $2$3($4+) Th\n ";
-
+	    my $ion_type;
+	    if ($2 eq 'A') {$ion_type = 'a'};
+	    if ($2 eq 'B') {$ion_type = 'b'};
             $chart->label(
-                           text      => "$chain$2$3($4+) = $mass Th",
+                           text      => "$chain$ion_type$3($4+) = $mass Th",
                            position  => "$mass, $abundance",
                            offset    => "-1.5,-6",
                            rotate    => 90,
@@ -201,14 +206,19 @@ foreach my $mass_abundance (@masses) {
       } else    #Would rather a Y or B/A drawn before drawing a water loss...
       {
          $top_10 =~ m/(.);(Y\[-H2O\]|A\[-H2O\]|B\[-H2O\])<sub>(\d*)<\/sub><sup>(\d)\+<\/sup> = $mass/;
-         if   ( defined $1 && ( $1 eq '5' ) ) { $chain = 'a' }
-         else                                 { $chain = 'b' }
+	 if   ( defined $1 eq '5' ) { $chain = 'α' }
+         else               { $chain = 'β' }
          if ( defined $2
               && ( $2 eq 'A[-H2O]' || $2 eq 'B[-H2O]' || $2 eq 'Y[-H2O]' ) )
          {
+    	    my $ion_type;
+	    if ($2 eq 'A[-H2O]') {$ion_type = 'a'};
+	    if ($2 eq 'B[-H2O]') {$ion_type = 'b'};
+	    if ($2 eq 'Y[-H2O]') {$ion_type = 'y'};
+
             push( @waterions, [ $mass, $abundance ] );
             $chart->label(
-                           text      => "$chain$2$3($4+) = $mass Th",
+                           text      => "$chain$ion_type$3($4+) = $mass Th",
                            position  => "$mass, $abundance",
                            offset    => "-1.5,-6",
                            rotate    => 90,
@@ -231,6 +241,7 @@ foreach my $mass_abundance (@masses) {
 
 my $impulses =
   Chart::Gnuplot::DataSet->new(
+				title  => 'unmatched ions',
                                 points => \@unmatched,
                                 color  => 'black',
                                 style  => "impulses",
@@ -238,6 +249,7 @@ my $impulses =
 
 my $impulses2 =
   Chart::Gnuplot::DataSet->new(
+				title  => 'b-ions',
                                 points => \@bions,
                                 color  => 'red',
                                 style  => "impulses",
@@ -245,6 +257,7 @@ my $impulses2 =
 
 my $impulses3 =
   Chart::Gnuplot::DataSet->new(
+				title  => 'y-ions',
                                 points => \@yions,
                                 color  => 'green',
                                 style  => "impulses",
@@ -252,6 +265,7 @@ my $impulses3 =
 
 my $impulses4 =
   Chart::Gnuplot::DataSet->new(
+				title  => 'neutral-loss ions',
                                 points => \@waterions,
                                 color  => 'blue',
                                 style  => "impulses",
@@ -263,11 +277,11 @@ $chart->svg;
 
 $chart->plot2d( $impulses, $impulses2, $impulses3, $impulses4 );
 
-seek $fh, 0, 0;
-
-while (<$fh>) {
-   print "$_";
-}
+# seek $fh, 0, 0;
+# 
+# while (<$fh>) {
+#    print "$_";
+# }
 
 $top_hits->finish();
 $results_dbh->disconnect();

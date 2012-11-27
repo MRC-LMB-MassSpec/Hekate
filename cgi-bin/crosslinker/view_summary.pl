@@ -45,18 +45,17 @@ if ( defined $query->param('more') ) {
 
 my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
-my $settings_dbh = DBI->connect( "dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 } );
 
    my $settings_sql = $settings_dbh->prepare( "SELECT name FROM settings WHERE name = ?" );
    $settings_sql->execute($table);
    my @data = $settings_sql->fetchrow_array();
-   if (@data[0] != $table)
+   if ($data[0] != $table)
    {
     print "Content-Type: text/plain\n\n";
     print "Cannont find results database";
     exit;
     }
-
+    $settings_sql->finish();
 
 ########################
 #                      #

@@ -70,7 +70,9 @@ if ($scan == -1) {
 #                     #
 #######################
 
-my ( $fh, $filename ) = tempfile();
+# my ( $fh, $filename ) = tempfile();
+# Tempfile is needed on Scientific Linux as for some reason STDOUT doesn't go to browser
+# as it does with other Linux distros.
 
 ########################
 #                      #
@@ -131,10 +133,12 @@ if ( $query->param('heavy') == 0 ) {
 # Chart object
 my $chart = Chart::Gnuplot->new(
                                  terminal  => 'png',
-                                 output    => $filename,
+#                                  output    => $filename,
                                  imagesize => '320, 240',
                                  xtics     => { labelfmt => '', },
                                  ytics     => { labelfmt => '', },
+		  
+				  
 );
 
 $chart->gnuplot('/usr/bin/gnuplot');
@@ -222,11 +226,11 @@ binmode STDOUT;
 $chart->svg;
 $chart->plot2d( $impulses, $impulses2, $impulses3, $impulses4 );
 
-seek $fh, 0, 0;
-
-while (<$fh>) {
-   print "$_";
-}
+# seek $fh, 0, 0;
+# 
+# while (<$fh>) {
+#    print "$_";
+# }
 
 $top_hits->finish();
 $results_dbh->disconnect();
