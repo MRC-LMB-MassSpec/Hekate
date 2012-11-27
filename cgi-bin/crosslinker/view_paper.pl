@@ -107,7 +107,7 @@ sub print_results_paper {
 
    if ( $no_tables == 0 ) {
       print
-'<table><tr><td></td><td>Chain 1</td><td>Chain 2</td><td>Position1</td><td>Position2</td><td>Fragment&nbsp;and&nbsp;Position</td><td>Score</td><td>Charge</td><td>Mass<td>PPM</td></td></td><td>Mod</td></tr>';
+'<table><tr><td></td><td>Chain 1</td><td>Chain 2</td><td>Position1</td><td>Position2</td><td>Fragment&nbsp;and&nbsp;Position</td><td>Score</td><td>Mass</td><td>Charge<td>PPM</td></td></td><td>Mod</td></tr>';
    }
 
    while (    ( my $top_hits_results = $top_hits->fetchrow_hashref )
