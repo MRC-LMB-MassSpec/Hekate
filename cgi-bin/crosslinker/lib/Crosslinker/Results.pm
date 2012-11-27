@@ -486,8 +486,7 @@ sub print_results {
              && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
 	     && ( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' )
              && $repeats == 0
-	     &&    (( $top_hits_results->{'fragment'} =~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 2 ))
-		|| ( $top_hits_results->{'fragment'} !~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 1 )))
+
            )
            || (    $repeats == 1
                 && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
@@ -499,6 +498,11 @@ sub print_results {
       {
 	   $fdr_decoy = $fdr_decoy +1;
       }
+      else {
+	 $fdr_non_decoy = $fdr_non_decoy +1;  
+      }
+	  
+
       if (
            (
                 !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far )
@@ -518,7 +522,7 @@ sub print_results {
         )
       {
 
-	 $fdr_non_decoy = $fdr_non_decoy +1;  
+
 
 	 push @hits_so_far, $top_hits_results->{'fragment'};
          push @mz_so_far,   $top_hits_results->{'mz'};
