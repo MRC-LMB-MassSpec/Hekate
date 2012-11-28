@@ -110,6 +110,8 @@ $settings_dbh->disconnect();
 my $top_hits;
 $SQL_query = "";
 
+
+print "\nCrosslinks\n";
 for ( my $table_no = 0 ; $table_no < @table ; $table_no++ ) {
    $SQL_query = $SQL_query . "SELECT * FROM db$table[$table_no].results WHERE name=? AND score > 0 UNION ALL ";
 }
@@ -117,7 +119,13 @@ $SQL_query = substr( $SQL_query, 0, -10 );
 $top_hits = $results_dbh->prepare( "SELECT * FROM (" . $SQL_query . ") ORDER BY score DESC " );    #nice injection problem here, need to sort
 $top_hits->execute(@table);
 print_results_text( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined,
-                    $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, 'table', 0, 0, 0 );
+                    $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, 'table', 0, 2, 0 );
+
+print "\nMonolinks\n";
+$top_hits->execute(@table);
+print_results_text( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences_combined,
+                    $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, 'table', 0, 1, 0 );
+
 $top_hits->finish();
 $results_dbh->disconnect();
 exit;

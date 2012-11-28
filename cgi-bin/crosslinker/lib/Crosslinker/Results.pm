@@ -138,7 +138,7 @@ sub print_results_text {
 
    my (
         $top_hits,      $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protien_sequences,
-        $reactive_site, $dbh,              $xlinker_mass,      $mono_mass_diff,   $table,            $repeats
+        $reactive_site, $dbh,              $xlinker_mass,      $mono_mass_diff,   $table,            $repeats, $xlink_mono_or_all
    ) = @_;
 
    my $fasta = $protien_sequences;
@@ -248,8 +248,13 @@ sub print_results_text {
              && !( grep $_ eq $top_hits_results->{'mz'}, @mz_so_far )
              && !( grep $_ eq $top_hits_results->{'name'} . $top_hits_results->{'scan'}, @scan_so_far )
              && $repeats == 0
+	     &&    (( $top_hits_results->{'fragment'} =~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 2 ))
+		|| ( $top_hits_results->{'fragment'} !~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 1 )))
            )
-           || $repeats == 1
+           || 
+	   ( $repeats == 1
+	   &&    (( $top_hits_results->{'fragment'} =~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 2 ))
+	   || ( $top_hits_results->{'fragment'} !~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 1 ))))
         )
       {
 

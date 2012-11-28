@@ -82,11 +82,16 @@ print "Pragma: no-cache\n\n";
 if ( $is_finished != '-1' ) {
    print "** Warning: Data analysis not finished **\n";
 }
-
+print "\Crosslinks\n";
 my $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? and SCORE > 0 ORDER BY score DESC");    #nice injection problem here, need to sort
 $top_hits->execute($table);
 print_results_text( $top_hits,      $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences,
-                    $reactive_site, $results_dbh,      $xlinker_mass,      $mono_mass_diff,   $table,            0 );
+                    $reactive_site, $results_dbh,      $xlinker_mass,      $mono_mass_diff,   $table,            0, 2);
+
+print "\nMonolinks\n";
+$top_hits->execute($table);
+print_results_text( $top_hits, $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13, $cut_residues, $protein_sequences,
+                    $reactive_site, $results_dbh, $xlinker_mass, $mono_mass_diff, 'table', 0, 1, 0 );
 
 $top_hits->finish();
 $results_dbh->disconnect();
