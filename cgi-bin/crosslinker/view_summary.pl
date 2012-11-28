@@ -73,6 +73,8 @@ my (
 $settings->finish();
 $settings_dbh->disconnect();
 
+if (defined $query->param('decoy')) {$decoy = $query->param('decoy')};
+
 ########################
 #                      #
 # Connect to results DB#

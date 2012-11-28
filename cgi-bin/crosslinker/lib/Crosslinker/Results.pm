@@ -479,10 +479,22 @@ sub print_results {
       print '</tr>';
    }
 
+  
+
+
+
    while (    ( my $top_hits_results = $top_hits->fetchrow_hashref )
            && ( $max_hits == 0 || $printed_hits < $max_hits ) )
    {
-      if ( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy')
+
+                my $target = "&#945";
+                my $alpha_ions = () = $top_hits_results->{'top_10'} =~ /$target/g;
+                $target = "&#946";
+                my $beta_ions = () = $top_hits_results->{'top_10'} =~ /$target/g;
+		my $min_ions= -1; #Allows for you to filter a minium number of ions for A and B chains, but is surprisingly ineffective at improving confidence.
+
+
+      if ( ($top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy') &&  ($alpha_ions > $min_ions  && $beta_ions > $min_ions))
 	  {
 	     $fdr_decoy = $fdr_decoy +1;
 	  }
@@ -496,17 +508,21 @@ sub print_results {
                 !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far )
              && !( grep $_ eq $top_hits_results->{'mz'},   @mz_so_far )
              && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
-	     && !( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' )
+	     && (!( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' ) || $decoy eq 'No')
              && $repeats == 0
 	     &&    (( $top_hits_results->{'fragment'} =~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 2 ))
 		|| ( $top_hits_results->{'fragment'} !~ '-' && ($xlink_mono_or_all == 0 || $xlink_mono_or_all == 1 )))
+      
+	     && ($alpha_ions > $min_ions  && $beta_ions > $min_ions)
+
+
            )
            || (    $repeats == 1
                 && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
                 && $scan_repeats == 0 
-		&& !( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' ))
+		&& (!( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' ) || $decoy eq 'No'))
            || ( $repeats == 1 && $scan_repeats == 1 
-		&& !( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' ))
+		&& (!( $top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy' ) || $decoy eq 'No'))
         )
       {
 
