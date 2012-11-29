@@ -62,6 +62,7 @@ sub generate_decoy {
       my $decoy = reverse $sequence;
       $sequence_name =~ s/[^A-z1-9]//g;
       $decoy         =~ s/[^A-Z]//g;
+      $decoy	     =~ tr/KR/RK/;
       $fasta = $fasta . ">decoy" . $sequence_name . "\r\n" . $decoy . "\n\n";
    }
 

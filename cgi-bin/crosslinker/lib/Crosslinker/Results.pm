@@ -494,11 +494,17 @@ sub print_results {
 		my $min_ions= -1; #Allows for you to filter a minium number of ions for A and B chains, but is surprisingly ineffective at improving confidence.
 
 
-      if ( ($top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy') &&  ($alpha_ions > $min_ions  && $beta_ions > $min_ions))
+      if (    !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far )
+             && !( grep $_ eq $top_hits_results->{'mz'},   @mz_so_far )
+             && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
+	     && ($top_hits_results->{'sequence1_name'} =~ 'decoy' || $top_hits_results->{'sequence2_name'} =~ 'decoy') &&  ($alpha_ions > $min_ions  && $beta_ions > $min_ions))
 	  {
 	     $fdr_decoy = $fdr_decoy +1;
 	  }
-      else
+      elsif (   !( grep $_ eq $top_hits_results->{'fragment'}, @hits_so_far )
+             && !( grep $_ eq $top_hits_results->{'mz'},   @mz_so_far )
+             && !( grep $_ eq $top_hits_results->{'scan'}, @scan_so_far )
+	    )
 	  {
  	     $fdr_non_decoy = $fdr_non_decoy +1;     
 	  }
