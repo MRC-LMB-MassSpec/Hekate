@@ -604,7 +604,13 @@ sub print_results {
 	         print "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>$top_hits_results->{'scan'}</a>";
 	     }
            }
-             print "</td><td>";
+	   if ($top_hits_results->{'precursor_scan'} ne '' ){
+		print "<br/>(";
+ 	         print "<a  href='view_precursor.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'precursor_scan'}&mass=$top_hits_results->{'mz'}'  class='screenshot'  rel='view_precursor_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'precursor_scan'}&mass=$top_hits_results->{'mz'}'>";
+		 print $top_hits_results->{'precursor_scan'};
+ 	         print "</a>)";
+	   }
+	   print "</td><td>";
            print_ms2_link(
                          $top_hits_results->{'MSn_string'},   $top_hits_results->{'d2_MSn_string'}, $top_hits_results->{'fragment'},
                          $top_hits_results->{'modification'}, $top_hits_results->{'best_x'},        $top_hits_results->{'best_y'},

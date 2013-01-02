@@ -73,7 +73,7 @@ if ($child) {
         $ms2_error,         $mass_seperation,    $isotope,               $seperation,            $mono_mass_diff,     $xlinker_mass,
         $dynamic_mods_ref,  $fixed_mods_ref,     $ms2_fragmentation_ref, $threshold,		 $n_or_c,	      $scan_width,
 	$match_charge,	    $match_intensity,    $scored_ions,           $no_xlink_at_cut_site,  $ms1_intensity_ratio,$fast_mode,
-        $doublet_tolerance
+        $doublet_tolerance, $upload_format
    ) = import_cgi_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
    my @sequence_names    = @{$sequence_names_ref};
    my @upload_filehandle = @{$upload_filehandle_ref};
@@ -100,13 +100,16 @@ if ($child) {
 
   warn "Run $results_table: Query saved \n"; 
   
-   create_table($results_dbh);
+   create_table($results_dbh);  #unimplimented Database table to replace hash.
 
   warn "Run $results_table: Table created for results \n"; 
+     warn "Upload format: $upload_format \n";
 
    for ( my $n = 1 ; $n <= $no_of_fractions ; $n++ ) {
+
       if ( defined( $upload_filehandle[$n] ) ) {
-         import_mgf( $n, $upload_filehandle[$n], $results_dbh );
+	 if ($upload_format eq 'MGF') {import_mgf( $n, $upload_filehandle[$n], $results_dbh )}
+	 else {import_mzXML( $n, $upload_filehandle[$n], $results_dbh )};
       }
     }
    $results_dbh->disconnect;
@@ -171,7 +174,7 @@ if ($child) {
         $ms2_error,         $mass_seperation,    $isotope,               $seperation,            $mono_mass_diff,     $xlinker_mass,
         $dynamic_mods_ref,  $fixed_mods_ref,     $ms2_fragmentation_ref, $threshold,		 $n_or_c,	      $scan_width,
 	$match_charge,	    $match_intensity,    $scored_ions,           $no_xlink_at_cut_site,  $ms1_intensity_ratio,$fast_mode,
-        $doublet_tolerance
+        $doublet_tolerance, $upload_format
 	) = import_cgi_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
         @sequence_names    = @{$sequence_names_ref};
 	@upload_filehandle = @{$upload_filehandle_ref};

@@ -5,7 +5,7 @@ use base 'Exporter';
 use lib 'lib';
 use Crosslinker::Config;
 
-our @EXPORT = ( 'modifications', 'residue_position', 'digest_proteins', 'digest_proteins_masses', 'crosslink_peptides' );
+our @EXPORT = ( 'modifications', 'residue_position', 'digest_proteins', 'digest_proteins_masses', 'crosslink_peptides', 'calculate_peptide_masses', 'calculate_crosslink_peptides' );
 
 sub modifications {
 
@@ -211,6 +211,44 @@ sub digest_proteins_masses    #Calculates the mass of a list of peptides
    return %protein_fragments_masses;
 }
 
+
+
+sub calculate_peptide_masses    
+{
+   my ( $results_dbh,$results_table, $protein_residuemass_ref, $fragment_source_ref ) = @_;
+   my %protein_residuemass = %{$protein_residuemass_ref};
+   my %fragment_source     = %{$fragment_source_ref};
+   my $peptide_mass        = 0;
+   my $terminalmass        = 1.0078250 * 2 + 15.9949146 * 1;
+
+   my $peptidelist = $results_dbh->prepare(
+         "SELECT * FROM peptides WHERE results_table = ?"
+      );
+
+   my $update_mass = $results_dbh->prepare(
+         "UPDATE peptides SET mass = ? WHERE  results_table = ? AND sequence = ?;"
+      );
+
+    $peptidelist->execute($results_table);
+
+      while ( my $peptides = $peptidelist->fetchrow_hashref ) {
+      my $peptide = $peptides->{'sequence'};
+      if ( $peptide =~ /[ARNDCEQGHILKMFPSTWYV]/ ) {
+         my @residues = split //, $peptide;
+
+         foreach my $residue (@residues) {    #split the peptide in indivual amino acids
+            $peptide_mass = $peptide_mass + $protein_residuemass{ $residue };    #tally the masses of each amino acid one at a time
+         }
+
+#          $protein_fragments_masses{$peptide} = $peptide_mass + $terminalmass;
+	$update_mass->execute($peptide_mass+$terminalmass,$results_table,$peptide);
+         $peptide_mass = 0;
+      }
+
+   }
+
+}
+
 sub crosslink_peptides                                                           #Calculates all the possible xlinks
 {
 
@@ -242,6 +280,59 @@ sub crosslink_peptides                                                          
    }
 
    return ( \%xlink_fragment_masses, \%xlink_fragment_sources );
+}
+
+
+
+sub calculate_crosslink_peptides                                                          
+{
+
+   my ( $results_dbh, $results_table, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues ) = @_;
+   my $xlink;
+   my $xlink_fragment_mass;
+   my $xlink_fragment_sources;
+
+   my $peptidelist = $results_dbh->prepare(
+         "
+	  INSERT INTO peptides
+	  SELECT
+		 p1.results_table as results_table,
+		 p1.sequence || '-' || p2.sequence as sequence,
+ 		 p1.source   || '-' || p2.source as sequence,
+		 0 as linear_only,
+		 p1.mass + p2.mass as mass, 
+		 '' as modifications,
+		 0 as monolink,
+		 1 as xlink
+	
+			  FROM peptides p1 inner join peptides p2 on (p1.results_table = p2.results_table)
+ 			  WHERE p1.linear_only = '0' AND p2.linear_only = '0' AND p1.sequence LIKE '%K%' AND p2.sequence LIKE '%K%'
+			  AND p1.rowid >= p2.rowid
+    ");
+
+
+    my $index = $results_dbh->prepare("CREATE INDEX peptide_index ON peptides (sequence);");
+   $index->execute();
+
+	my $insert_xlink = $results_dbh->prepare(
+      "INSERT INTO peptides ( 		    results_table,
+					    sequence,
+					    source,
+					    linear_only,
+					    mass,
+					    modifcations,
+					    monolink,
+					    xlink) VALUES (?,?,?,1,?,'',0,1)");				  
+
+     $peptidelist->execute();
+
+
+     my $correct_xlink_mass = $results_dbh->prepare("UPDATE peptides SET mass = mass + ? WHERE  xlink = 1 and results_table = ?;");
+     $correct_xlink_mass->execute($xlinker_mass, $results_table);
+
+     #Need to add xlinker mass to all xlinks with UPDATE statments.
+        
+
 }
 
 1;

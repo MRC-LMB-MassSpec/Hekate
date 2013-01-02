@@ -210,6 +210,15 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
 </tr>
 <tr><td  style="background: white; margin:0">
 <table>
+<tr><td>
+Format</td>
+<td>
+<input type="radio" name="data_format" value="MGF" checked>MGF<br>
+<input type="radio" name="data_format" value="mzXML" >mzXML (32-bit precision)<br>
+</td></tr>
+</table><br/>
+</div>
+<table>
   <tr><td style="background: white; padding:0">Fraction 1:</td><td style="background: white;padding:0"> <input type="file" name="mgf"/><br/></td></tr>
   <tr><td style="background: white; padding:0">Fraction 2:</td><td style="background: white;padding:0"> <input type="file" name="mgf2" /><br/></td></tr>
   <tr><td style="background: white; padding:0">Fraction 3:</td><td style="background: white;padding:0"> <input type="file" name="mgf3" /><br/></td></tr>

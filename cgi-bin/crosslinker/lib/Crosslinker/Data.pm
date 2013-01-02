@@ -5,13 +5,14 @@ use base 'Exporter';
 use lib 'lib';
 use Crosslinker::Scoring;
 use Crosslinker::Config;
+use MIME::Base64;
 
 our @EXPORT = (
                 'connect_db',    'check_state',  'give_permission',    'is_ready',            'disconnect_db', 'set_finished',
-                'save_settings', 'update_state', 'import_cgi_query',   'find_free_tablename', 'matchpeaks',    'create_table',
+                'save_settings', 'update_state', 'import_cgi_query',   'find_free_tablename', 'matchpeaks', 'matchpeaks_single',   'create_table',
                 'import_mgf',    'import_csv',   'loaddoubletlist_db', 'generate_decoy',      'set_doublets_found',
 		'import_mgf_doublet_query',	 'connect_db_single', 'import_scan', 'create_settings', 'set_failed',
-		'connect_db_results',	'set_state', 'create_results'
+		'connect_db_results',	'set_state', 'create_results', 'import_mzXML', 'create_peptide_table', 'add_peptide'
 );
 ######
 #
@@ -110,7 +111,8 @@ my ($results_dbh) = @_;
 						      best_alpha REAL,
 						      best_beta REAL,
 						      min_chain_score,
-						      time) "
+						      time,
+						      precursor_scan) "
    )};
 
 
@@ -461,6 +463,7 @@ sub import_cgi_query {
    $protien_sequences =~ s/^.//;
    $protien_sequences =~ s/ //g;
    my $missed_clevages = $query->param('missed_cleavages');
+   my $upload_format = $query->param('data_format');
    my @upload_filehandle;
    $upload_filehandle[1] = $query->upload("mgf");
    $upload_filehandle[2] = $query->upload("mgf2");
@@ -565,6 +568,7 @@ sub import_cgi_query {
       $linkspacing    = $crosslinker->{'setting5'};
    }
 
+
    my $mass_seperation = 0;
    if ( $isotope eq "deuterium" ) {
       $mass_seperation = $linkspacing * ( $mass_of_deuterium - $mass_of_hydrogen );
@@ -579,7 +583,7 @@ sub import_cgi_query {
             $ms2_error,         $mass_seperation, $isotope,            $linkspacing,        $mono_mass_diff,  $xlinker_mass,
             \@dynamic_mods,     \@fixed_mods,     \%ms2_fragmentation, $threshold,	    $n_or_c,	      $scan_width,
 	    $match_charge,	$match_intensity, $scored_ions,	       $no_xlink_at_cut_site, $ms1_intensity_ratio, $fast_mode,
-	    $doublet_tolerance
+	    $doublet_tolerance, $upload_format
    );
 }
 
@@ -656,6 +660,277 @@ sub find_free_tablename {
 }
 
 sub matchpeaks {
+   my (
+        $peaklist_ref,          $protien_sequences,  $match_ppm,        $dbh,
+        $results_dbh,           $settings_dbh,        $results_table,        $mass_of_deuterium,  $mass_of_hydrogen, $mass_of_carbon13,
+        $mass_of_carbon12,      $cut_residues,        $nocut_residues,       $sequence_names_ref, $mono_mass_diff,   $xlinker_mass,
+        $linkspacing,           $isotope,             $reactive_site,        $modifications_ref,  $ms2_error,        $protein_residuemass_ref,
+        $ms2_fragmentation_ref, $threshold, 	      $no_xlink_at_cut_site, $fast_mode
+   ) = @_;
+#    my %fragment_masses     = %{$fragment_masses_ref};
+#    my %fragment_sources    = %{$fragment_sources_ref};
+   my %modifications       = %{$modifications_ref};
+   my %protein_residuemass = %{$protein_residuemass_ref};
+   my %ms2_fragmentation   = %{$ms2_fragmentation_ref};
+   my @sequences           = split( '>', $protien_sequences );
+   my @sequence_names      = @{$sequence_names_ref};
+   my $max_delta           = 1 + ( $match_ppm / 1000000 );
+   my $TIC;
+   my %fragment_score;
+   my @peaklist = @{$peaklist_ref};
+   my $xlinker;
+   my $codensation;
+
+   my $seperation = 0;
+   if ( $isotope eq "deuterium" ) {
+      $seperation = $linkspacing * ( $mass_of_deuterium - $mass_of_hydrogen );
+   } elsif ($isotope eq "carbon-13") {
+      $seperation = $linkspacing * ( $mass_of_carbon13 - $mass_of_carbon12 );
+   }
+
+#    foreach my $fragment ( keys %fragment_masses ) {
+#       $fragment_score{$fragment} = 0;
+#    }
+
+   my $ms2 = $dbh->prepare(
+"SELECT MSn_string, scan_num FROM msdata WHERE mz between ? +0.00005 and ? -0.00005 and scan_num between ? - 20 and ? + 20 and fraction = ? and msorder = 2 LIMIT 0,1"
+   );
+
+   my $peak_no = 0;
+
+######
+   #
+   # Connect to results DB and create a table
+   #
+######
+   my $time = time;
+   my $results_sql = $results_dbh->prepare(
+      "INSERT INTO results (
+						      name,
+						      MSn_string,
+						      d2_MSn_string,
+						      mz,
+						      charge,
+						      fragment,
+						      sequence1,
+						      sequence2,
+						      sequence1_name,
+						      sequence2_name,
+						      score,
+						      fraction,
+						      scan,
+						      d2_scan,
+						      modification,
+						      no_of_mods,
+						      best_x,
+						      best_y,
+						      unmodified_fragment,
+						      ppm,
+						      top_10,
+  						      d2_top_10,
+						      matched_abundance,
+						      d2_matched_abundance,
+						      total_abundance,
+						      d2_total_abundance,
+						      matched_common,
+     						      matched_crosslink,
+						      d2_matched_common,
+						      d2_matched_crosslink, 
+						      monolink_mass,
+						      best_alpha,
+						      best_beta,	
+						      time,
+						      precursor_scan
+						      )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+   );
+
+   my $peptides = $results_dbh->prepare("select * from peptides where results_table = ?");
+
+#######
+   #
+   #
+   #
+#######
+
+   foreach my $peak (@peaklist) {
+#        warn $peak->{'scan_num'};
+#        warn $peak->{'d2_scan_num'};
+      $peak_no = $peak_no + 1;
+      my $percent_done = 0;
+#        warn $percent_done * 100, " % Peak mz = " . sprintf( "%.5f", $peak->{'mz'} ) . "\n";
+
+       if ( check_state( $settings_dbh, $results_table ) == -4 ) {
+          return %fragment_score;
+       }
+
+      if ($percent_done != sprintf( "%.2f", $peak_no / @peaklist ))
+      {
+	  $percent_done = sprintf( "%.2f", $peak_no / @peaklist );
+	  update_state( $settings_dbh, $results_table, $percent_done );
+      }
+      my $MSn_string    = "";
+      my $d2_MSn_string = "";
+      my $round         = sprintf( "%.5f", $peak->{'mz'} );
+
+      #  if ($peak->{'MSn_string'} eq "")
+      # 		      {
+      # 		      my $round = sprintf ("%.5f", $peak->{'mz'});
+      # 		      $ms2->execute($round, $round, $peak->{'scan_num'}, $peak->{'scan_num'} , $peak->{'fraction'});
+      # 		      my $results = $ms2->fetchrow_hashref;
+      # 		      $MSn_string =$results->{'MSn_string'};
+      # 		     }
+      # 		  else
+      # 		    {
+      $MSn_string = $peak->{'MSn_string'};
+
+      # 		    }
+      # 		  if ($peak->{'d2_MSn_string'} eq "")
+      # 		    {
+      # 		      my $round = sprintf ("%.5f", $peak->{'d2_mz'});
+      # 		      $ms2->execute($round,$round, $peak->{'scan_num'}, $peak->{'scan_num'} , $peak->{'fraction'});
+      # 		      my $results = $ms2->fetchrow_hashref;
+      # 		      $d2_MSn_string =$results->{'MSn_string'};
+      # 		     }
+      # 		  else
+      # 		    {
+      $d2_MSn_string = $peak->{'d2_MSn_string'};
+
+      # 		    }
+
+      # 	 print_xquest_link(
+      # 				$MSn_string,
+      # 				$d2_MSn_string,
+      # 				$peak->{'mz'},
+      # 				$peak->{'charge'},
+      # 				$protien_sequences,
+      # 				$query->param('seperation'),
+      # 				$query->param('isotope'),
+      # 				$mass_of_deuterium,
+      # 				$mass_of_hydrogen,
+      # 				$mass_of_carbon13,
+      # 				$mass_of_carbon12,
+      # 				$cut_residues,
+      # 				$query->param('xlinker_mass'),
+      # 				$query->param('mono_mass_diff'),
+      # 				$query->param('reactive_site'),
+      # 				$query->param('user_protein_sequence'));
+
+
+      $peptides->execute($results_table);
+      
+
+      while ( my $peptide = $peptides->fetchrow_hashref ) {
+#       foreach my $fragment ( sort( keys %fragment_masses ) ) {
+
+         my $fragment = $peptide->{'sequence'};
+
+         foreach my $modification ( sort( keys %modifications ) ) {
+            my $location = $modifications{$modification}{Location};
+            my $rxn_residues = @{ [ $fragment =~ /$location/g ] };
+
+            if (    !( $modifications{$modification}{Name} eq "loop link" && $fragment =~ /[-]/ )
+                 && !( $modifications{$modification}{Name} eq "mono link" )
+              )    #crosslink and loop link on the same peptide is a messy option,certainly shouldn't give a mass doublet, so remove them
+            {
+               my @monolink_masses;
+
+               my $mass = $peptide->{'mass'};
+               if ( $fragment !~ /[-]/ ) {
+                  @monolink_masses = split( ",", $mono_mass_diff );
+#  		  push @monolink_masses, 0;
+               } else {
+                  @monolink_masses = ('0');
+               }
+
+               foreach my $monolink_mass (@monolink_masses) {
+                  $mass = $peptide->{'mass'} + $monolink_mass;
+
+                  #                     if ( $modifications{$modification}{Name} eq "mono link" ) {
+                  #                         $rxn_residues = ( $rxn_residues - ( 2 * @{ [ $fragment =~ /[-]/g ] } ) );
+                  #                     }
+
+                  if ( $modifications{$modification}{Name} eq "loop link" ) {
+                     $rxn_residues = ( $rxn_residues - ( 2 * @{ [ $fragment =~ /[-]/g ] } ) ) / 2;
+                  }
+                  for ( my $n = 1 ; $n <= $rxn_residues ; $n++ ) {
+
+
+                     if (
+                        (
+                           $peak->{monoisotopic_mw} / $peak->{charge} <
+                           ( ( $mass + ( $modifications{$modification}{Delta} * $n ) ) / $peak->{charge} ) * $max_delta
+                        )    #Divide by charge to give PPM of detected species otherwise we are 4 times more stick on 4+ m/z
+                        && ( $peak->{monoisotopic_mw} / $peak->{charge} >
+                             ( ( $mass + ( $modifications{$modification}{Delta} * $n ) ) / $peak->{charge} ) / $max_delta )
+                       )
+                     {
+                        my $score = ( abs( ( $peak->{monoisotopic_mw} - ( $mass + ( $modifications{$modification}{Delta} * $n ) ) ) ) ) / ($mass) * 1000000;
+
+# 	   	        my $d2_score = (abs(($peak->{d2_monoisotopic_mw} - ($fragment_masses{$fragment}+$seperation+($modifications{$modification}{Delta}*$n)))))/($fragment_masses{$fragment})*1000000;
+                        my $rounded = sprintf( "%.3f", $score );
+                        {
+
+#                                                            warn $fragment, $modifications{$modification}{Name}, "\n";
+                           # 				if ( $modifications{$modification}{Name} eq "loop link" ) { warn "loop link ";	}
+			   my $abundance_ratio = -1;
+			   if (defined  $peak->{'d2_abundance'} > 0) {
+			      if ($peak->{'abundance'} > 0 && $peak->{'d2_abundance'} > 0) {$abundance_ratio = $peak->{'abundance'}/$peak->{'d2_abundance'}};
+			      }
+
+                           my (
+                                $ms2_score,      $modified_fragment, $best_x,               $best_y,          $top_10,
+                                $d2_top_10,      $matched_abundance, $d2_matched_abundance, $total_abundance, $d2_total_abundance,
+                                $matched_common, $matched_crosslink, $d2_matched_common,    $d2_matched_crosslink,
+				$best_alpha,	 $best_beta, $min_chain_score
+                             )
+                             = calc_score(
+                                           \%protein_residuemass, $MSn_string,    $d2_MSn_string,      $fragment,
+                                           \%modifications,       $n,             $modification,       $mass_of_hydrogen,
+                                           $xlinker_mass,         $monolink_mass, $seperation,         $reactive_site,
+                                           $peak->{'charge'},     $ms2_error,     \%ms2_fragmentation, $threshold,  $no_xlink_at_cut_site,
+					   $abundance_ratio,      $fast_mode
+                             );
+
+# 		       my ($d2_ms2_score,$d2_modified_fragment,$d2_best_x,$d2_best_y, $d2_top_10) = calc_score($d2_MSn_string,$d2_MSn_string,$fragment, \%modifications, $n,$modification, $mass_of_hydrogen,$xlinker_mass+$seperation,$mono_mass_diff,  $seperation, $reactive_site,$peak->{'charge'}, $best_x, $best_y);
+
+                           my ( $fragment1_source, $fragment2_source ) =
+                             split "-", $peptide->{'source'};
+                           if ( $fragment !~ m/[-]/ ) {
+                              $fragment2_source = "0";
+                           }
+                          _retry 15, sub {
+			    $results_sql->execute(
+                                                  $results_table,                     $MSn_string,                   $d2_MSn_string,
+                                                  $peak->{'mz'},                      $peak->{'charge'},             $modified_fragment,
+                                                  $sequences[$fragment1_source],      $sequences[$fragment2_source], $sequence_names[$fragment1_source],
+                                                  $sequence_names[$fragment2_source], $ms2_score,                    $peak->{'fraction'},
+                                                  $peak->{'scan_num'},                $peak->{'d2_scan_num'},        $modification,
+                                                  $n,                                 $best_x,                       $best_y,
+                                                  $fragment,                          $score,                        $top_10,
+                                                  $d2_top_10,                         $matched_abundance,            $d2_matched_abundance,
+                                                  $total_abundance,                   $d2_total_abundance,           $matched_common,
+                                                  $matched_crosslink,                 $d2_matched_common,            $d2_matched_crosslink,
+                                                  $monolink_mass,		      $best_alpha,		     $best_beta,
+						  $time,			      $peak->{'precursor_scan'}
+                           )};
+
+# 		       $results_sql->execute($d2_MSn_string,$d2_MSn_string,$peak->{'d2_mz'},$peak->{'d2_charge'},$d2_modified_fragment, @sequences[(substr($fragment_sources{$fragment},0,1)-1)],@sequences[(substr($fragment_sources{$fragment},-1,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},0,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},-1,1)-1)],$d2_ms2_score, $peak->{'fraction'},"d2_".$peak->{'scan_num'},"d2_".$peak->{'d2_scan_num'}, $modification,$n,$d2_best_x,$d2_best_y,$fragment, $d2_score, $d2_top_10);
+                        };
+
+                     }
+
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   return %fragment_score;
+
+}
+
+sub matchpeaks_single {
    my (
         $peaklist_ref,          $fragment_masses_ref, $fragment_sources_ref, $protien_sequences,  $match_ppm,        $dbh,
         $results_dbh,           $settings_dbh,        $results_table,        $mass_of_deuterium,  $mass_of_hydrogen, $mass_of_carbon13,
@@ -925,12 +1200,45 @@ sub create_table    #Creates the working table in the SQLite database
    my $masslist = $dbh->prepare("DROP TABLE IF EXISTS msdata;");
    _retry 15, sub {$masslist->execute()};
    _retry 15, sub {$dbh->do(
-            "CREATE TABLE msdata (scan_num number,fraction, title, charge number, mz number, monoisotopic_mw number, abundance number, MSn_string, msorder) " );
+            "CREATE TABLE msdata (scan_num number,fraction, title, charge number, mz number, monoisotopic_mw number, abundance number, MSn_string, msorder number, precursor_scan) " );
    };
    #  $masslist=  $dbh->prepare("DROP TABLE IF EXISTS scans;");
    #  $masslist->execute();
    #  $dbh->do("CREATE TABLE scans (scan_num number, mz float, abundance float) ");
 }
+
+sub create_peptide_table   
+{
+
+   my ($dbh) = @_;
+
+   _retry 15, sub {$dbh->do(
+            "CREATE TABLE IF NOT EXISTS peptides ( 
+					    results_table number,
+					    sequence,
+					    source,
+					    linear_only number,
+					    mass float,
+					    modifcations,
+					    monolink number,
+					    xlink number) " );
+   };
+
+}
+
+
+sub add_peptide   
+{
+
+   my ($dbh, $table, $sequence, $source, $linear_only, $mass, $modifications, $monolink, $xlink) = @_;
+
+   my $newline = $dbh->prepare(
+             "INSERT INTO peptides (results_table, sequence, source, linear_only, mass, modifcations, monolink, xlink) VALUES (?,?,?,?,?,?,?,?)" );
+   
+   _retry 15, sub {$newline->execute($table, $sequence, $source, $linear_only, $mass, $modifications, $monolink, $xlink);  };
+
+}
+
 
 sub import_mgf    #Enters the uploaded MGF into a SQLite database
 {
@@ -989,6 +1297,69 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
   $dbh->commit;
 }
 
+
+
+sub import_mzXML    #Adapted from mzXML cpan script
+{
+
+   my ( $fraction, $file, $dbh ) = @_;
+  
+   my %line;
+   my $MSn_count = 0;
+   my $dataset   = 0;
+   my $MSn_string = '';
+
+   $line{'fraction'} = $fraction;
+
+   #  my $scan_data = $dbh->prepare("INSERT INTO scans (scan_num, mz, abundance ) VALUES (?, ?, ?)");
+
+  $/ = '</peaks>';
+  while ( <$file> ) {
+    if ( s/(<peaks[^>]+>)(.*)$// ) {
+      $dataset = $dataset + 1;
+      my ($tag, $data) = ($1, $2);
+      s/\n$//;
+      if ( /scan num="(\d+)"/ ) {
+	$line{'scan_num'} = $1;
+	/msLevel="(\d+)"/;
+        $line{'ms_order'} = $1;
+	if ($1 > 1)
+	 {
+	   /precursorScanNum="(\d+)"/;
+	   $line{'precursor_scan'} = $1 ;
+	   /precursorCharge="(\d+)"/;
+	   $line{'charge'} = $1 ;
+	   /precursorIntensity="(\d+).(\d+)"/;
+	    if (defined $2) {    $line{'abundance'} =  $1 ."." . $2} else { $line{'abundance'} =  $1};
+	   /(\d+).(\d+)\<\/precursorMz>/;
+	   $line{'mz'}        = $1.  "." . $2;
+	   $line{'title'} = ""; 
+	  }
+        $data =~ s{</peaks>$}{};
+        my @spec = unpack("f>*",decode_base64($data));
+        foreach my $i (0 .. scalar @spec / 2 - 1) {
+        $MSn_count  = $MSn_count + 1;
+	$MSn_string =$MSn_string . $spec[2*$i] . "\t". $spec[2*$i+1] . "\n";
+        }
+         if ($line{'ms_order'} > 1) {$line{'monoisoptic_mw'} = $line{'mz'} * $line{'charge'} - ( $line{'charge'} * 1.00728 )}
+	 else {$line{'monoisoptic_mw'} };
+         my $newline = $dbh->prepare(
+             "INSERT INTO msdata (scan_num, fraction, title, charge, mz, abundance, monoisotopic_mw, MSn_string, msorder, precursor_scan) VALUES (? , ?, ?, ?, ?, ?, ?,?, ?,?)" );
+         _retry 15, sub {$newline->execute( $line{'scan_num'}, $line{'fraction'}, $line{'title'}, $line{'charge'}, $line{'mz'}, $line{'abundance'}, $line{'monoisoptic_mw'},
+                            $MSn_string , $line{'ms_order'} , $line{'precursor_scan'})};
+ 	 if ($line{'scan_num'} % 100 == 0){ warn "Scans imported : $line{'scan_num'}  \n"};
+
+         $line{'scan_num'} = $line{'monoisoptic_mw'} = $line{'abundance'} = $MSn_string = '';
+         $MSn_count = 0;
+      }
+      else {
+        die "cannot determine scan number";
+      }
+    }
+  }
+
+  $dbh->commit;
+}
 
 sub import_scan    #Enters the uploaded MGF into a SQLite database
 {
@@ -1088,13 +1459,14 @@ sub loaddoubletlist_db    #Used to get mass-doublets from the data.
 				  d2.charge as d2_charge,
 				  d2.monoisotopic_mw as d2_monoisotopic_mw,
 				  d2.title as d2_title,
-				  d2.abundance as d2_abundance
+				  d2.abundance as d2_abundance,
+				  d2.precursor_scan as d2_precursor_scan
 			  FROM msdata d1 inner join msdata d2 on (d2.monoisotopic_mw between d1.monoisotopic_mw + ? and d1.monoisotopic_mw + ? )
 				  and d2.scan_num between d1.scan_num - ? 
 				  and d1.scan_num + ? " . 
 				  $charge_match_string . $intensity_match_string
 				  . "and d1.fraction = d2.fraction 
-				  and d1.msorder = 2
+				  and d1.msorder = 2 and d2.msorder = 2
 			  ORDER BY d1.scan_num ASC "
       );
 #       warn "Exceuting Doublet Search\n";
