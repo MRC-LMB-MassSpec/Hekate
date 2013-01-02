@@ -28,7 +28,7 @@ if ($child) {
 } else {
     my $query = new CGI;
     $CGI::POST_MAX = 1024 * 50000;
-    or die "Can't chdir to /: $!";
+
     open STDIN,  '/dev/null'  or die "Can't read /dev/null: $!";
     open STDOUT, '>/dev/null' or die "Can't write to /dev/null: $!";
     open STDERR, '>>log'      or die "Can't write to /tmp/log: $!";

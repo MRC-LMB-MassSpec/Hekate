@@ -1427,7 +1427,7 @@ sub import_mzXML    #Adapted from mzXML cpan script
                 if ($line{'ms_order'} > 1) {
                     $line{'monoisoptic_mw'} = $line{'mz'} * $line{'charge'} - ($line{'charge'} * 1.00728);
                 } else {
-                    $line{'monoisoptic_mw'};
+                     $line{'monoisoptic_mw'} = '';
                 }
                 my $newline = $dbh->prepare(
 "INSERT INTO msdata (scan_num, fraction, title, charge, mz, abundance, monoisotopic_mw, MSn_string, msorder, precursor_scan) VALUES (? , ?, ?, ?, ?, ?, ?,?, ?,?)"
