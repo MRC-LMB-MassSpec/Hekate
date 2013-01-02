@@ -12,11 +12,14 @@ use Time::Local;
 use lib 'lib';
 use Crosslinker::HTML;
 
+########################
+#                      #
+# Code	               #
+#                      #
+########################
 
-   print_page_top_fancy; 
-   print_heading('Clear Log');
-
-
+print_page_top_fancy;
+print_heading('Clear Log');
 
 open FH, '>log' or die "Cannot open log file";
 
@@ -25,5 +28,4 @@ print FH "[$time] *** Log Started ***\n";
 
 print "<p> The log has been emptied</p>";
 
-
-  print_page_bottom_fancy;
+print_page_bottom_fancy;

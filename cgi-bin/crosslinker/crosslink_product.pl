@@ -27,7 +27,7 @@ my $path = installed;
 
 print_page_top_fancy("Crosslink Product");
 my $version = version();
-my $dbh = connect_conf_db;
+my $dbh     = connect_conf_db;
 print_heading('Crosslink Product');
 print <<ENDHTML;
 <form method="POST" enctype="multipart/form-data" action="product.pl" >

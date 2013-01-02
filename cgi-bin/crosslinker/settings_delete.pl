@@ -24,19 +24,27 @@ use Crosslinker::Config;
 ########################
 
 print_page_top_fancy("Settings");
-my $version = version();
-my $query = new CGI;
+my $version    = version();
+my $query      = new CGI;
 my $areyousure = $query->param('areyousure');
 
-if ( !defined $query->param('ID') ) {
-   print 'Required Information Not Supplied';
-} elsif ( defined $areyousure && $areyousure eq 'yes' ) { 
-   my $dbh = connect_conf_db;
-   delete_conf( $dbh, $query->param('ID') );
-   print "<p>Setting deleted return to <a href='settings.pl?page=" . $query->param('type') . "s'>previous page?</a></p>";
+if (!defined $query->param('ID')) {
+    print 'Required Information Not Supplied';
+} elsif (defined $areyousure && $areyousure eq 'yes') {
+    my $dbh = connect_conf_db;
+    delete_conf($dbh, $query->param('ID'));
+    print "<p>Setting deleted return to <a href='settings.pl?page="
+      . $query->param('type')
+      . "s'>previous page?</a></p>";
 } else {
-   print "<p>Are you sure you want to delete this ". $query->param('type') . "?</p>";
-   print "<p><a href='settings_delete.pl?ID=" . $query->param('ID') . "&type=" . $query->param('type'). "&areyousure=yes'>Yes</a>  or <a href='settings.pl?page=" . $query->param('type') . "s'>No</a></p>";
+    print "<p>Are you sure you want to delete this " . $query->param('type') . "?</p>";
+    print "<p><a href='settings_delete.pl?ID="
+      . $query->param('ID')
+      . "&type="
+      . $query->param('type')
+      . "&areyousure=yes'>Yes</a>  or <a href='settings.pl?page="
+      . $query->param('type')
+      . "s'>No</a></p>";
 }
 
 print_page_bottom_fancy;

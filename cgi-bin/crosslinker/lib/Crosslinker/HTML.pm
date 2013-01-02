@@ -8,9 +8,14 @@ use Crosslinker::Proteins;
 use Crosslinker::Scoring;
 use Crosslinker::Constants;
 use base 'Exporter';
-our @EXPORT =
-  ( 'generate_page', 'print_heading', 'print_subheading', 'print_page_top', 'print_page_bottom', 'print_page_top_fancy', 'print_page_bottom_fancy',
-    'mgf_doublet_search', 'crosslink_digest', 'mgf_doublet_search_mgf_output', 'generate_page_single_scan');
+our @EXPORT = (
+               'generate_page',           'print_heading',
+               'print_subheading',        'print_page_top',
+               'print_page_bottom',       'print_page_top_fancy',
+               'print_page_bottom_fancy', 'mgf_doublet_search',
+               'crosslink_digest',        'mgf_doublet_search_mgf_output',
+               'generate_page_single_scan'
+);
 ######
 #
 # Creates html for pages
@@ -20,75 +25,76 @@ our @EXPORT =
 ######
 
 sub generate_page {
-  
-   #This really should be in data or similar, but in the past it generated a page, now it insteads puts the results into the DB.
-   #much nicer, but hence the strange name.
 
-   my (
-        $protien_sequences,     $dbh,                $results_dbh,        $settings_dbh,      $results_table,      $no_of_fractions,
-        $upload_filehandle_ref, $csv_filehandle_ref, $missed_clevages,    $cut_residues,      $nocut_residues,     $protein_residuemass_ref,
-        $reactive_site,         $scan_width,         $sequence_names_ref, $match_ppm,         $min_peptide_length, $mass_of_deuterium,
-        $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
-        $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
-        $threshold,		$n_or_c,	     $match_charge,	  $match_intensity,   $no_xlink_at_cut_site, $ms1_intensity_ratio,
-        $fast_mode,		$doublet_tolerance
-   ) = @_;
+#This really should be in data or similar, but in the past it generated a page, now it insteads puts the results into the DB.
+#much nicer, but hence the strange name.
 
+    my (
+        $protien_sequences,  $dbh,                   $results_dbh,           $settings_dbh,
+        $results_table,      $no_of_fractions,       $upload_filehandle_ref, $csv_filehandle_ref,
+        $missed_clevages,    $cut_residues,          $nocut_residues,        $protein_residuemass_ref,
+        $reactive_site,      $scan_width,            $sequence_names_ref,    $match_ppm,
+        $min_peptide_length, $mass_of_deuterium,     $mass_of_hydrogen,      $mass_of_carbon13,
+        $mass_of_carbon12,   $modifications_ref,     $query,                 $mono_mass_diff,
+        $xlinker_mass,       $isotope,               $seperation,            $ms2_error,
+        $state,              $ms2_fragmentation_ref, $threshold,             $n_or_c,
+        $match_charge,       $match_intensity,       $no_xlink_at_cut_site,  $ms1_intensity_ratio,
+        $fast_mode,          $doublet_tolerance
+    ) = @_;
 
+    #     die;
 
-#     die;
-   
-   my %protein_residuemass = %{$protein_residuemass_ref};
-   my @csv_filehandle      = @{$csv_filehandle_ref};
-   my @upload_filehandle   = @{$upload_filehandle_ref};
-   my @sequence_names      = @{$sequence_names_ref};
-   my %modifications       = %{$modifications_ref};
-   my %ms2_fragmentation   = %{$ms2_fragmentation_ref};
+    my %protein_residuemass = %{$protein_residuemass_ref};
+    my @csv_filehandle      = @{$csv_filehandle_ref};
+    my @upload_filehandle   = @{$upload_filehandle_ref};
+    my @sequence_names      = @{$sequence_names_ref};
+    my %modifications       = %{$modifications_ref};
+    my %ms2_fragmentation   = %{$ms2_fragmentation_ref};
 
-   my $fragment;
-   my @fragments;
-   my @fragments_linear_only;
-   my %fragment_source;
-   my %fragment_source_linear_only;
-   my @sequence_fragments;
-   my @sequences = split '>', $protien_sequences;
-   my $count = 0;
+    my $fragment;
+    my @fragments;
+    my @fragments_linear_only;
+    my %fragment_source;
+    my %fragment_source_linear_only;
+    my @sequence_fragments;
+    my @sequences = split '>', $protien_sequences;
+    my $count = 0;
 
+    warn "Run $results_table: Generating page \n";
 
-      warn "Run $results_table: Generating page \n"; 
-  
-   create_peptide_table ($results_dbh); 
+    create_peptide_table($results_dbh);
 
-   foreach my $sequence (@sequences) {
-      my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
-      my @sequence_fragments = @{$sequence_fragments_ref};
-      my @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
-  
-      @fragments = ( @fragments, @sequence_fragments );
-      @fragments_linear_only = ( @fragments_linear_only, @sequence_fragments_linear_only );
-      warn "Run $results_table: Sequence $count = $sequence_names[$count] \n";
-      warn "Run $results_table: Digested peptides:", scalar(@fragments), " \n";
+    foreach my $sequence (@sequences) {
+        my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) =
+          digest_proteins($missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c);
+        my @sequence_fragments             = @{$sequence_fragments_ref};
+        my @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
 
-      foreach $fragment (@fragments)
+        @fragments             = (@fragments,             @sequence_fragments);
+        @fragments_linear_only = (@fragments_linear_only, @sequence_fragments_linear_only);
+        warn "Run $results_table: Sequence $count = $sequence_names[$count] \n";
+        warn "Run $results_table: Digested peptides:", scalar(@fragments), " \n";
 
-	
+        foreach $fragment (@fragments)
 
-      {add_peptide ($results_dbh,$results_table, $fragment, $count ,0,0,' ',0,0);}  #$table, $sequence, $source, $linear_only, $mass, $modifications, $monolink, $xlink
+        {
+            add_peptide($results_dbh, $results_table, $fragment, $count, 0, 0, ' ', 0, 0);
+        }    #$table, $sequence, $source, $linear_only, $mass, $modifications, $monolink, $xlink
 
-      foreach $fragment (@fragments_linear_only) 
-      {add_peptide ($results_dbh,$results_table, $fragment, $count ,1,0,' ',0,0);}  
+        foreach $fragment (@fragments_linear_only) {
+            add_peptide($results_dbh, $results_table, $fragment, $count, 1, 0, ' ', 0, 0);
+        }
 
-      %fragment_source = ( ( map { $_ => $count } @fragments ), %fragment_source );
-      %fragment_source_linear_only = ( ( map { $_ => $count } @fragments_linear_only ), %fragment_source_linear_only );
-      $count++;
-   }
+        %fragment_source             = ((map { $_ => $count } @fragments),             %fragment_source);
+        %fragment_source_linear_only = ((map { $_ => $count } @fragments_linear_only), %fragment_source_linear_only);
+        $count++;
+    }
 
-   warn "Run $results_table: Calulating masses...  \n";
+    warn "Run $results_table: Calulating masses...  \n";
 
-   calculate_peptide_masses( $results_dbh, $results_table, \%protein_residuemass, \%fragment_source );
-   
+    calculate_peptide_masses($results_dbh, $results_table, \%protein_residuemass, \%fragment_source);
 
-   warn "Run $results_table: Crosslinking peptides...  \n";
+    warn "Run $results_table: Crosslinking peptides...  \n";
 
 #    my ( $xlink_fragment_masses_ref, $xlink_fragment_sources_ref ) =
 #      crosslink_peptides( \%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
@@ -96,391 +102,431 @@ sub generate_page {
 #    %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses, %fragment_masses_linear_only );
 #    my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only );
 
-   $results_dbh->disconnect;
-   ( $results_dbh ) = connect_db_results($results_table, 0);
-   calculate_crosslink_peptides(  $results_dbh, $results_table, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
-   $results_dbh->commit;
-   $results_dbh->disconnect;
-   ( $results_dbh ) = connect_db_results($results_table);
+    $results_dbh->disconnect;
+    ($results_dbh) = connect_db_results($results_table, 0);
+    calculate_crosslink_peptides($results_dbh,  $results_table,   $reactive_site, $min_peptide_length,
+                                 $xlinker_mass, $missed_clevages, $cut_residues);
+    $results_dbh->commit;
+    $results_dbh->disconnect;
+    ($results_dbh) = connect_db_results($results_table);
 
-   warn "Run $results_table: Finding doublets...  \n";
-   my @peaklist = loaddoubletlist_db( $doublet_tolerance,      $seperation,       $isotope,          $results_dbh, $scan_width,
-                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12,
-				      $match_charge, 	       $match_intensity,  $ms1_intensity_ratio );
+    warn "Run $results_table: Finding doublets...  \n";
+    my @peaklist = loaddoubletlist_db(
+                                      $doublet_tolerance, $seperation,       $isotope,
+                                      $results_dbh,       $scan_width,       $mass_of_deuterium,
+                                      $mass_of_hydrogen,  $mass_of_carbon13, $mass_of_carbon12,
+                                      $match_charge,      $match_intensity,  $ms1_intensity_ratio
+    );
 
-   my $doublets_found = @peaklist;
-   set_doublets_found( $results_table, $settings_dbh, $doublets_found );
+    my $doublets_found = @peaklist;
+    set_doublets_found($results_table, $settings_dbh, $doublets_found);
 
-   warn "Run $results_table: Starting Peak Matches...\n";
-   my %fragment_score = matchpeaks(
-                                    \@peaklist,          $protien_sequences,
-                                    $match_ppm,          $results_dbh,            $results_dbh,             $settings_dbh,
-                                    $results_table,      $mass_of_deuterium,      $mass_of_hydrogen,        $mass_of_carbon13,
-                                    $mass_of_carbon12,   $cut_residues,           $nocut_residues,          \@sequence_names,
-                                    $mono_mass_diff,     $xlinker_mass,           $seperation,              $isotope,
-                                    $reactive_site,      \%modifications,         $ms2_error,               \%protein_residuemass,
-                                    \%ms2_fragmentation, $threshold,		  $no_xlink_at_cut_site,    $fast_mode
-   );
+    warn "Run $results_table: Starting Peak Matches...\n";
+    my %fragment_score = matchpeaks(
+                                    \@peaklist,            $protien_sequences,  $match_ppm,
+                                    $results_dbh,          $results_dbh,        $settings_dbh,
+                                    $results_table,        $mass_of_deuterium,  $mass_of_hydrogen,
+                                    $mass_of_carbon13,     $mass_of_carbon12,   $cut_residues,
+                                    $nocut_residues,       \@sequence_names,    $mono_mass_diff,
+                                    $xlinker_mass,         $seperation,         $isotope,
+                                    $reactive_site,        \%modifications,     $ms2_error,
+                                    \%protein_residuemass, \%ms2_fragmentation, $threshold,
+                                    $no_xlink_at_cut_site, $fast_mode
+    );
 
-#    give_permission($settings_dbh);
-   if ( check_state( $settings_dbh, $results_table ) == -4 ) {
-      return '-4';
-   }
-   return '-1';
+    #    give_permission($settings_dbh);
+    if (check_state($settings_dbh, $results_table) == -4) {
+        return '-4';
+    }
+    return '-1';
 }
 
-
 sub generate_page_single_scan {
-  
 
+    my (
+        $protien_sequences,  $dbh,                   $results_dbh,           $settings_dbh,
+        $results_table,      $no_of_fractions,       $upload_filehandle_ref, $csv_filehandle_ref,
+        $missed_clevages,    $cut_residues,          $nocut_residues,        $protein_residuemass_ref,
+        $reactive_site,      $scan_width,            $sequence_names_ref,    $match_ppm,
+        $min_peptide_length, $mass_of_deuterium,     $mass_of_hydrogen,      $mass_of_carbon13,
+        $mass_of_carbon12,   $modifications_ref,     $query,                 $mono_mass_diff,
+        $xlinker_mass,       $isotope,               $seperation,            $ms2_error,
+        $state,              $ms2_fragmentation_ref, $threshold,             $n_or_c,
+        $match_charge,       $match_intensity,       $no_xlink_at_cut_site,  $light_scan,
+        $heavy_scan,         $precursor_charge,      $precursor_mass,        $mass_seperation,
+        $mass_of_proton
+    ) = @_;
 
-   my (
-        $protien_sequences,     $dbh,                $results_dbh,        $settings_dbh,      $results_table,      $no_of_fractions,
-        $upload_filehandle_ref, $csv_filehandle_ref, $missed_clevages,    $cut_residues,      $nocut_residues,     $protein_residuemass_ref,
-        $reactive_site,         $scan_width,         $sequence_names_ref, $match_ppm,         $min_peptide_length, $mass_of_deuterium,
-        $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
-        $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
-        $threshold,		$n_or_c,	     $match_charge,	  $match_intensity,   $no_xlink_at_cut_site,
-	$light_scan,		$heavy_scan,	   $precursor_charge, $precursor_mass, $mass_seperation, $mass_of_proton  
-   ) = @_;
+    my %protein_residuemass = %{$protein_residuemass_ref};
+    my @csv_filehandle      = @{$csv_filehandle_ref};
+    my @upload_filehandle   = @{$upload_filehandle_ref};
+    my @sequence_names      = @{$sequence_names_ref};
+    my %modifications       = %{$modifications_ref};
+    my %ms2_fragmentation   = %{$ms2_fragmentation_ref};
 
+    my $fragment;
+    my @fragments;
+    my @fragments_linear_only;
+    my %fragment_source;
+    my %fragment_source_linear_only;
+    my @sequence_fragments;
+    my @sequences = split '>', $protien_sequences;
+    my $count = 0;
 
-   my %protein_residuemass = %{$protein_residuemass_ref};
-   my @csv_filehandle      = @{$csv_filehandle_ref};
-   my @upload_filehandle   = @{$upload_filehandle_ref};
-   my @sequence_names      = @{$sequence_names_ref};
-   my %modifications       = %{$modifications_ref};
-   my %ms2_fragmentation   = %{$ms2_fragmentation_ref};
+    create_table($dbh);
 
-   my $fragment;
-   my @fragments;
-   my @fragments_linear_only;
-   my %fragment_source;
-   my %fragment_source_linear_only;
-   my @sequence_fragments;
-   my @sequences = split '>', $protien_sequences;
-   my $count = 0;
+    if ($state == -4) {
+        return $state;
+    }
 
-   create_table($dbh);
+    import_scan($light_scan, $heavy_scan, $precursor_charge, $precursor_mass, $mass_seperation, $mass_of_proton, $dbh);
 
-     
-   if ( $state == -4 ) { 
-      return $state;
-   }
+    foreach my $sequence (@sequences) {
+        my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) =
+          digest_proteins($missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c);
+        my @sequence_fragments             = @{$sequence_fragments_ref};
+        my @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
 
-   
-    import_scan( $light_scan,		$heavy_scan,	   $precursor_charge, $precursor_mass, $mass_seperation, $mass_of_proton  , $dbh );
-   
- foreach my $sequence (@sequences) {
-      my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
-      my @sequence_fragments = @{$sequence_fragments_ref};
-      my @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
-  
-      @fragments = ( @fragments, @sequence_fragments );
-      @fragments_linear_only = ( @fragments_linear_only, @sequence_fragments_linear_only );
-      %fragment_source = ( ( map { $_ => $count } @fragments ), %fragment_source );
-      %fragment_source_linear_only = ( ( map { $_ => $count } @fragments_linear_only ), %fragment_source_linear_only );
-      $count++;
-   }
+        @fragments             = (@fragments,             @sequence_fragments);
+        @fragments_linear_only = (@fragments_linear_only, @sequence_fragments_linear_only);
+        %fragment_source             = ((map { $_ => $count } @fragments),             %fragment_source);
+        %fragment_source_linear_only = ((map { $_ => $count } @fragments_linear_only), %fragment_source_linear_only);
+        $count++;
+    }
 
-   my %fragment_masses 		   = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
-   my %fragment_masses_linear_only = digest_proteins_masses( \@fragments_linear_only, \%protein_residuemass, \%fragment_source_linear_only );   
+    my %fragment_masses = digest_proteins_masses(\@fragments, \%protein_residuemass, \%fragment_source);
+    my %fragment_masses_linear_only =
+      digest_proteins_masses(\@fragments_linear_only, \%protein_residuemass, \%fragment_source_linear_only);
 
-   my ( $xlink_fragment_masses_ref, $xlink_fragment_sources_ref ) =
-     crosslink_peptides( \%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
-   my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
-   %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses, %fragment_masses_linear_only );
-   my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only );
+    my ($xlink_fragment_masses_ref, $xlink_fragment_sources_ref) =
+      crosslink_peptides(\%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length,
+                         $xlinker_mass,     $missed_clevages,  $cut_residues);
+    my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
+    %xlink_fragment_masses = (%xlink_fragment_masses, %fragment_masses, %fragment_masses_linear_only);
+    my %xlink_fragment_sources = (%{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only);
 
+    #    warn "Finding doublets...  \n";
+    my @peaklist = loaddoubletlist_db(
+                                      10,                $seperation,        $isotope,          $dbh,
+                                      $scan_width,       $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13,
+                                      $mass_of_carbon12, $match_charge,      $match_intensity
+    );
 
-#    warn "Finding doublets...  \n";
-   my @peaklist = loaddoubletlist_db( 10, $seperation,       $isotope,          $dbh, $scan_width,
-                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12,
-				      $match_charge, 	       $match_intensity );
+    my $doublets_found = @peaklist;
+    set_doublets_found($results_table, $settings_dbh, $doublets_found);
 
-   my $doublets_found = @peaklist;
-   set_doublets_found( $results_table, $settings_dbh, $doublets_found );
+    my %fragment_score = matchpeaks_single(
+                                           \@peaklist,               \%xlink_fragment_masses,
+                                           \%xlink_fragment_sources, $protien_sequences,
+                                           $match_ppm,               $dbh,
+                                           $results_dbh,             $settings_dbh,
+                                           $results_table,           $mass_of_deuterium,
+                                           $mass_of_hydrogen,        $mass_of_carbon13,
+                                           $mass_of_carbon12,        $cut_residues,
+                                           $nocut_residues,          \@sequence_names,
+                                           $mono_mass_diff,          $xlinker_mass,
+                                           $seperation,              $isotope,
+                                           $reactive_site,           \%modifications,
+                                           $ms2_error,               \%protein_residuemass,
+                                           \%ms2_fragmentation,      $threshold,
+                                           $no_xlink_at_cut_site
+    );
 
-   my %fragment_score = matchpeaks_single(
-                                    \@peaklist,          \%xlink_fragment_masses, \%xlink_fragment_sources, $protien_sequences,
-                                    $match_ppm,          $dbh,                    $results_dbh,             $settings_dbh,
-                                    $results_table,      $mass_of_deuterium,      $mass_of_hydrogen,        $mass_of_carbon13,
-                                    $mass_of_carbon12,   $cut_residues,           $nocut_residues,          \@sequence_names,
-                                    $mono_mass_diff,     $xlinker_mass,           $seperation,              $isotope,
-                                    $reactive_site,      \%modifications,         $ms2_error,               \%protein_residuemass,
-                                    \%ms2_fragmentation, $threshold, $no_xlink_at_cut_site
-   );
-  
- 
 }
 
 sub crosslink_digest {
-  
-   my (
-        $protien_sequences,     $dbh,                $results_dbh,        $settings_dbh,      $results_table,      $no_of_fractions,
-        $upload_filehandle_ref, $csv_filehandle_ref, $missed_clevages,    $cut_residues,      $nocut_residues,     $protein_residuemass_ref,
-        $reactive_site,         $scan_width,         $sequence_names_ref, $match_ppm,         $min_peptide_length, $mass_of_deuterium,
-        $mass_of_hydrogen,      $mass_of_carbon13,   $mass_of_carbon12,   $modifications_ref, $query,              $mono_mass_diff,
-        $xlinker_mass,          $isotope,            $seperation,         $ms2_error,         $state,              $ms2_fragmentation_ref,
-        $threshold,		$n_or_c,	     $max_peptide_mass,	  $min_peptide_mass
-   ) = @_;
 
-   
-   my %protein_residuemass = %{$protein_residuemass_ref};
-   my @csv_filehandle      = @{$csv_filehandle_ref};
-   my @upload_filehandle   = @{$upload_filehandle_ref};
-   my @sequence_names      = @{$sequence_names_ref};
-   my %modifications       = %{$modifications_ref};
-   my %ms2_fragmentation   = %{$ms2_fragmentation_ref};
+    my (
+        $protien_sequences,  $dbh,                   $results_dbh,           $settings_dbh,
+        $results_table,      $no_of_fractions,       $upload_filehandle_ref, $csv_filehandle_ref,
+        $missed_clevages,    $cut_residues,          $nocut_residues,        $protein_residuemass_ref,
+        $reactive_site,      $scan_width,            $sequence_names_ref,    $match_ppm,
+        $min_peptide_length, $mass_of_deuterium,     $mass_of_hydrogen,      $mass_of_carbon13,
+        $mass_of_carbon12,   $modifications_ref,     $query,                 $mono_mass_diff,
+        $xlinker_mass,       $isotope,               $seperation,            $ms2_error,
+        $state,              $ms2_fragmentation_ref, $threshold,             $n_or_c,
+        $max_peptide_mass,   $min_peptide_mass
+    ) = @_;
 
-   my $fragment;
-   my @fragments;
-   my @fragments_linear_only;
-   my %fragment_source;
-   my %fragment_source_linear_only;
-   my @sequence_fragments;
-   my @sequences = split '>', $protien_sequences;
-   my $count = 0;
+    my %protein_residuemass = %{$protein_residuemass_ref};
+    my @csv_filehandle      = @{$csv_filehandle_ref};
+    my @upload_filehandle   = @{$upload_filehandle_ref};
+    my @sequence_names      = @{$sequence_names_ref};
+    my %modifications       = %{$modifications_ref};
+    my %ms2_fragmentation   = %{$ms2_fragmentation_ref};
 
-   create_table($dbh);
+    my $fragment;
+    my @fragments;
+    my @fragments_linear_only;
+    my %fragment_source;
+    my %fragment_source_linear_only;
+    my @sequence_fragments;
+    my @sequences = split '>', $protien_sequences;
+    my $count = 0;
 
-   for ( my $n = 1 ; $n <= $no_of_fractions ; $n++ ) {
-      if ( defined( $upload_filehandle[$n] ) ) {
-         import_mgf( $n, $upload_filehandle[$n], $dbh );
-      }
+    create_table($dbh);
 
-      #   	import_csv($n,$csv_filehandle[$n], $dbh);
-   }
+    for (my $n = 1 ; $n <= $no_of_fractions ; $n++) {
+        if (defined($upload_filehandle[$n])) {
+            import_mgf($n, $upload_filehandle[$n], $dbh);
+        }
 
+        #   	import_csv($n,$csv_filehandle[$n], $dbh);
+    }
 
- foreach my $sequence (@sequences) {
-      my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) = digest_proteins( $missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c );
-      my @sequence_fragments = @{$sequence_fragments_ref};
-      my @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
-  
-      @fragments = ( @fragments, @sequence_fragments );
-      @fragments_linear_only = ( @fragments_linear_only, @sequence_fragments_linear_only );
-      %fragment_source = ( ( map { $_ => $count } @fragments ), %fragment_source );
-      %fragment_source_linear_only = ( ( map { $_ => $count } @fragments_linear_only ), %fragment_source_linear_only );
-      $count++;
-   }
+    foreach my $sequence (@sequences) {
+        my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) =
+          digest_proteins($missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c);
+        my @sequence_fragments             = @{$sequence_fragments_ref};
+        my @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
 
-   my %fragment_masses 		   = digest_proteins_masses( \@fragments, \%protein_residuemass, \%fragment_source );
-   my %fragment_masses_linear_only = digest_proteins_masses( \@fragments_linear_only, \%protein_residuemass, \%fragment_source_linear_only );   
+        @fragments             = (@fragments,             @sequence_fragments);
+        @fragments_linear_only = (@fragments_linear_only, @sequence_fragments_linear_only);
+        %fragment_source             = ((map { $_ => $count } @fragments),             %fragment_source);
+        %fragment_source_linear_only = ((map { $_ => $count } @fragments_linear_only), %fragment_source_linear_only);
+        $count++;
+    }
 
-   my ( $xlink_fragment_masses_ref, $xlink_fragment_sources_ref ) =
-     crosslink_peptides( \%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
-   my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
-   %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses, %fragment_masses_linear_only );
-   my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only );
+    my %fragment_masses = digest_proteins_masses(\@fragments, \%protein_residuemass, \%fragment_source);
+    my %fragment_masses_linear_only =
+      digest_proteins_masses(\@fragments_linear_only, \%protein_residuemass, \%fragment_source_linear_only);
 
+    my ($xlink_fragment_masses_ref, $xlink_fragment_sources_ref) =
+      crosslink_peptides(\%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length,
+                         $xlinker_mass,     $missed_clevages,  $cut_residues);
+    my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
+    %xlink_fragment_masses = (%xlink_fragment_masses, %fragment_masses, %fragment_masses_linear_only);
+    my %xlink_fragment_sources = (%{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only);
 
-  my $n = 1;
-  print "<h2>Crosslinks</h2>";
-  print "<table>";
-  my %line;
-       foreach (sort { $xlink_fragment_masses{$a} <=> $xlink_fragment_masses{$b} } keys  %xlink_fragment_masses) {
-	if ($_ =~ /-/   )
-	{
-	    foreach my $modification ( reverse sort( keys %modifications ) ) {
-		my $location = $modifications{$modification}{Location};
-		my $rxn_residues = @{ [ $_ =~ /$location/g ] };
-		if ($location eq $reactive_site)
-		  { $rxn_residues = $rxn_residues -2};
-	    if (    !( $modifications{$modification}{Name} eq "loop link" )
-                 && !( $modifications{$modification}{Name} eq "mono link" )
-		)   
-	{
-	     
-	      for ( my $x = 1 ; $x <=  $rxn_residues  ; $x++ ) {
-	      if ( ($xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x) > $min_peptide_mass && ($xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x)  <$max_peptide_mass) {
-	       if ($x > 1) {
-		      my $source = substr($sequence_names[substr($xlink_fragment_sources{$_},0,1)],1);
-		      $source = $source ."-" . substr($sequence_names[substr($xlink_fragment_sources{$_},-1)],1);
-		      my $mass =  $xlink_fragment_masses{$_}+1.00728+$modifications{$modification}{Delta} *$x ;
-		      $line{$xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x} =
-		      "</td><td>$_ </td><td>$modifications{$modification}{Name} x $x</td><td>$mass</td><td> $source </td></tr>";
+    my $n = 1;
+    print "<h2>Crosslinks</h2>";
+    print "<table>";
+    my %line;
+    foreach (sort { $xlink_fragment_masses{$a} <=> $xlink_fragment_masses{$b} } keys %xlink_fragment_masses) {
+        if ($_ =~ /-/) {
+            foreach my $modification (reverse sort(keys %modifications)) {
+                my $location = $modifications{$modification}{Location};
+                my $rxn_residues = @{ [ $_ =~ /$location/g ] };
+                if ($location eq $reactive_site) { $rxn_residues = $rxn_residues - 2 }
+                if (   !($modifications{$modification}{Name} eq "loop link")
+                    && !($modifications{$modification}{Name} eq "mono link"))
+                {
 
-	       } else { 
-		      my $source = substr($sequence_names[substr($xlink_fragment_sources{$_},0,1)],1);
-		      $source = $source ."-" . substr($sequence_names[substr($xlink_fragment_sources{$_},-1)],1);
-		      my $mass =  $xlink_fragment_masses{$_}+1.00728 +$modifications{$modification}{Delta} *$x ;
-		      $line{$xlink_fragment_masses{$_}+1.00728+$modifications{$modification}{Delta} *$x} =
-		      "</td><td>$_ </td><td>$modifications{$modification}{Name} </td><td>$mass</td><td> $source </td></tr>";
+                    for (my $x = 1 ; $x <= $rxn_residues ; $x++) {
+                        if (($xlink_fragment_masses{$_} + 1.00728 + $modifications{$modification}{Delta} * $x) >
+                            $min_peptide_mass
+                            && ($xlink_fragment_masses{$_} + 1.00728 + $modifications{$modification}{Delta} * $x) <
+                            $max_peptide_mass)
+                        {
+                            if ($x > 1) {
+                                my $source = substr($sequence_names[ substr($xlink_fragment_sources{$_}, 0, 1) ], 1);
+                                $source =
+                                  $source . "-" . substr($sequence_names[ substr($xlink_fragment_sources{$_}, -1) ], 1);
+                                my $mass =
+                                  $xlink_fragment_masses{$_} + 1.00728 + $modifications{$modification}{Delta} * $x;
+                                $line{ $xlink_fragment_masses{$_} + 1.00728 +
+                                      $modifications{$modification}{Delta} * $x } =
+"</td><td>$_ </td><td>$modifications{$modification}{Name} x $x</td><td>$mass</td><td> $source </td></tr>";
 
-	       }			   
-	      $n++;
-	      
-	      
-#              $fragment_source{$_} = $sequence_names[1];
-	    
-	      }
-  
-	    }
-	  }
-         }
-      }
-      }
-     $n=0;
-     foreach (sort { $a <=> $b } keys %line)
-      { $n++; print "<tr><td>$n.".$line{$_}; }
-     print "</table>";
+                            } else {
+                                my $source = substr($sequence_names[ substr($xlink_fragment_sources{$_}, 0, 1) ], 1);
+                                $source =
+                                  $source . "-" . substr($sequence_names[ substr($xlink_fragment_sources{$_}, -1) ], 1);
+                                my $mass =
+                                  $xlink_fragment_masses{$_} + 1.00728 + $modifications{$modification}{Delta} * $x;
+                                $line{ $xlink_fragment_masses{$_} + 1.00728 +
+                                      $modifications{$modification}{Delta} * $x } =
+"</td><td>$_ </td><td>$modifications{$modification}{Name} </td><td>$mass</td><td> $source </td></tr>";
 
+                            }
+                            $n++;
 
-for (keys %line)
-    {
+                            #              $fragment_source{$_} = $sequence_names[1];
+
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+    $n = 0;
+    foreach (sort { $a <=> $b } keys %line) {
+        $n++;
+        print "<tr><td>$n." . $line{$_};
+    }
+    print "</table>";
+
+    for (keys %line) {
         delete $line{$_};
     }
 
-my @monolink_masses = split( ",", $mono_mass_diff );
-$n = 1;
+    my @monolink_masses = split(",", $mono_mass_diff);
+    $n = 1;
 
-print "<h2>Monolinks</h2>"; 
-  print "<table>";
- 
-       foreach (sort { $xlink_fragment_masses{$a} <=> $xlink_fragment_masses{$b} } keys  %xlink_fragment_masses) {
-	    foreach my $modification ( reverse sort( keys %modifications ) ) {
-		my $location = $modifications{$modification}{Location};
-		my $rxn_residues = @{ [ $_ =~ /$location/g ] };
-	    if (     !( $modifications{$modification}{Name} eq "mono link" )
-		)   
-            {
-	  if ($location eq $reactive_site)
-		  { $rxn_residues = $rxn_residues - 1};
-	  if ($modifications{$modification}{Name} eq "loop link")
-		  { $rxn_residues = $rxn_residues / 2};
-	      if ($_ !~ /-/ && substr($_,0,-1) =~ /$reactive_site/  )
-	      {
-	      for ( my $x = 1 ; $x <=  $rxn_residues  ; $x++ ) {
-	      foreach my $monolink_mass (@monolink_masses){
-	      if ( ($xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x) > $min_peptide_mass && ($xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x)  <$max_peptide_mass) {
-	       if ($x > 1) {
-		      my $source = substr($sequence_names[$xlink_fragment_sources{$_}],1);
-		      my $mass =  $xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x ;
-		      $line{$xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x} =
-		      "</td><td>$_ </td><td>$modifications{$modification}{Name} x $x</td><td>$mass</td><td> $source </td></tr>";
+    print "<h2>Monolinks</h2>";
+    print "<table>";
 
-	       } else { 
-		      my $source = substr($sequence_names[$xlink_fragment_sources{$_}],1);
-		      my $mass =  $xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x ;
-		      $line{$xlink_fragment_masses{$_}+1.00728 +$monolink_mass+$modifications{$modification}{Delta} *$x} =
-		      "</td><td>$_ </td><td>$modifications{$modification}{Name} </td><td>$mass</td><td> $source </td></tr>";
+    foreach (sort { $xlink_fragment_masses{$a} <=> $xlink_fragment_masses{$b} } keys %xlink_fragment_masses) {
+        foreach my $modification (reverse sort(keys %modifications)) {
+            my $location = $modifications{$modification}{Location};
+            my $rxn_residues = @{ [ $_ =~ /$location/g ] };
+            if (!($modifications{$modification}{Name} eq "mono link")) {
+                if ($location eq $reactive_site) { $rxn_residues = $rxn_residues - 1 }
+                if ($modifications{$modification}{Name} eq "loop link") { $rxn_residues = $rxn_residues / 2 }
+                if ($_ !~ /-/ && substr($_, 0, -1) =~ /$reactive_site/) {
+                    for (my $x = 1 ; $x <= $rxn_residues ; $x++) {
+                        foreach my $monolink_mass (@monolink_masses) {
+                            if (
+                                (
+                                 $xlink_fragment_masses{$_} + 1.00728 +
+                                 $monolink_mass +
+                                 $modifications{$modification}{Delta} * $x
+                                ) > $min_peptide_mass
+                                && ($xlink_fragment_masses{$_} + 1.00728 +
+                                    $monolink_mass +
+                                    $modifications{$modification}{Delta} * $x) < $max_peptide_mass
+                              )
+                            {
+                                if ($x > 1) {
+                                    my $source = substr($sequence_names[ $xlink_fragment_sources{$_} ], 1);
+                                    my $mass =
+                                      $xlink_fragment_masses{$_} + 1.00728 +
+                                      $monolink_mass +
+                                      $modifications{$modification}{Delta} * $x;
+                                    $line{ $xlink_fragment_masses{$_} + 1.00728 +
+                                          $monolink_mass +
+                                          $modifications{$modification}{Delta} * $x } =
+"</td><td>$_ </td><td>$modifications{$modification}{Name} x $x</td><td>$mass</td><td> $source </td></tr>";
 
-	       }			   
-	      $n++;
-	      }
-	      }
-	      }
-#              $fragment_source{$_} = $sequence_names[1];
-	    
-	      }
-  
-	    }
-	  }
-         }
-     $n=0;
-     foreach (sort { $a <=> $b }  keys %line)
-      { $n++; print "<tr><td>$n.".$line{$_}; }
-     print "</table>";
+                                } else {
+                                    my $source = substr($sequence_names[ $xlink_fragment_sources{$_} ], 1);
+                                    my $mass =
+                                      $xlink_fragment_masses{$_} + 1.00728 +
+                                      $monolink_mass +
+                                      $modifications{$modification}{Delta} * $x;
+                                    $line{ $xlink_fragment_masses{$_} + 1.00728 +
+                                          $monolink_mass +
+                                          $modifications{$modification}{Delta} * $x } =
+"</td><td>$_ </td><td>$modifications{$modification}{Name} </td><td>$mass</td><td> $source </td></tr>";
+
+                                }
+                                $n++;
+                            }
+                        }
+                    }
+
+                    #              $fragment_source{$_} = $sequence_names[1];
+
+                }
+
+            }
+        }
+    }
+    $n = 0;
+    foreach (sort { $a <=> $b } keys %line) {
+        $n++;
+        print "<tr><td>$n." . $line{$_};
+    }
+    print "</table>";
 
 }
-
-
 
 sub mgf_doublet_search {
-   
-   my (
-        $upload_filehandle_ref, $doublet_tolerance,   $seperation, $isotope, $linkspacing, $dbh,
-	$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width,
-	$match_charge,  $match_intensity, $ms1_intensity_ratio
+
+    my (
+        $upload_filehandle_ref, $doublet_tolerance, $seperation,        $isotope,
+        $linkspacing,           $dbh,               $mass_of_deuterium, $mass_of_hydrogen,
+        $mass_of_carbon13,      $mass_of_carbon12,  $scan_width,        $match_charge,
+        $match_intensity,       $ms1_intensity_ratio
     ) = @_;
 
- 
-   
-   
-   my @upload_filehandle   = @{$upload_filehandle_ref};
-   
-  
-   create_table($dbh);
+    my @upload_filehandle = @{$upload_filehandle_ref};
 
-  
-      if ( defined( $upload_filehandle[1] ) ) {
-         import_mgf( 1, $upload_filehandle[1], $dbh );
-      }
-   
-   my @peaklist = loaddoubletlist_db( $doublet_tolerance, $seperation,       $isotope,          $dbh, $scan_width,
-                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge,  $match_intensity, $ms1_intensity_ratio );
+    create_table($dbh);
 
-#   print "Match charge: $match_charge";
+    if (defined($upload_filehandle[1])) {
+        import_mgf(1, $upload_filehandle[1], $dbh);
+    }
 
-  print "<table><tr><td>mz</td><td>Monoisoptic mass</td><td>Charge</td><td>Scan 1</td><td>Scan 2</td></tr>";
-  foreach my $peak (@peaklist) {
-    print "<tr><td>$peak->{'mz'} </td><td> $peak->{monoisotopic_mw} </td><td> $peak->{charge}+ </td><td> $peak->{scan_num}</td><td> $peak->{d2_scan_num} </td></tr>"
-  }
-  print "</table>";
+    my @peaklist = loaddoubletlist_db(
+                                      $doublet_tolerance, $seperation,       $isotope,
+                                      $dbh,               $scan_width,       $mass_of_deuterium,
+                                      $mass_of_hydrogen,  $mass_of_carbon13, $mass_of_carbon12,
+                                      $match_charge,      $match_intensity,  $ms1_intensity_ratio
+    );
+
+    #   print "Match charge: $match_charge";
+
+    print "<table><tr><td>mz</td><td>Monoisoptic mass</td><td>Charge</td><td>Scan 1</td><td>Scan 2</td></tr>";
+    foreach my $peak (@peaklist) {
+        print
+"<tr><td>$peak->{'mz'} </td><td> $peak->{monoisotopic_mw} </td><td> $peak->{charge}+ </td><td> $peak->{scan_num}</td><td> $peak->{d2_scan_num} </td></tr>";
+    }
+    print "</table>";
 
 }
-
 
 sub mgf_doublet_search_mgf_output {
-   
-   my (
-        $upload_filehandle_ref, $doublet_tolerance,   $seperation, $isotope, $linkspacing, $dbh,
-	$mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $scan_width,
-	$match_charge,  $match_intensity, $ms1_intensity_ratio
+
+    my (
+        $upload_filehandle_ref, $doublet_tolerance, $seperation,        $isotope,
+        $linkspacing,           $dbh,               $mass_of_deuterium, $mass_of_hydrogen,
+        $mass_of_carbon13,      $mass_of_carbon12,  $scan_width,        $match_charge,
+        $match_intensity,       $ms1_intensity_ratio
     ) = @_;
 
+    my @upload_filehandle = @{$upload_filehandle_ref};
 
-   my @upload_filehandle   = @{$upload_filehandle_ref};
-   
-  
-   create_table($dbh);
+    create_table($dbh);
 
-  
-      if ( defined( $upload_filehandle[1] ) ) {
-         import_mgf( 1, $upload_filehandle[1], $dbh );
-      }
-   
-   my @peaklist = loaddoubletlist_db( $doublet_tolerance, $seperation,       $isotope,          $dbh, $scan_width,
-                                      $mass_of_deuterium,      $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12, $match_charge,  $match_intensity, $ms1_intensity_ratio );
+    if (defined($upload_filehandle[1])) {
+        import_mgf(1, $upload_filehandle[1], $dbh);
+    }
 
-#   print "Match charge: $match_charge";
+    my @peaklist = loaddoubletlist_db(
+                                      $doublet_tolerance, $seperation,       $isotope,
+                                      $dbh,               $scan_width,       $mass_of_deuterium,
+                                      $mass_of_hydrogen,  $mass_of_carbon13, $mass_of_carbon12,
+                                      $match_charge,      $match_intensity,  $ms1_intensity_ratio
+    );
 
-  print "MASS=monoisotopic\n";
-  foreach my $peak (@peaklist) {
-    print "BEGIN IONS\n";
-    print "TITLE=$peak->{title}\n";
-    print "PEPMASS=$peak->{mz} $peak->{abundance}\n";
-    print "CHARGE=$peak->{charge}+\n";
-    print "SCANS=$peak->{scan_num}\n";
-    print "$peak->{MSn_string}";
-    print "END IONS\n\n";
+    #   print "Match charge: $match_charge";
 
-    print "BEGIN IONS\n";
-    print "TITLE=$peak->{d2_title}\n";
-    print "PEPMASS=$peak->{d2_mz} $peak->{d2_abundance}\n";
-    print "CHARGE=$peak->{d2_charge}+\n";
-    print "SCANS=$peak->{d2_scan_num}\n";
-    print "$peak->{d2_MSn_string}";
-    print "END IONS\n\n";
-  }
+    print "MASS=monoisotopic\n";
+    foreach my $peak (@peaklist) {
+        print "BEGIN IONS\n";
+        print "TITLE=$peak->{title}\n";
+        print "PEPMASS=$peak->{mz} $peak->{abundance}\n";
+        print "CHARGE=$peak->{charge}+\n";
+        print "SCANS=$peak->{scan_num}\n";
+        print "$peak->{MSn_string}";
+        print "END IONS\n\n";
+
+        print "BEGIN IONS\n";
+        print "TITLE=$peak->{d2_title}\n";
+        print "PEPMASS=$peak->{d2_mz} $peak->{d2_abundance}\n";
+        print "CHARGE=$peak->{d2_charge}+\n";
+        print "SCANS=$peak->{d2_scan_num}\n";
+        print "$peak->{d2_MSn_string}";
+        print "END IONS\n\n";
+    }
 
 }
-
 
 sub print_heading    #Prints HTML heading
 {
-   print "<br><br><h1>@_</h1>";
+    print "<br><br><h1>@_</h1>";
 }
 
 sub print_subheading    #Prints HTML subheading
 {
-   print "<h2>@_</h2>";
+    print "<h2>@_</h2>";
 }
 
 sub print_page_top      #Prints opening to HTML page
 {
-   print <<ENDHTML;
+    print <<ENDHTML;
 Content-type: text/html\n\n
 <html>
 <head>
@@ -554,16 +600,16 @@ ENDHTML
 
 sub print_page_bottom    #Prints the end of the HTML page
 {
-   print '<br/><br/>
+    print '<br/><br/>
 </body>
 </html>';
 }
 
 sub print_page_top_fancy    #Prints the end of the HTML page
 {
-   my $version = version();
-   my $path = installed();
-   print <<ENDHTML;
+    my $version = version();
+    my $path    = installed();
+    print <<ENDHTML;
 Content-type: text/html\n\n
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
@@ -640,8 +686,8 @@ Content-type: text/html\n\n
 <div id="title"><h1>
 
 ENDHTML
-   print @_;
-   print <<ENDHTML;
+    print @_;
+    print <<ENDHTML;
 </h1></div>
 
 <div id="content">
@@ -650,7 +696,7 @@ ENDHTML
 
 sub print_page_bottom_fancy    #Prints the end of the HTML page
 {
-   print <<ENDHTML;
+    print <<ENDHTML;
 </div>
 <!-- close main content -->
 <div id="footer">

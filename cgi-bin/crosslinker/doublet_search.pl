@@ -44,9 +44,9 @@ print <<ENDHTML;
 ENDHTML
 
 my $dbh = connect_conf_db;
-my $crosslinkers = get_conf( $dbh, 'crosslinker' );
-while ( ( my $crosslinker = $crosslinkers->fetchrow_hashref ) ) {
-   print "<option value='" . $crosslinker->{'rowid'} . "'>" . $crosslinker->{'name'} . "</option>";
+my $crosslinkers = get_conf($dbh, 'crosslinker');
+while ((my $crosslinker = $crosslinkers->fetchrow_hashref)) {
+    print "<option value='" . $crosslinker->{'rowid'} . "'>" . $crosslinker->{'name'} . "</option>";
 }
 $crosslinkers->finish();
 print "<option value='-1' selected='true'>Custom (enter right)</option></select>";

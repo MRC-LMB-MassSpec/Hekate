@@ -5,7 +5,7 @@ use base 'Exporter';
 use lib 'lib';
 use Crosslinker::Config;
 
-our @EXPORT = ( 'residue_mass', 'protein_residuemass', 'constants', 'version' ,'installed');
+our @EXPORT = ('residue_mass', 'protein_residuemass', 'constants', 'version', 'installed');
 
 ######
 #
@@ -16,21 +16,21 @@ our @EXPORT = ( 'residue_mass', 'protein_residuemass', 'constants', 'version' ,'
 ######
 
 sub residue_mass {
-   my %RNA_residuemass = (
+    my %RNA_residuemass = (
                            g => 345.04744,
                            u => 306.02530,
                            c => 305.04129,
                            a => 329.05252,
-   );
+    );
 
-   return %RNA_residuemass;
+    return %RNA_residuemass;
 }
 
 sub protein_residuemass {
 
-   my ($table, $dbh) = @_;
+    my ($table, $dbh) = @_;
 
-   my %protein_residuemass = (
+    my %protein_residuemass = (
                                G => 57.02146,
                                A => 71.03711,
                                S => 87.03203,
@@ -55,38 +55,43 @@ sub protein_residuemass {
                                R => 156.10111,
                                Y => 163.06333,
                                W => 186.07931
-   );
+    );
 
-   if ( defined $table ) {
-      my $fixed_mods = get_mods( $table, 'fixed', $dbh );
-      while ( ( my $fixed_mod = $fixed_mods->fetchrow_hashref ) ) {
-         $protein_residuemass{ $fixed_mod->{'mod_residue'} } = $protein_residuemass{ $fixed_mod->{'mod_residue'} } + $fixed_mod->{'mod_mass'};
-      }
+    if (defined $table) {
+        my $fixed_mods = get_mods($table, 'fixed', $dbh);
+        while ((my $fixed_mod = $fixed_mods->fetchrow_hashref)) {
+            $protein_residuemass{ $fixed_mod->{'mod_residue'} } =
+              $protein_residuemass{ $fixed_mod->{'mod_residue'} } + $fixed_mod->{'mod_mass'};
+        }
 
-   }
-   return %protein_residuemass;
+    }
+    return %protein_residuemass;
 }
 
 sub constants {
-   my $mass_of_deuterium = 2.01410178;
-   my $mass_of_hydrogen  = 1.00783;
-   my $mass_of_proton    = 1.00728;
-   my $mass_of_carbon12  = 12;
-   my $mass_of_carbon13  = 13.00335;
+    my $mass_of_deuterium = 2.01410178;
+    my $mass_of_hydrogen  = 1.00783;
+    my $mass_of_proton    = 1.00728;
+    my $mass_of_carbon12  = 12;
+    my $mass_of_carbon13  = 13.00335;
 
-   my $no_of_fractions    = 20;
-   my $min_peptide_length = '3';
-#    my $scan_width         = 60;
+    my $no_of_fractions    = 20;
+    my $min_peptide_length = '3';
 
-   return ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, $mass_of_carbon13, $no_of_fractions, $min_peptide_length );
+    #    my $scan_width         = 60;
+
+    return (
+            $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12,
+            $mass_of_carbon13,  $no_of_fractions,  $min_peptide_length
+    );
 }
 
 sub version {
-   return '0.9.3';
+    return '0.9.3';
 }
 
 sub installed {
-  return 'crosslinker';
+    return 'crosslinker';
 }
 
 1;

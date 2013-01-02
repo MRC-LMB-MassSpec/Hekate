@@ -17,185 +17,185 @@ use Crosslinker::Constants;
 use Crosslinker::HTML;
 
 $SIG{CHLD} = 'IGNORE';
-defined( my $child = fork ) or die "Cannot fork: $!\n";
+defined(my $child = fork) or die "Cannot fork: $!\n";
 if ($child) {
-   print_page_top_fancy; 
-   print_heading('File Upload');
-#    print "<p>Parent $$ has finished, Child's PID: $child\n</p>";
-  print "<p>File upload complete, your search has been added to the queue and should appear on the results page soon.</p>";
+    print_page_top_fancy;
+    print_heading('File Upload');
+    print
+"<p>File upload complete, your search has been added to the queue and should appear on the results page soon.</p>";
 
-
-
-  print_page_bottom_fancy;
+    print_page_bottom_fancy;
 } else {
+    my $query = new CGI;
+    $CGI::POST_MAX = 1024 * 50000;
+    or die "Can't chdir to /: $!";
+    open STDIN,  '/dev/null'  or die "Can't read /dev/null: $!";
+    open STDOUT, '>/dev/null' or die "Can't write to /dev/null: $!";
+    open STDERR, '>>log'      or die "Can't write to /tmp/log: $!";
+    setsid or die "Can't start a new session: $!";
 
-   # Import CGI Varibles
-   my $query = new CGI;
-   $CGI::POST_MAX = 1024 * 50000;
+    my $oldfh = select STDERR;
+    local $| = 1;
+    select $oldfh;
 
-   #       chdir '/'                 or die "Can't chdir to /: $!";
-   open STDIN,  '/dev/null'  or die "Can't read /dev/null: $!";
-   open STDOUT, '>/dev/null' or die "Can't write to /dev/null: $!";
-   open STDERR, '>>log'      or die "Can't write to /tmp/log: $!";
-   setsid or die "Can't start a new session: $!";
+    use DBI;
 
-   my $oldfh = select STDERR;
-   local $| = 1;
-   select $oldfh;
+    use lib 'lib';
+    use Crosslinker::Links;
+    use Crosslinker::HTML;
+    use Crosslinker::Data;
+    use Crosslinker::Proteins;
+    use Crosslinker::Scoring;
+    use Crosslinker::Config;
 
-#    warn "Started\n";
+    # Constants
+    my (
+        $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12,
+        $mass_of_carbon13,  $no_of_fractions,  $min_peptide_length
+    ) = constants;
 
-   # do something time-consuming
-   #      warn "Parent Completed\n";
-   #      warn $0;
-   # Run our programme
+    # Connect to databases
+    my ($dbh, $settings_dbh) = connect_db;
 
-   use DBI;
+    my (
+        $protien_sequences,     $sequence_names_ref, $missed_clevages,   $upload_filehandle_ref,
+        $csv_filehandle_ref,    $reactive_site,      $cut_residues,      $nocut_residues,
+        $fasta,                 $desc,               $decoy,             $match_ppm,
+        $ms2_error,             $mass_seperation,    $isotope,           $seperation,
+        $mono_mass_diff,        $xlinker_mass,       $dynamic_mods_ref,  $fixed_mods_ref,
+        $ms2_fragmentation_ref, $threshold,          $n_or_c,            $scan_width,
+        $match_charge,          $match_intensity,    $scored_ions,       $no_xlink_at_cut_site,
+        $ms1_intensity_ratio,   $fast_mode,          $doublet_tolerance, $upload_format
+    ) = import_cgi_query($query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12);
+    my @sequence_names    = @{$sequence_names_ref};
+    my @upload_filehandle = @{$upload_filehandle_ref};
+    my @csv_filehandle    = @{$csv_filehandle_ref};
+    my @dynamic_mods      = @{$dynamic_mods_ref};
+    my @fixed_mods        = @{$fixed_mods_ref};
+    my %ms2_fragmentation = %{$ms2_fragmentation_ref};
 
-   use lib 'lib';
-   use Crosslinker::Links;
-   use Crosslinker::HTML;
-   use Crosslinker::Data;
-   use Crosslinker::Proteins;
-   use Crosslinker::Scoring;
-   use Crosslinker::Config;
+    my $results_table = save_settings(
+        $settings_dbh,
 
-   # Constants
-   my ( $mass_of_deuterium, $mass_of_hydrogen, $mass_of_proton, $mass_of_carbon12, $mass_of_carbon13, $no_of_fractions, $min_peptide_length ) =
-     constants;
+        $cut_residues, $fasta,     $reactive_site, $mono_mass_diff,  $xlinker_mass,    -6,
+        $desc,         $decoy,     $ms2_error,     $match_ppm,       $mass_seperation, \@dynamic_mods,
+        \@fixed_mods,  $threshold, $match_charge,  $match_intensity, $scored_ions
+    );
 
-   # Connect to databases
-   my ( $dbh, $settings_dbh ) = connect_db;
+    my ($results_dbh) = connect_db_results($results_table, 0);
 
-   my (
-        $protien_sequences, $sequence_names_ref, $missed_clevages,       $upload_filehandle_ref, $csv_filehandle_ref, $reactive_site,
-        $cut_residues,      $nocut_residues,     $fasta,                 $desc,                  $decoy,              $match_ppm,
-        $ms2_error,         $mass_seperation,    $isotope,               $seperation,            $mono_mass_diff,     $xlinker_mass,
-        $dynamic_mods_ref,  $fixed_mods_ref,     $ms2_fragmentation_ref, $threshold,		 $n_or_c,	      $scan_width,
-	$match_charge,	    $match_intensity,    $scored_ions,           $no_xlink_at_cut_site,  $ms1_intensity_ratio,$fast_mode,
-        $doublet_tolerance, $upload_format
-   ) = import_cgi_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
-   my @sequence_names    = @{$sequence_names_ref};
-   my @upload_filehandle = @{$upload_filehandle_ref};
-   my @csv_filehandle    = @{$csv_filehandle_ref};
-   my @dynamic_mods      = @{$dynamic_mods_ref};
-   my @fixed_mods        = @{$fixed_mods_ref};
-   my %ms2_fragmentation = %{$ms2_fragmentation_ref};
+    warn "Run $results_table: Started \n";
 
-   my $results_table = save_settings( $settings_dbh, 
+    #Save Query data
 
-		  $cut_residues, $fasta,     	$reactive_site, $mono_mass_diff, 	$xlinker_mass, 	  -6,
-                  $desc,         $decoy,        $ms2_error,    	$match_ppm, 		$mass_seperation, \@dynamic_mods,  
-		 \@fixed_mods,   $threshold,	$match_charge, 	$match_intensity, 	$scored_ions);
+    open(OUT, '>', "query_data/query-$results_table.txt");
+    $query->save(\*OUT);
+    close OUT;
 
-   my ( $results_dbh ) = connect_db_results($results_table, 0);
+    warn "Run $results_table: Query saved \n";
 
- warn "Run $results_table: Started \n";    
+    create_table($results_dbh);   
 
-  #Save Query data
+    warn "Run $results_table: Table created for results \n";
+    warn "Upload format: $upload_format \n";
 
-  open (OUT,'>',"query_data/query-$results_table.txt");
-  $query->save(\*OUT);
-  close OUT;
+    for (my $n = 1 ; $n <= $no_of_fractions ; $n++) {
 
-  warn "Run $results_table: Query saved \n"; 
-  
-   create_table($results_dbh);  #unimplimented Database table to replace hash.
-
-  warn "Run $results_table: Table created for results \n"; 
-     warn "Upload format: $upload_format \n";
-
-   for ( my $n = 1 ; $n <= $no_of_fractions ; $n++ ) {
-
-      if ( defined( $upload_filehandle[$n] ) ) {
-	 if ($upload_format eq 'MGF') {import_mgf( $n, $upload_filehandle[$n], $results_dbh )}
-	 else {import_mzXML( $n, $upload_filehandle[$n], $results_dbh )};
-      }
+        if (defined($upload_filehandle[$n])) {
+            if ($upload_format eq 'MGF') { import_mgf($n, $upload_filehandle[$n], $results_dbh) }
+            else                         { import_mzXML($n, $upload_filehandle[$n], $results_dbh) }
+        }
     }
-   $results_dbh->disconnect;
-   ( $results_dbh ) = connect_db_results($results_table);
-    
-  warn "Run $results_table: Data Imported \n"; 
+    $results_dbh->disconnect;
+    ($results_dbh) = connect_db_results($results_table);
 
-   my $next_run = -1;
+    warn "Run $results_table: Data Imported \n";
 
-   my $state = is_ready($settings_dbh);
-   set_state ( $results_table, $settings_dbh, $state );
-#    warn $state;
+    my $next_run = -1;
 
-#    $state = check_state( $settings_dbh, $results_table );
-   if ( $state == -2 ) {
-      warn "Run $results_table: terminating as another in progress.\n";
-      $next_run = 0;
-   }
+    my $state = is_ready($settings_dbh);
+    set_state($results_table, $settings_dbh, $state);
 
+    if ($state == -2) {
+        warn "Run $results_table: terminating as another in progress.\n";
+        $next_run = 0;
+    }
 
-  
-   while ($next_run != 0)
-   { 
+    while ($next_run != 0) {
 
-   # Setup Modifications
-   my %protein_residuemass = protein_residuemass($results_table, $settings_dbh);
-   my %modifications = modifications( $mono_mass_diff, $xlinker_mass, $reactive_site, $results_table, $settings_dbh );
+        # Setup Modifications
+        my %protein_residuemass = protein_residuemass($results_table, $settings_dbh);
+        my %modifications =
+          modifications($mono_mass_diff, $xlinker_mass, $reactive_site, $results_table, $settings_dbh);
 
-  
-   #Output page
+        #Output page
 
-   eval { $state = generate_page  (
-                           $protien_sequences,  $dbh,              $results_dbh,      $settings_dbh,   $results_table,      $no_of_fractions,
-                           \@upload_filehandle, \@csv_filehandle,  $missed_clevages,  $cut_residues,   $nocut_residues,     \%protein_residuemass,
-                           $reactive_site,      $scan_width,       \@sequence_names,  $match_ppm,      $min_peptide_length, $mass_of_deuterium,
-                           $mass_of_hydrogen,   $mass_of_carbon13, $mass_of_carbon12, \%modifications, 1,      		    $mono_mass_diff,
-                           $xlinker_mass,       $isotope,          $seperation,       $ms2_error,      $state,              \%ms2_fragmentation,
-                           $threshold,		$n_or_c, 	   $match_charge,     $match_intensity, $no_xlink_at_cut_site, $ms1_intensity_ratio,
-			   $fast_mode,		$doublet_tolerance,
-   )};
-   
-   if  ($@) { 
-	warn "Run " , $results_table, ":", $@;
-	set_failed ( $results_table, $settings_dbh );
-        $state = -5;
-   };
-    
-    $next_run = 0;
+        eval {
+            $state = generate_page(
+                                   $protien_sequences,  $dbh,                  $results_dbh,
+                                   $settings_dbh,       $results_table,        $no_of_fractions,
+                                   \@upload_filehandle, \@csv_filehandle,      $missed_clevages,
+                                   $cut_residues,       $nocut_residues,       \%protein_residuemass,
+                                   $reactive_site,      $scan_width,           \@sequence_names,
+                                   $match_ppm,          $min_peptide_length,   $mass_of_deuterium,
+                                   $mass_of_hydrogen,   $mass_of_carbon13,     $mass_of_carbon12,
+                                   \%modifications,     1,                     $mono_mass_diff,
+                                   $xlinker_mass,       $isotope,              $seperation,
+                                   $ms2_error,          $state,                \%ms2_fragmentation,
+                                   $threshold,          $n_or_c,               $match_charge,
+                                   $match_intensity,    $no_xlink_at_cut_site, $ms1_intensity_ratio,
+                                   $fast_mode,          $doublet_tolerance,
+            );
+        };
 
-    if ( $state == -1 ) { set_finished( $results_table, $settings_dbh ) } 
+        if ($@) {
+            warn "Run ", $results_table, ":", $@;
+            set_failed($results_table, $settings_dbh);
+            $state = -5;
+        }
 
-    if (is_ready($settings_dbh, 1) == 0 && is_ready($settings_dbh, 0) == -2) {
-      $next_run = give_permission($settings_dbh);		      
-      warn "Run " , $results_table, ": - picking up data to process from Run $next_run. \n";
-      open (OUT,'<',"query_data/query-$next_run.txt");
-	$query = CGI->new(\*OUT);
-      close OUT;
-      
-	(
-        $protien_sequences, $sequence_names_ref, $missed_clevages,       $upload_filehandle_ref, $csv_filehandle_ref, $reactive_site,
-        $cut_residues,      $nocut_residues,     $fasta,                 $desc,                  $decoy,              $match_ppm,
-        $ms2_error,         $mass_seperation,    $isotope,               $seperation,            $mono_mass_diff,     $xlinker_mass,
-        $dynamic_mods_ref,  $fixed_mods_ref,     $ms2_fragmentation_ref, $threshold,		 $n_or_c,	      $scan_width,
-	$match_charge,	    $match_intensity,    $scored_ions,           $no_xlink_at_cut_site,  $ms1_intensity_ratio,$fast_mode,
-        $doublet_tolerance, $upload_format
-	) = import_cgi_query( $query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12 );
-        @sequence_names    = @{$sequence_names_ref};
-	@upload_filehandle = @{$upload_filehandle_ref};
-	@csv_filehandle    = @{$csv_filehandle_ref};
-	@dynamic_mods      = @{$dynamic_mods_ref};
-	@fixed_mods        = @{$fixed_mods_ref};
-	%ms2_fragmentation = %{$ms2_fragmentation_ref};
+        $next_run = 0;
 
-	warn "Run " , $results_table, ":$cut_residues";
+        if ($state == -1) { set_finished($results_table, $settings_dbh) }
 
-	  $results_dbh->disconnect();
-	  $results_table = $next_run;
-          $results_dbh = connect_db_results($results_table);
-      }
+        if (is_ready($settings_dbh, 1) == 0 && is_ready($settings_dbh, 0) == -2) {
+            $next_run = give_permission($settings_dbh);
+            warn "Run ", $results_table, ": - picking up data to process from Run $next_run. \n";
+            open(OUT, '<', "query_data/query-$next_run.txt");
+            $query = CGI->new(\*OUT);
+            close OUT;
+
+            (
+             $protien_sequences,     $sequence_names_ref, $missed_clevages,   $upload_filehandle_ref,
+             $csv_filehandle_ref,    $reactive_site,      $cut_residues,      $nocut_residues,
+             $fasta,                 $desc,               $decoy,             $match_ppm,
+             $ms2_error,             $mass_seperation,    $isotope,           $seperation,
+             $mono_mass_diff,        $xlinker_mass,       $dynamic_mods_ref,  $fixed_mods_ref,
+             $ms2_fragmentation_ref, $threshold,          $n_or_c,            $scan_width,
+             $match_charge,          $match_intensity,    $scored_ions,       $no_xlink_at_cut_site,
+             $ms1_intensity_ratio,   $fast_mode,          $doublet_tolerance, $upload_format
+            ) = import_cgi_query($query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12);
+            @sequence_names    = @{$sequence_names_ref};
+            @upload_filehandle = @{$upload_filehandle_ref};
+            @csv_filehandle    = @{$csv_filehandle_ref};
+            @dynamic_mods      = @{$dynamic_mods_ref};
+            @fixed_mods        = @{$fixed_mods_ref};
+            %ms2_fragmentation = %{$ms2_fragmentation_ref};
+
+            warn "Run ", $results_table, ":$cut_residues";
+
+            $results_dbh->disconnect();
+            $results_table = $next_run;
+            $results_dbh   = connect_db_results($results_table);
+        }
 
     }
-   #Tidy up
- 
-   disconnect_db( $dbh, $settings_dbh, $results_dbh );
-   warn "Run " , $results_table, ": Process complete\n";
-   CORE::exit(0);    # terminate the forked process cleanly
+
+    #Tidy up
+
+    disconnect_db($dbh, $settings_dbh, $results_dbh);
+    warn "Run ", $results_table, ": Process complete\n";
+    CORE::exit(0);    # terminate the forked process cleanly
 }
 exit;
 
