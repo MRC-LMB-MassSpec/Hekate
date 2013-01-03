@@ -777,7 +777,7 @@ sub matchpeaks {
 						      )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
     );
 
-    my $peptides = $results_dbh->prepare("select * from peptides where results_table = ?");
+    my $peptides = $results_dbh->prepare("select * from peptides where results_table = ? AND xlink = 1 or monolink <> 0");
 
 #######
     #
@@ -865,19 +865,18 @@ sub matchpeaks {
                     && !($modifications{$modification}{Name} eq "mono link")
                   ) #crosslink and loop link on the same peptide is a messy option,certainly shouldn't give a mass doublet, so remove them
                 {
-                    my @monolink_masses;
-
+                    my $monolink_mass = $peptide->{'monolink'};
                     my $mass = $peptide->{'mass'};
-                    if ($fragment !~ /[-]/) {
-                        @monolink_masses = split(",", $mono_mass_diff);
-
-                        #  		  push @monolink_masses, 0;
-                    } else {
-                        @monolink_masses = ('0');
-                    }
-
-                    foreach my $monolink_mass (@monolink_masses) {
-                        $mass = $peptide->{'mass'} + $monolink_mass;
+#                     if ($fragment !~ /[-]/) {
+#                         @monolink_masses = split(",", $mono_mass_diff);
+# 
+#                         #  		  push @monolink_masses, 0;
+#                     } else {
+#                         @monolink_masses = ('0');
+#                     }
+# 
+#                      foreach my $monolink_mass (@monolink_masses) {
+#                         $mass = $peptide->{'mass'} + $monolink_mass;
 
                      #                     if ( $modifications{$modification}{Name} eq "mono link" ) {
                      #                         $rxn_residues = ( $rxn_residues - ( 2 * @{ [ $fragment =~ /[-]/g ] } ) );
@@ -975,7 +974,7 @@ sub matchpeaks {
                             }
 
                         }
-                    }
+#                     }
                 }
             }
         }

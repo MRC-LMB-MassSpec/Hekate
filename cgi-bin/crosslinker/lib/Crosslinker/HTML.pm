@@ -85,8 +85,8 @@ sub generate_page {
             add_peptide($results_dbh, $results_table, $fragment, $count, 1, 0, ' ', 0, 0);
         }
 
-        %fragment_source             = ((map { $_ => $count } @fragments),             %fragment_source);
-        %fragment_source_linear_only = ((map { $_ => $count } @fragments_linear_only), %fragment_source_linear_only);
+#         %fragment_source             = ((map { $_ => $count } @fragments),             %fragment_source);
+#         %fragment_source_linear_only = ((map { $_ => $count } @fragments_linear_only), %fragment_source_linear_only);
         $count++;
     }
 
@@ -109,6 +109,8 @@ sub generate_page {
     $results_dbh->commit;
     $results_dbh->disconnect;
     ($results_dbh) = connect_db_results($results_table);
+
+    generate_monolink_peptides($results_dbh,  $results_table,   $reactive_site, $mono_mass_diff);
 
     warn "Run $results_table: Finding doublets...  \n";
     my @peaklist = loaddoubletlist_db(

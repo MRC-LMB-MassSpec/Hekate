@@ -9,8 +9,38 @@ our @EXPORT = (
                'modifications',      'residue_position',
                'digest_proteins',    'digest_proteins_masses',
                'crosslink_peptides', 'calculate_peptide_masses',
-               'calculate_crosslink_peptides'
+               'calculate_crosslink_peptides',
+	       'generate_monolink_peptides'
 );
+
+sub generate_monolink_peptides {
+
+my ($results_dbh,  $results_table,   $reactive_site, $mono_mass_diff) = @_;
+my @monolink_masses = split(",", $mono_mass_diff);
+
+
+    my $monolinks = $results_dbh->prepare("
+	  INSERT INTO peptides
+	  SELECT 
+		 results_table,
+		 sequence,
+ 		 source,
+		 linear_only,
+		 mass + ? as mass, 
+		 '' as modifications,
+		 ? as monolink,
+		 0 as xlink
+		 FROM peptides
+ 			  WHERE sequence LIKE '%K%'and xlink = 0 and monolink = 0;
+    ");
+
+  foreach my $monolink_mass (@monolink_masses) {
+      $monolinks->execute($monolink_mass, $monolink_mass);
+  }
+
+
+return;
+}
 
 sub modifications {
 
