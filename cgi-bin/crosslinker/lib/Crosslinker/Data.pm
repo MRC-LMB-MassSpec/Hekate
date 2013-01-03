@@ -777,7 +777,7 @@ sub matchpeaks {
 						      )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
     );
 
-    my $peptides = $results_dbh->prepare("select * from peptides where results_table = ? AND (xlink = 1 or monolink <> 0) and (mass / ?)  between ? and ?");
+    my $peptides = $results_dbh->prepare("select * from peptides where results_table = ? AND (xlink = 1 or monolink <> 0) and mass between ? and ?");
 
 #######
     #
@@ -809,7 +809,7 @@ sub matchpeaks {
         $d2_MSn_string = $peak->{'d2_MSn_string'};
 
 
-        $peptides->execute($results_table, $peak->{charge} ,  ($peak->{monoisotopic_mw} / $peak->{charge}) / $max_delta, ($peak->{monoisotopic_mw} / $peak->{charge}) * $max_delta);
+        $peptides->execute( $results_table,  $peak->{monoisotopic_mw} / $max_delta , $peak->{monoisotopic_mw} *$max_delta );
 
         while (my $peptide = $peptides->fetchrow_hashref) {
             my $fragment = $peptide->{'sequence'};
