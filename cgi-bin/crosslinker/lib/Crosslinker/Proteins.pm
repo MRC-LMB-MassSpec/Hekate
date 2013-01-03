@@ -10,13 +10,72 @@ our @EXPORT = (
                'digest_proteins',    'digest_proteins_masses',
                'crosslink_peptides', 'calculate_peptide_masses',
                'calculate_crosslink_peptides',
-	       'generate_monolink_peptides'
+	       'generate_monolink_peptides', 'generate_modified_peptides'
 );
 
+sub generate_modified_peptides {
+
+my ($results_dbh,  $results_table, $modifications_ref ) = @_;
+  my %modifications       = %{$modifications_ref};
+
+
+
+    my $modify = $results_dbh->prepare("
+	  INSERT INTO peptides
+	  SELECT 
+		 results_table,
+		 sequence,
+ 		 source,
+		 linear_only,
+		 mass + ? as mass, 
+		 ? as modifications,
+		 monolink,
+		 xlink,
+		 ? as no_of_mods
+		 FROM peptides
+ 			  WHERE sequence LIKE ? and modifications = ''  ;
+    ");
+
+    my $monolinks = $results_dbh->prepare("
+	  INSERT INTO peptides
+	  SELECT 
+		 results_table,
+		 sequence,
+ 		 source,
+		 linear_only,
+		 mass + ? as mass, 
+		 ? as modifications,
+		 monolink,
+		 xlink,
+		 ? as no_of_mods
+		 FROM peptides
+ 			  WHERE  sequence LIKE ? and xlink = 0 and monolink > 0 and modifications = '' ;
+    ");
+
+
+
+foreach my $modification (sort(keys %modifications)) {
+
+
+                if (   !($modifications{$modification}{Name} eq "loop link" )
+                    && !($modifications{$modification}{Name} eq "mono link" ) 
+		    && !($modifications{$modification}{Name} eq " ")
+                  ) 
+                {
+		    $modify->execute($modifications{$modification}{Delta},$modification, 1, "%".$modifications{$modification}{Location}."%") 
+		} elsif ($modifications{$modification}{Name} eq "loop link" ) {
+		      $monolinks->execute($modifications{$modification}{Delta},$modification, 1, "%".$modifications{$modification}{Location}."%")
+		}
+}
+
+
+
+}
 sub generate_monolink_peptides {
 
 my ($results_dbh,  $results_table,   $reactive_site, $mono_mass_diff) = @_;
 my @monolink_masses = split(",", $mono_mass_diff);
+
 
 
     my $monolinks = $results_dbh->prepare("
@@ -29,13 +88,14 @@ my @monolink_masses = split(",", $mono_mass_diff);
 		 mass + ? as mass, 
 		 '' as modifications,
 		 ? as monolink,
-		 0 as xlink
+		 0 as xlink,
+		 0 as no_of_mods
 		 FROM peptides
- 			  WHERE sequence LIKE '%K%'and xlink = 0 and monolink = 0;
+ 			  WHERE sequence LIKE ? and xlink = 0 and monolink = 0 and results_table = ?;
     ");
 
   foreach my $monolink_mass (@monolink_masses) {
-      $monolinks->execute($monolink_mass, $monolink_mass);
+      $monolinks->execute($monolink_mass, $monolink_mass, "%".$reactive_site."%", $results_table);
   }
 
 
@@ -347,28 +407,19 @@ sub calculate_crosslink_peptides {
 		 p1.mass + p2.mass as mass, 
 		 '' as modifications,
 		 0 as monolink,
-		 1 as xlink
+		 1 as xlink,
+		 0 as no_of_mods
 	
 			  FROM peptides p1 inner join peptides p2 on (p1.results_table = p2.results_table)
- 			  WHERE p1.linear_only = '0' AND p2.linear_only = '0' AND p1.sequence LIKE '%K%' AND p2.sequence LIKE '%K%'
+ 			  WHERE p1.linear_only = '0' AND p2.linear_only = '0' AND p1.sequence LIKE ? AND p2.sequence LIKE ?
 			  AND p1.rowid >= p2.rowid
     ");
 
     my $index = $results_dbh->prepare("CREATE INDEX peptide_index ON peptides (sequence);");
     $index->execute();
 
-    my $insert_xlink = $results_dbh->prepare(
-        "INSERT INTO peptides ( 		    results_table,
-					    sequence,
-					    source,
-					    linear_only,
-					    mass,
-					    modifcations,
-					    monolink,
-					    xlink) VALUES (?,?,?,1,?,'',0,1)"
-    );
 
-    $peptidelist->execute();
+    $peptidelist->execute("%".$reactive_site."%","%".$reactive_site."%");
 
     my $correct_xlink_mass =
       $results_dbh->prepare("UPDATE peptides SET mass = mass + ? WHERE  xlink = 1 and results_table = ?;");

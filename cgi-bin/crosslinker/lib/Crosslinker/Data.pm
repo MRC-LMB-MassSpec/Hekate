@@ -857,44 +857,32 @@ sub matchpeaks {
 
             my $fragment = $peptide->{'sequence'};
 
-            foreach my $modification (sort(keys %modifications)) {
+#             foreach my $modification (sort(keys %modifications)) {
+	        
+		my $modification;
+	        if (defined $peptide->{'modifications'} && $peptide->{'modifications'} ne '')
+		      { $modification = $peptide->{'modifications'}}
+		else {  $modification = 'NoMod'}
                 my $location = $modifications{$modification}{Location};
                 my $rxn_residues = @{ [ $fragment =~ /$location/g ] };
 
-                if (   !($modifications{$modification}{Name} eq "loop link" && $fragment =~ /[-]/)
-                    && !($modifications{$modification}{Name} eq "mono link")
-                  ) #crosslink and loop link on the same peptide is a messy option,certainly shouldn't give a mass doublet, so remove them
-                {
+#                 if (   !($modifications{$modification}{Name} eq "loop link" && $fragment =~ /[-]/) #REMOVE THIS?
+#                     && !($modifications{$modification}{Name} eq "mono link")
+#                   ) #crosslink and loop link on the same peptide is a messy option,certainly shouldn't give a mass doublet, so remove them
+#                 {
                     my $monolink_mass = $peptide->{'monolink'};
                     my $mass = $peptide->{'mass'};
-#                     if ($fragment !~ /[-]/) {
-#                         @monolink_masses = split(",", $mono_mass_diff);
-# 
-#                         #  		  push @monolink_masses, 0;
-#                     } else {
-#                         @monolink_masses = ('0');
-#                     }
-# 
-#                      foreach my $monolink_mass (@monolink_masses) {
-#                         $mass = $peptide->{'mass'} + $monolink_mass;
 
-                     #                     if ( $modifications{$modification}{Name} eq "mono link" ) {
-                     #                         $rxn_residues = ( $rxn_residues - ( 2 * @{ [ $fragment =~ /[-]/g ] } ) );
-                     #                     }
-
-                        if ($modifications{$modification}{Name} eq "loop link") {
-                            $rxn_residues = ($rxn_residues - (2 * @{ [ $fragment =~ /[-]/g ] })) / 2;
-                        }
-                        for (my $n = 1 ; $n <= $rxn_residues ; $n++) {
+#                         for (my $n = 1 ; $n <= $rxn_residues ; $n++) {
 
                             if (
                                 (
                                  $peak->{monoisotopic_mw} / $peak->{charge} <
-                                 (($mass + ($modifications{$modification}{Delta} * $n)) / $peak->{charge}) * $max_delta
+                                 ($mass / $peak->{charge}) * $max_delta
                                 ) #Divide by charge to give PPM of detected species otherwise we are 4 times more stick on 4+ m/z
                                 && ($peak->{monoisotopic_mw} /
                                     $peak->{charge} >
-                                    (($mass + ($modifications{$modification}{Delta} * $n)) / $peak->{charge}) /
+                                    ($mass / $peak->{charge}) /
                                     $max_delta)
                               )
                             {
@@ -902,7 +890,7 @@ sub matchpeaks {
                                              abs(
                                                  (
                                                   $peak->{monoisotopic_mw} -
-                                                    ($mass + ($modifications{$modification}{Delta} * $n))
+                                                    ($mass)
                                                  )
                                              )
                                 ) / ($mass) * 1000000;
@@ -919,6 +907,8 @@ sub matchpeaks {
                                             $abundance_ratio = $peak->{'abundance'} / $peak->{'d2_abundance'};
                                         }
                                     }
+
+				    my $n = $peptide->{'no_of_mods'};
 
                                     my (
                                         $ms2_score,          $modified_fragment,    $best_x,
@@ -973,10 +963,9 @@ sub matchpeaks {
 
                             }
 
-                        }
-#                     }
-                }
-            }
+#                         }
+#                 }
+#             }
         }
     }
 
@@ -1299,9 +1288,10 @@ sub create_peptide_table {
 					    source,
 					    linear_only number,
 					    mass float,
-					    modifcations,
+					    modifications,
 					    monolink number,
-					    xlink number) "
+					    xlink number,
+					    no_of_mods number) "
         );
     };
 
@@ -1312,7 +1302,7 @@ sub add_peptide {
     my ($dbh, $table, $sequence, $source, $linear_only, $mass, $modifications, $monolink, $xlink) = @_;
 
     my $newline = $dbh->prepare(
-"INSERT INTO peptides (results_table, sequence, source, linear_only, mass, modifcations, monolink, xlink) VALUES (?,?,?,?,?,?,?,?)"
+"INSERT INTO peptides (results_table, sequence, source, linear_only, mass, modifications, monolink, xlink, no_of_mods) VALUES (?,?,?,?,?,?,?,?, 0)"
     );
 
     _retry 15,

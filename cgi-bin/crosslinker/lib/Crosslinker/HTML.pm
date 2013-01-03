@@ -78,11 +78,11 @@ sub generate_page {
         foreach $fragment (@fragments)
 
         {
-            add_peptide($results_dbh, $results_table, $fragment, $count, 0, 0, ' ', 0, 0);
+            add_peptide($results_dbh, $results_table, $fragment, $count, 0, 0, '', 0, 0);
         }    #$table, $sequence, $source, $linear_only, $mass, $modifications, $monolink, $xlink
 
         foreach $fragment (@fragments_linear_only) {
-            add_peptide($results_dbh, $results_table, $fragment, $count, 1, 0, ' ', 0, 0);
+            add_peptide($results_dbh, $results_table, $fragment, $count, 1, 0, '', 0, 0);
         }
 
 #         %fragment_source             = ((map { $_ => $count } @fragments),             %fragment_source);
@@ -111,6 +111,7 @@ sub generate_page {
     ($results_dbh) = connect_db_results($results_table);
 
     generate_monolink_peptides($results_dbh,  $results_table,   $reactive_site, $mono_mass_diff);
+    generate_modified_peptides($results_dbh,  $results_table,   \%modifications);
 
     warn "Run $results_table: Finding doublets...  \n";
     my @peaklist = loaddoubletlist_db(
