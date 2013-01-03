@@ -777,7 +777,7 @@ sub matchpeaks {
 						      )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
     );
 
-    my $peptides = $results_dbh->prepare("select * from peptides where results_table = ? AND xlink = 1 or monolink <> 0");
+    my $peptides = $results_dbh->prepare("select * from peptides where results_table = ? AND (xlink = 1 or monolink <> 0) and (mass / ?)  between ? and ?");
 
 #######
     #
@@ -805,87 +805,37 @@ sub matchpeaks {
         my $MSn_string    = "";
         my $d2_MSn_string = "";
         my $round         = sprintf("%.5f", $peak->{'mz'});
-
-        #  if ($peak->{'MSn_string'} eq "")
-        # 		      {
-        # 		      my $round = sprintf ("%.5f", $peak->{'mz'});
-        # 		      $ms2->execute($round, $round, $peak->{'scan_num'}, $peak->{'scan_num'} , $peak->{'fraction'});
-        # 		      my $results = $ms2->fetchrow_hashref;
-        # 		      $MSn_string =$results->{'MSn_string'};
-        # 		     }
-        # 		  else
-        # 		    {
         $MSn_string = $peak->{'MSn_string'};
-
-        # 		    }
-        # 		  if ($peak->{'d2_MSn_string'} eq "")
-        # 		    {
-        # 		      my $round = sprintf ("%.5f", $peak->{'d2_mz'});
-        # 		      $ms2->execute($round,$round, $peak->{'scan_num'}, $peak->{'scan_num'} , $peak->{'fraction'});
-        # 		      my $results = $ms2->fetchrow_hashref;
-        # 		      $d2_MSn_string =$results->{'MSn_string'};
-        # 		     }
-        # 		  else
-        # 		    {
         $d2_MSn_string = $peak->{'d2_MSn_string'};
 
-        # 		    }
 
-        # 	 print_xquest_link(
-        # 				$MSn_string,
-        # 				$d2_MSn_string,
-        # 				$peak->{'mz'},
-        # 				$peak->{'charge'},
-        # 				$protien_sequences,
-        # 				$query->param('seperation'),
-        # 				$query->param('isotope'),
-        # 				$mass_of_deuterium,
-        # 				$mass_of_hydrogen,
-        # 				$mass_of_carbon13,
-        # 				$mass_of_carbon12,
-        # 				$cut_residues,
-        # 				$query->param('xlinker_mass'),
-        # 				$query->param('mono_mass_diff'),
-        # 				$query->param('reactive_site'),
-        # 				$query->param('user_protein_sequence'));
-
-        $peptides->execute($results_table);
+        $peptides->execute($results_table, $peak->{charge} ,  ($peak->{monoisotopic_mw} / $peak->{charge}) / $max_delta, ($peak->{monoisotopic_mw} / $peak->{charge}) * $max_delta);
 
         while (my $peptide = $peptides->fetchrow_hashref) {
-
-            #       foreach my $fragment ( sort( keys %fragment_masses ) ) {
-
             my $fragment = $peptide->{'sequence'};
 
-#             foreach my $modification (sort(keys %modifications)) {
-	        
 		my $modification;
 	        if (defined $peptide->{'modifications'} && $peptide->{'modifications'} ne '')
 		      { $modification = $peptide->{'modifications'}}
 		else {  $modification = 'NoMod'}
+
                 my $location = $modifications{$modification}{Location};
                 my $rxn_residues = @{ [ $fragment =~ /$location/g ] };
 
-#                 if (   !($modifications{$modification}{Name} eq "loop link" && $fragment =~ /[-]/) #REMOVE THIS?
-#                     && !($modifications{$modification}{Name} eq "mono link")
-#                   ) #crosslink and loop link on the same peptide is a messy option,certainly shouldn't give a mass doublet, so remove them
-#                 {
                     my $monolink_mass = $peptide->{'monolink'};
                     my $mass = $peptide->{'mass'};
 
-#                         for (my $n = 1 ; $n <= $rxn_residues ; $n++) {
-
-                            if (
-                                (
-                                 $peak->{monoisotopic_mw} / $peak->{charge} <
-                                 ($mass / $peak->{charge}) * $max_delta
-                                ) #Divide by charge to give PPM of detected species otherwise we are 4 times more stick on 4+ m/z
-                                && ($peak->{monoisotopic_mw} /
-                                    $peak->{charge} >
-                                    ($mass / $peak->{charge}) /
-                                    $max_delta)
-                              )
-                            {
+#                             if (
+#                                 (
+#                                  $peak->{monoisotopic_mw} / $peak->{charge} <
+#                                  ($mass / $peak->{charge}) * $max_delta
+#                                 ) #Divide by charge to give PPM of detected species otherwise we are 4 times more stick on 4+ m/z
+#                                 && ($peak->{monoisotopic_mw} /
+#                                     $peak->{charge} >
+#                                     ($mass / $peak->{charge}) /
+#                                     $max_delta)
+#                               )
+#                             {
                                 my $score = (
                                              abs(
                                                  (
@@ -961,11 +911,8 @@ sub matchpeaks {
 # 		       $results_sql->execute($d2_MSn_string,$d2_MSn_string,$peak->{'d2_mz'},$peak->{'d2_charge'},$d2_modified_fragment, @sequences[(substr($fragment_sources{$fragment},0,1)-1)],@sequences[(substr($fragment_sources{$fragment},-1,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},0,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},-1,1)-1)],$d2_ms2_score, $peak->{'fraction'},"d2_".$peak->{'scan_num'},"d2_".$peak->{'d2_scan_num'}, $modification,$n,$d2_best_x,$d2_best_y,$fragment, $d2_score, $d2_top_10);
                                 };
 
-                            }
+                            
 
-#                         }
-#                 }
-#             }
         }
     }
 
