@@ -19,7 +19,7 @@ my ($results_dbh,  $results_table, $modifications_ref ) = @_;
   my %modifications       = %{$modifications_ref};
 
 
-
+    
     my $modify = $results_dbh->prepare("
 	  INSERT INTO peptides
 	  SELECT 
@@ -33,8 +33,10 @@ my ($results_dbh,  $results_table, $modifications_ref ) = @_;
 		 xlink,
 		 ? as no_of_mods
 		 FROM peptides
- 			  WHERE sequence LIKE ? and modifications = ''  ;
+ 			  WHERE modifications = '' and  (LENGTH(sequence) - LENGTH(REPLACE(sequence, ?, ''))) >= (? + 0)
     ");
+
+#  and (LENGTH(sequence) - LENGTH(REPLACE(sequence, ?, ''))) >= ? ;
 
     my $monolinks = $results_dbh->prepare("
 	  INSERT INTO peptides
@@ -62,9 +64,12 @@ foreach my $modification (sort(keys %modifications)) {
 		    && !($modifications{$modification}{Name} eq " ")
                   ) 
                 {
-		    $modify->execute($modifications{$modification}{Delta},$modification, 1, "%".$modifications{$modification}{Location}."%") 
+		    for (my $n = 1; $n <= 2; $n++) {
+		    warn  "Modification:" . $modification;
+		    warn $modify->execute($modifications{$modification}{Delta}*$n,$modification, $n, $modifications{$modification}{Location}, $n+0)
+		    }
 		} elsif ($modifications{$modification}{Name} eq "loop link" ) {
-		      $monolinks->execute($modifications{$modification}{Delta},$modification, 1, "%".$modifications{$modification}{Location}."%")
+		    warn  $monolinks->execute($modifications{$modification}{Delta},$modification, 1, "%".$modifications{$modification}{Location}."%")
 		}
 }
 
@@ -419,7 +424,7 @@ sub calculate_crosslink_peptides {
     $index->execute();
 
 
-    $peptidelist->execute("%".$reactive_site."%","%".$reactive_site."%");
+    $peptidelist->execute("%".$reactive_site."_%","%".$reactive_site."_%");
 
     my $correct_xlink_mass =
       $results_dbh->prepare("UPDATE peptides SET mass = mass + ? WHERE  xlink = 1 and results_table = ?;");
