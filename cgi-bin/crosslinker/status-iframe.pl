@@ -41,7 +41,7 @@ else {
     $state = $table_name->{'finished'} * 100 . "%";
 }
 
-if ($table_name->{'finished'} > -1) {
+if ($table_name->{'finished'} > -1 || $table_name->{'finished'} > -6 ) {
     print "Refresh: 30\n";
 } elsif ($table_name->{'finished'} != -1 && $table_name->{'finished'} != -4 && $table_name->{'finished'} != -5) {
     print "Refresh: 600\n";

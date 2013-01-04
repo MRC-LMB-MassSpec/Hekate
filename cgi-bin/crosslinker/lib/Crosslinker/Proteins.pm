@@ -64,7 +64,7 @@ foreach my $modification (sort(keys %modifications)) {
 		    && !($modifications{$modification}{Name} eq " ")
                   ) 
                 {
-		    for (my $n = 1; $n <= 2; $n++) {
+		    for (my $n = 1; $n <= 3; $n++) {
 		    warn  "Modification:" . $modification;
 		    warn $modify->execute($modifications{$modification}{Delta}*$n,$modification, $n, $modifications{$modification}{Location}, $n+0)
 		    }
