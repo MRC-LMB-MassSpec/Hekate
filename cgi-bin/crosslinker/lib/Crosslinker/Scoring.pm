@@ -75,12 +75,13 @@ sub calc_score {
         $modifications_ref,       $no_of_mods,      $modification,          $mass_of_hydrogen,
         $xlinker_mass,            $monolink_mass,   $seperation,            $reactive_site,
         $parent_charge,           $ms2_error,       $ms2_fragmentation_ref, $threshold,
-        $no_xlink_at_cut_site,    $abundance_ratio, $fast_mode
+        $no_xlink_at_cut_site,    $abundance_ratio, $fast_mode,		    $amber_codon,
     ) = @_;
     my %residuemass       = %{$protein_residuemass_ref};
     my $data              = $MSn_string;
     my $data2             = $d2_MSn_string;
     my %ms2_fragmentation = %{$ms2_fragmentation_ref};
+    if (!defined $amber_codon) {$amber_codon = 0};
 
     # my $sequence  = $sequence;
     my $xlink = $xlinker_mass;
@@ -106,6 +107,11 @@ sub calc_score {
     my $xlink_res = $reactive_site;
     my @xlink_pos;
     my $best_match = 0;
+
+    if ($amber_codon == 1)  {
+	      $xlink_res = 'Z';
+	      $residuemass{'Z'} = $monolink_mass;
+	      }
 
 ######
     #
@@ -279,6 +285,8 @@ sub calc_score {
         #
 ######
         my @peptides = split /-/, $sequence;
+
+	if ($amber_codon == 0) {
         for (my $i = 0 ; $i < $#peptides + 1 ; $i++) {
             my $peptide = $peptides[$i];
             my @residues = split //, $peptide;
@@ -291,7 +299,23 @@ sub calc_score {
                 }
             }
             $xlink_pos[$i] = [@tmp];
-        }
+        }}
+	else {
+	  for (my $i = 0 ; $i < $#peptides + 1 ; $i++) {
+            my $peptide = $peptides[$i];
+            my @residues = split //, $peptide;
+            my @tmp;
+	    if ($i == 0) {
+            for (my $n = 0 ; $n < @residues - $no_xlink_at_cut_site ; $n++) {
+                    push @tmp, $n
+            }
+	    } else {
+            for (my $n = 0 ; $n < @residues - $no_xlink_at_cut_site ; $n++) {
+                if ($residues[$n] eq $xlink_res) {
+                    push @tmp, $n; }}
+	    }
+            $xlink_pos[$i] = [@tmp];
+	}}
 
         if ($sequence !~ /-/) { $xlink_pos[1] = [ (0) ] }
         ;    #Make sure monolinks actually search for position if $xlink_pos[1] was empty it would never loop.

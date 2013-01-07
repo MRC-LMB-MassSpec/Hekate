@@ -38,7 +38,7 @@ my $settings_dbh = DBI->connect("dbi:SQLite:dbname=db/settings", "", "", { Raise
 my $settings_sql = $settings_dbh->prepare("SELECT name FROM settings WHERE name = ?");
 $settings_sql->execute($table);
 my @data = $settings_sql->fetchrow_array();
-if (@data[0] != $table) {
+if ($data[0] != $table) {
     print "Content-Type: text/plain\n\n";
     print "Cannont find results database";
     exit;
@@ -178,23 +178,23 @@ sub print_results_paper {
                 print "<td>";
 
                 if ($flip_order == 0) {
-                    print residue_position ($unmodified_fragments[0], $protien_sequences) +
+                    print residue_position ($unmodified_fragments[0], $top_hits_results->{'sequence1'}) +
                       $top_hits_results->{'best_x'} + 1 +
                       $error{ substr($top_hits_results->{'sequence1_name'}, 1) };
                     print "</td><td>";   
-                    print residue_position ($unmodified_fragments[1], $protien_sequences) +
+                    print residue_position ($unmodified_fragments[1], $top_hits_results->{'sequence2'}) +
                       $top_hits_results->{'best_y'} + 1 +
                       $error{ substr($top_hits_results->{'sequence2_name'}, 1) };
                     print "</td>";
                     print "<td>$unmodified_fragments[0]&#8209;$unmodified_fragments[1]</td>";
                 } else {
-                    print residue_position ($unmodified_fragments[1], $protien_sequences) +
+                    print residue_position ($unmodified_fragments[1], $top_hits_results->{'sequence1'}) +
                       $top_hits_results->{'best_y'} + 1 +
                       $error{ substr($top_hits_results->{'sequence2_name'}, 1) };
                     print "</td><td>"; 
-                    print residue_position ($unmodified_fragments[0], $protien_sequences) +
+                    print residue_position ($unmodified_fragments[0], $top_hits_results->{'sequence2'}) +
                       $top_hits_results->{'best_x'} + 1 +
-                      $error{ substr($top_hits_results->{'sequence1_name'}, 1) }; .
+                      $error{ substr($top_hits_results->{'sequence1_name'}, 1) }; 
                     print "</td>";;
                     print "<td>$unmodified_fragments[1]&#8209;$unmodified_fragments[0]</td>";
                 }
@@ -334,6 +334,7 @@ while ((my $sequences_results = $sequences->fetchrow_hashref)) {
       . '"/></td></tr>';
 }
 $settings->finish();
+$settings_sql->finish();
 $settings_dbh->disconnect();
 
 print '<tr><td colspan="3"><input type="submit" value="Submit" /></td></tr></table></from>';

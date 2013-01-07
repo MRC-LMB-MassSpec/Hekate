@@ -136,6 +136,24 @@ value="4"/>
     Reactive amino acid: <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/><br/>
 </td>
 </tr>
+</tr>
+    <tr><td style="background: white;">Amber Codon Mode:  <input type="checkbox" name="amber_codon"   value="1"/>Enabled?</td>
+      <td style="background: white;"></td>
+      </tr>
+    <tr>
+  <td class="half"  >
+      Mass change on crosslinking: <input type="text" name="amber_xlink" size="10" maxlength="10" value="0"/>Da<br/>
+      Atoms on  <select
+name="amber_isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select>
+ 
+in heavy form: <input type="text" 
+name="amber_seperation" size="2" maxlength="5" 
+value="11"/> 
+</td><td>
+    Amino acid residue mass: <input type="text" name="amber_residue_mass" size="10" maxlength="21" value="251.0946254"/>Da<br/>
+    Amber codon (Z) peptide sequence: <input type="text" name="amber_peptide" size="10" maxlength="20" value="FZPVINKPAK"/><br/>
+</td>
+</tr>
 <tr>
   <td class="half"  style="background: white;">
     Fragment Ions (Label):

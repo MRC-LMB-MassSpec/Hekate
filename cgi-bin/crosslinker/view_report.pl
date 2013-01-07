@@ -37,7 +37,7 @@ my $settings_dbh = DBI->connect("dbi:SQLite:dbname=db/settings", "", "", { Raise
 my $settings_sql = $settings_dbh->prepare("SELECT name FROM settings WHERE name = ?");
 $settings_sql->execute($table);
 my @data = $settings_sql->fetchrow_array();
-if (@data[0] != $table) {
+if ($data[0] != $table) {
     print "Content-Type: text/plain\n\n";
     print "Cannont find results database";
     exit;
@@ -59,6 +59,7 @@ my (
     $threshold,    $doublets_found, $match_charge, $match_intensity,   $scored_ions
 ) = $settings->fetchrow_array;
 $settings->finish();
+$settings_sql->finish();
 $settings_dbh->disconnect();
 
 ########################

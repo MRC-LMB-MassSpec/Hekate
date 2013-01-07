@@ -602,9 +602,9 @@ sub print_results {
                 if ($no_links == 0) {
                     print "<a href='view_peptide.pl?table=$table&peptide=$fragments[0]-$fragments[1]'>";
                 }
-                print residue_position $unmodified_fragments[0], $protien_sequences;
+                print residue_position $unmodified_fragments[0], $top_hits_results->{'sequence1'};
                 print ".", $fragments[0], "&#8209;";
-                print residue_position $unmodified_fragments[1], $protien_sequences;
+                print residue_position $unmodified_fragments[1], $top_hits_results->{'sequence2'};
                 print ".", $fragments[1] . "</td><td>", $top_hits_results->{'best_x'} + 1, "&#8209;",
                   $top_hits_results->{'best_y'} + 1;
                 if ($no_links == 0) { print "</a>" }
@@ -656,7 +656,7 @@ sub print_results {
 "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>$top_hits_results->{'scan'}</a>";
                 }
             }
-            if ($top_hits_results->{'precursor_scan'} ne '') {
+            if (defined $top_hits_results->{'precursor_scan'} && $top_hits_results->{'precursor_scan'} ne '') {
                 print "<br/>(";
                 print
 "<a  href='view_precursor.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'precursor_scan'}&mass=$top_hits_results->{'mz'}'  class='screenshot'  rel='view_precursor_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'precursor_scan'}&mass=$top_hits_results->{'mz'}'>";
@@ -903,9 +903,9 @@ sub print_report {
             if ($top_hits_results->{'fragment'} =~ '-') {
                 $printed_hits = $printed_hits + 1;
                 print "Sequence: <a href='view_peptide.pl?table=$table&peptide=$fragments[0]-$fragments[1]'>";
-                print residue_position $unmodified_fragments[0], $protien_sequences;
+                print residue_position $unmodified_fragments[0], $top_hits_results->{'sequence1'};
                 print ".", $fragments[0], "&#8209;";
-                print residue_position $unmodified_fragments[1], $protien_sequences;
+                print residue_position $unmodified_fragments[1], $top_hits_results->{'sequence2'};
                 print ".", $fragments[1] . "</a><br/>Cross link position: ", $top_hits_results->{'best_x'} + 1, "-",
                   $top_hits_results->{'best_y'} + 1, "</br>";
             } else {

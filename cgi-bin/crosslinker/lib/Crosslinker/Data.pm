@@ -162,6 +162,7 @@ sub create_settings {
 						      charge_match,
 						      intensity_match,
 						      scored_ions,
+						      amber,
 						      time
 						) "
         );
@@ -317,8 +318,10 @@ sub save_settings {
         $settings_dbh, $cut_residues,    $protien_sequences, $reactive_site,  $mono_mass_diff,
         $xlinker_mass, $state,           $desc,              $decoy,          $ms2_da,
         $ms1_ppm,      $mass_seperation, $dynamic_mods_ref,  $fixed_mods_ref, $threshold,
-        $match_charge, $match_intensity, $scored_ions
+        $match_charge, $match_intensity, $scored_ions, $amber_codon
     ) = @_;
+
+    if (!defined $amber_codon) {$amber_codon = 0;};
 
     create_settings($settings_dbh);
 
@@ -340,8 +343,9 @@ sub save_settings {
 						      charge_match,
 						      intensity_match,
 						      scored_ions,
+						      amber,
 						      time
-						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?)"
+						 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
     );
 
     if   ($match_charge == '1') { $match_charge = 'Yes' }
@@ -354,7 +358,8 @@ sub save_settings {
                                $desc,           $cut_residues,    $protien_sequences, $reactive_site,
                                $mono_mass_diff, $xlinker_mass,    $decoy,             $ms2_da,
                                $ms1_ppm,        $state,           $mass_seperation,   $threshold,
-                               $match_charge,   $match_intensity, $scored_ions,       time
+                               $match_charge,   $match_intensity, $scored_ions,       $amber_codon,
+				time
         );
     };
 
@@ -509,11 +514,32 @@ sub import_cgi_query {
     my @dynamic_mods = $query->param('dynamic_mod');
     my @fixed_mods   = $query->param('fixed_mod');
 
-    my $mono_mass_diff       = $query->param('mono_mass_diff');
-    my $xlinker_mass         = $query->param('xlinker_mass');
-    my $reactive_site        = $query->param('reactive_site');
-    my $isotope              = $query->param("isotope");
-    my $linkspacing          = $query->param('seperation');
+    my $mono_mass_diff;
+    my $xlinker_mass;
+    my $reactive_site;
+    my $isotope;
+    my $amber_codon;
+    my $linkspacing;
+
+    if (!defined $query->param('amber_codon'))
+    {
+      $mono_mass_diff       = $query->param('mono_mass_diff');
+      $xlinker_mass         = $query->param('xlinker_mass');
+      $reactive_site        = $query->param('reactive_site');
+      $isotope              = $query->param("isotope");
+      $linkspacing          = $query->param('seperation');
+      $amber_codon = 0;
+    } else {
+      $mono_mass_diff       = $query->param('amber_residue_mass');
+      $xlinker_mass         = $query->param('amber_xlink');
+      $reactive_site        = $query->param('amber_peptide');
+      $isotope              = $query->param("amber_isotope");
+      $linkspacing          = $query->param('amber_seperation');
+      $amber_codon =1;
+    }
+
+
+
     my $doublet_tolerance    = $query->param("ms_ppm");
     my $threshold            = $query->param('threshold');
     my $match_charge         = 0;
@@ -613,7 +639,7 @@ sub import_cgi_query {
             $mono_mass_diff,      $xlinker_mass,    \@dynamic_mods,     \@fixed_mods,
             \%ms2_fragmentation,  $threshold,       $n_or_c,            $scan_width,
             $match_charge,        $match_intensity, $scored_ions,       $no_xlink_at_cut_site,
-            $ms1_intensity_ratio, $fast_mode,       $doublet_tolerance, $upload_format
+            $ms1_intensity_ratio, $fast_mode,       $doublet_tolerance, $upload_format, $amber_codon
     );
 }
 
@@ -697,7 +723,7 @@ sub matchpeaks {
         $nocut_residues,       $sequence_names_ref,      $mono_mass_diff,        $xlinker_mass,
         $linkspacing,          $isotope,                 $reactive_site,         $modifications_ref,
         $ms2_error,            $protein_residuemass_ref, $ms2_fragmentation_ref, $threshold,
-        $no_xlink_at_cut_site, $fast_mode
+        $no_xlink_at_cut_site, $fast_mode,		 $amber_codon
     ) = @_;
 
     #    my %fragment_masses     = %{$fragment_masses_ref};
@@ -708,11 +734,13 @@ sub matchpeaks {
     my @sequences           = split('>', $protien_sequences);
     my @sequence_names      = @{$sequence_names_ref};
     my $max_delta           = 1 + ($match_ppm / 1000000);
+    if (!defined $amber_codon) {$amber_codon = 0};
     my $TIC;
     my %fragment_score;
     my @peaklist = @{$peaklist_ref};
     my $xlinker;
     my $codensation;
+    my $amber_peptide = $reactive_site;
 
     my $seperation = 0;
     if ($isotope eq "deuterium") {
@@ -823,6 +851,9 @@ sub matchpeaks {
                 my $rxn_residues = @{ [ $fragment =~ /$location/g ] };
 
                     my $monolink_mass = $peptide->{'monolink'};
+		    if ($amber_codon == 1) {
+			$monolink_mass = $mono_mass_diff;
+		    }
                     my $mass = $peptide->{'mass'};
 
 #                             if (
@@ -875,7 +906,7 @@ sub matchpeaks {
                                                    $monolink_mass,        $seperation,           $reactive_site,
                                                    $peak->{'charge'},     $ms2_error,            \%ms2_fragmentation,
                                                    $threshold,            $no_xlink_at_cut_site, $abundance_ratio,
-                                                   $fast_mode
+                                                   $fast_mode,		  $amber_codon
                                       );
 
 # 		       my ($d2_ms2_score,$d2_modified_fragment,$d2_best_x,$d2_best_y, $d2_top_10) = calc_score($d2_MSn_string,$d2_MSn_string,$fragment, \%modifications, $n,$modification, $mass_of_hydrogen,$xlinker_mass+$seperation,$mono_mass_diff,  $seperation, $reactive_site,$peak->{'charge'}, $best_x, $best_y);
@@ -885,6 +916,8 @@ sub matchpeaks {
                                     if ($fragment !~ m/[-]/) {
                                         $fragment2_source = "0";
                                     }
+
+				    if ($amber_codon == 0) {
                                     _retry 15, sub {
                                         $results_sql->execute(
                                                  $results_table,                     $MSn_string,
@@ -905,8 +938,31 @@ sub matchpeaks {
                                                  $monolink_mass,                     $best_alpha,
                                                  $best_beta,                         $time,
                                                  $peak->{'precursor_scan'}
+                                        );};
+                                    } else {
+				    _retry 15, sub {
+                                        $results_sql->execute(
+                                                 $results_table,                     $MSn_string,
+                                                 $d2_MSn_string,                     $peak->{'mz'},
+                                                 $peak->{'charge'},                  $modified_fragment,
+                                                 $sequences[$fragment1_source],      $amber_peptide,
+                                                 $sequence_names[$fragment1_source], '>Peptide',
+                                                 $ms2_score,                         $peak->{'fraction'},
+                                                 $peak->{'scan_num'},                $peak->{'d2_scan_num'},
+                                                 $modification,                      $n,
+                                                 $best_x,                            $best_y,
+                                                 $fragment,                          $score,
+                                                 $top_10,                            $d2_top_10,
+                                                 $matched_abundance,                 $d2_matched_abundance,
+                                                 $total_abundance,                   $d2_total_abundance,
+                                                 $matched_common,                    $matched_crosslink,
+                                                 $d2_matched_common,                 $d2_matched_crosslink,
+                                                 $monolink_mass,                     $best_alpha,
+                                                 $best_beta,                         $time,
+                                                 $peak->{'precursor_scan'}
                                         );
                                     };
+				    }
 
 # 		       $results_sql->execute($d2_MSn_string,$d2_MSn_string,$peak->{'d2_mz'},$peak->{'d2_charge'},$d2_modified_fragment, @sequences[(substr($fragment_sources{$fragment},0,1)-1)],@sequences[(substr($fragment_sources{$fragment},-1,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},0,1)-1)],$sequence_names[(substr($fragment_sources{$fragment},-1,1)-1)],$d2_ms2_score, $peak->{'fraction'},"d2_".$peak->{'scan_num'},"d2_".$peak->{'d2_scan_num'}, $modification,$n,$d2_best_x,$d2_best_y,$fragment, $d2_score, $d2_top_10);
                                 };

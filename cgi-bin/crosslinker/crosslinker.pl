@@ -65,7 +65,8 @@ if ($child) {
         $mono_mass_diff,        $xlinker_mass,       $dynamic_mods_ref,  $fixed_mods_ref,
         $ms2_fragmentation_ref, $threshold,          $n_or_c,            $scan_width,
         $match_charge,          $match_intensity,    $scored_ions,       $no_xlink_at_cut_site,
-        $ms1_intensity_ratio,   $fast_mode,          $doublet_tolerance, $upload_format
+        $ms1_intensity_ratio,   $fast_mode,          $doublet_tolerance, $upload_format,
+	$amber_codon,
     ) = import_cgi_query($query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12);
     my @sequence_names    = @{$sequence_names_ref};
     my @upload_filehandle = @{$upload_filehandle_ref};
@@ -79,7 +80,7 @@ if ($child) {
 
         $cut_residues, $fasta,     $reactive_site, $mono_mass_diff,  $xlinker_mass,    -6,
         $desc,         $decoy,     $ms2_error,     $match_ppm,       $mass_seperation, \@dynamic_mods,
-        \@fixed_mods,  $threshold, $match_charge,  $match_intensity, $scored_ions
+        \@fixed_mods,  $threshold, $match_charge,  $match_intensity, $scored_ions,	$amber_codon
     );
 
     my ($results_dbh) = connect_db_results($results_table, 0);
@@ -144,7 +145,7 @@ if ($child) {
                                    $ms2_error,          $state,                \%ms2_fragmentation,
                                    $threshold,          $n_or_c,               $match_charge,
                                    $match_intensity,    $no_xlink_at_cut_site, $ms1_intensity_ratio,
-                                   $fast_mode,          $doublet_tolerance,
+                                   $fast_mode,          $doublet_tolerance,    $amber_codon
             );
         };
 
@@ -173,7 +174,8 @@ if ($child) {
              $mono_mass_diff,        $xlinker_mass,       $dynamic_mods_ref,  $fixed_mods_ref,
              $ms2_fragmentation_ref, $threshold,          $n_or_c,            $scan_width,
              $match_charge,          $match_intensity,    $scored_ions,       $no_xlink_at_cut_site,
-             $ms1_intensity_ratio,   $fast_mode,          $doublet_tolerance, $upload_format
+             $ms1_intensity_ratio,   $fast_mode,          $doublet_tolerance, $upload_format,
+	     $amber_codon
             ) = import_cgi_query($query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12);
             @sequence_names    = @{$sequence_names_ref};
             @upload_filehandle = @{$upload_filehandle_ref};

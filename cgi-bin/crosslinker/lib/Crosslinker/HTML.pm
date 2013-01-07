@@ -39,7 +39,7 @@ sub generate_page {
         $xlinker_mass,       $isotope,               $seperation,            $ms2_error,
         $state,              $ms2_fragmentation_ref, $threshold,             $n_or_c,
         $match_charge,       $match_intensity,       $no_xlink_at_cut_site,  $ms1_intensity_ratio,
-        $fast_mode,          $doublet_tolerance
+        $fast_mode,          $doublet_tolerance,     $amber_codon
     ) = @_;
 
     #     die;
@@ -79,14 +79,12 @@ sub generate_page {
 
         {
             add_peptide($results_dbh, $results_table, $fragment, $count, 0, 0, '', 0, 0);
-        }    #$table, $sequence, $source, $linear_only, $mass, $modifications, $monolink, $xlink
+        }   
 
         foreach $fragment (@fragments_linear_only) {
             add_peptide($results_dbh, $results_table, $fragment, $count, 1, 0, '', 0, 0);
         }
 
-#         %fragment_source             = ((map { $_ => $count } @fragments),             %fragment_source);
-#         %fragment_source_linear_only = ((map { $_ => $count } @fragments_linear_only), %fragment_source_linear_only);
         $count++;
     }
 
@@ -96,21 +94,24 @@ sub generate_page {
 
     warn "Run $results_table: Crosslinking peptides...  \n";
 
-#    my ( $xlink_fragment_masses_ref, $xlink_fragment_sources_ref ) =
-#      crosslink_peptides( \%fragment_masses, \%fragment_source, $reactive_site, $min_peptide_length, $xlinker_mass, $missed_clevages, $cut_residues );
-#    my %xlink_fragment_masses = %{$xlink_fragment_masses_ref};
-#    %xlink_fragment_masses = ( %xlink_fragment_masses, %fragment_masses, %fragment_masses_linear_only );
-#    my %xlink_fragment_sources = ( %{$xlink_fragment_sources_ref}, %fragment_source, %fragment_source_linear_only );
-
     $results_dbh->disconnect;
     ($results_dbh) = connect_db_results($results_table, 0);
-    calculate_crosslink_peptides($results_dbh,  $results_table,   $reactive_site, $min_peptide_length,
-                                 $xlinker_mass, $missed_clevages, $cut_residues);
+
+    if ($amber_codon == 0) {
+      calculate_crosslink_peptides($results_dbh,  $results_table,   $reactive_site, $min_peptide_length,
+				   $xlinker_mass, $missed_clevages, $cut_residues);
+    } else {
+      calculate_amber_crosslink_peptides($results_dbh,  $results_table,   $reactive_site, $min_peptide_length,
+					  $xlinker_mass, $missed_clevages, $cut_residues, $mono_mass_diff, \%protein_residuemass);
+    }
     $results_dbh->commit;
     $results_dbh->disconnect;
     ($results_dbh) = connect_db_results($results_table);
 
-    generate_monolink_peptides($results_dbh,  $results_table,   $reactive_site, $mono_mass_diff);
+
+    if ($amber_codon == 0) {
+	generate_monolink_peptides($results_dbh,  $results_table,   $reactive_site, $mono_mass_diff);
+    }
     generate_modified_peptides($results_dbh,  $results_table,   \%modifications);
 
     warn "Run $results_table: Finding doublets...  \n";
@@ -134,7 +135,7 @@ sub generate_page {
                                     $xlinker_mass,         $seperation,         $isotope,
                                     $reactive_site,        \%modifications,     $ms2_error,
                                     \%protein_residuemass, \%ms2_fragmentation, $threshold,
-                                    $no_xlink_at_cut_site, $fast_mode
+                                    $no_xlink_at_cut_site, $fast_mode,		$amber_codon
     );
 
     #    give_permission($settings_dbh);
