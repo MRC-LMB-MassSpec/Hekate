@@ -10,8 +10,26 @@ our @EXPORT = (
                'digest_proteins',    'digest_proteins_masses',
                'crosslink_peptides', 'calculate_peptide_masses',
                'calculate_crosslink_peptides', 'calculate_amber_crosslink_peptides',
-	       'generate_monolink_peptides', 'generate_modified_peptides'
+	       'generate_monolink_peptides', 'generate_modified_peptides',
+	       'no_enzyme_digest_proteins',
 );
+
+sub no_enzyme_digest_proteins {
+
+my ($min_length, $max_length, $reactive_site, $sequence) = @_;
+my @peptides;
+
+for (my $x=$min_length; $x <= $max_length; $x++)
+{
+for (my $y=$min_length; $y <= $max_length; $y++)
+{
+ @peptides = (@peptides, $sequence =~ m/.{$x}$reactive_site.{$y}/g);
+}
+}
+
+return \@peptides 
+
+}
 
 sub generate_modified_peptides {
 

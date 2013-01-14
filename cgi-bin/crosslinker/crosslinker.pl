@@ -66,7 +66,7 @@ if ($child) {
         $ms2_fragmentation_ref, $threshold,          $n_or_c,            $scan_width,
         $match_charge,          $match_intensity,    $scored_ions,       $no_xlink_at_cut_site,
         $ms1_intensity_ratio,   $fast_mode,          $doublet_tolerance, $upload_format,
-	$amber_codon,
+	$amber_codon,		$proteinase_k
     ) = import_cgi_query($query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12);
     my @sequence_names    = @{$sequence_names_ref};
     my @upload_filehandle = @{$upload_filehandle_ref};
@@ -145,7 +145,8 @@ if ($child) {
                                    $ms2_error,          $state,                \%ms2_fragmentation,
                                    $threshold,          $n_or_c,               $match_charge,
                                    $match_intensity,    $no_xlink_at_cut_site, $ms1_intensity_ratio,
-                                   $fast_mode,          $doublet_tolerance,    $amber_codon
+                                   $fast_mode,          $doublet_tolerance,    $amber_codon,
+				   $proteinase_k
             );
         };
 
@@ -175,7 +176,7 @@ if ($child) {
              $ms2_fragmentation_ref, $threshold,          $n_or_c,            $scan_width,
              $match_charge,          $match_intensity,    $scored_ions,       $no_xlink_at_cut_site,
              $ms1_intensity_ratio,   $fast_mode,          $doublet_tolerance, $upload_format,
-	     $amber_codon
+	     $amber_codon,	     $proteinase_k
             ) = import_cgi_query($query, $mass_of_deuterium, $mass_of_hydrogen, $mass_of_carbon13, $mass_of_carbon12);
             @sequence_names    = @{$sequence_names_ref};
             @upload_filehandle = @{$upload_filehandle_ref};

@@ -39,7 +39,7 @@ sub generate_page {
         $xlinker_mass,       $isotope,               $seperation,            $ms2_error,
         $state,              $ms2_fragmentation_ref, $threshold,             $n_or_c,
         $match_charge,       $match_intensity,       $no_xlink_at_cut_site,  $ms1_intensity_ratio,
-        $fast_mode,          $doublet_tolerance,     $amber_codon
+        $fast_mode,          $doublet_tolerance,     $amber_codon,	     $proteinase_k
     ) = @_;
 
     #     die;
@@ -51,9 +51,9 @@ sub generate_page {
     my %modifications       = %{$modifications_ref};
     my %ms2_fragmentation   = %{$ms2_fragmentation_ref};
 
-    my $fragment;
-    my @fragments;
-    my @fragments_linear_only;
+     my $fragment;
+#     my @fragments;
+#     my @fragments_linear_only;
     my %fragment_source;
     my %fragment_source_linear_only;
     my @sequence_fragments;
@@ -65,23 +65,34 @@ sub generate_page {
     create_peptide_table($results_dbh);
 
     foreach my $sequence (@sequences) {
-        my ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) =
+
+	my $sequence_fragments_ref;		
+	my $sequence_fragments_linear_only_ref;
+	my @sequence_fragments;
+	my @sequence_fragments_linear_only;
+
+        if ($proteinase_k == 0) {
+	  ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) =
           digest_proteins($missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c);
-        my @sequence_fragments             = @{$sequence_fragments_ref};
-        my @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
+	  @sequence_fragments             = @{$sequence_fragments_ref};
+	  @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
+	} else {
+	    ($sequence_fragments_ref) = no_enzyme_digest_proteins(3, 10, $reactive_site, $sequence);
+	    @sequence_fragments             = @{$sequence_fragments_ref};
+	}
 
-        @fragments             = (@fragments,             @sequence_fragments);
-        @fragments_linear_only = (@fragments_linear_only, @sequence_fragments_linear_only);
+#         @fragments             = (@fragments,             @sequence_fragments);
+#         @fragments_linear_only = (@fragments_linear_only, @sequence_fragments_linear_only);
         warn "Run $results_table: Sequence $count = $sequence_names[$count] \n";
-        warn "Run $results_table: Digested peptides:", scalar(@fragments), " \n";
+        warn "Run $results_table: Digested peptides:", scalar(@sequence_fragments), " \n";
 
-        foreach $fragment (@fragments)
+        foreach $fragment (@sequence_fragments)
 
         {
             add_peptide($results_dbh, $results_table, $fragment, $count, 0, 0, '', 0, 0);
         }   
 
-        foreach $fragment (@fragments_linear_only) {
+        foreach $fragment (@sequence_fragments_linear_only) {
             add_peptide($results_dbh, $results_table, $fragment, $count, 1, 0, '', 0, 0);
         }
 
@@ -674,9 +685,9 @@ Content-type: text/html\n\n
 </div>
 <div id="menu">
     <ul id="nav">
-        <li id="home"><a id="home" href="/cgi-bin/$path/index.pl">Crosslinker Full Search</a></li>
+        <li id="home"><a id="home" href="/cgi-bin/$path/index.pl">Crosslinker Search</a></li>
         <li id="results"><a id="results" href="/cgi-bin/$path/results.pl">Results</a></li>
-        <li id="results"><a id="results" href="/cgi-bin/$path/singlescan.pl">Score Scan</a></li>
+        <li id="results"><a id="results" href="/cgi-bin/$path/singlescan.pl">Score</a></li>
         <li id="results"><a id="results" href="/cgi-bin/$path/doublet_search.pl">Doublet</a></li>
         <li id="results"><a id="results" href="/cgi-bin/$path/crosslink_digest.pl">Digest</a></li>
 	<li id="results"><a id="results" href="/cgi-bin/$path/crosslink_product.pl">Fragment</a></li>

@@ -548,7 +548,10 @@ sub import_cgi_query {
     my $no_xlink_at_cut_site = 1;
     my $ms1_intensity_ratio  = 1;
     my $fast_mode            = 1;
+    my $proteinase_k	     = 0;
+
     if (defined $query->param('ms1_intensity_ratio')) { $ms1_intensity_ratio = $query->param('ms1_intensity_ratio') }
+    if (defined $query->param('proteinase_k'))	      { $proteinase_k = 1; }
     if (defined $query->param('detailed_scoring'))    { $fast_mode           = 0 }
 
     if   (defined $query->param('charge_match')) { $match_charge = '1' }
@@ -639,7 +642,7 @@ sub import_cgi_query {
             $mono_mass_diff,      $xlinker_mass,    \@dynamic_mods,     \@fixed_mods,
             \%ms2_fragmentation,  $threshold,       $n_or_c,            $scan_width,
             $match_charge,        $match_intensity, $scored_ions,       $no_xlink_at_cut_site,
-            $ms1_intensity_ratio, $fast_mode,       $doublet_tolerance, $upload_format, $amber_codon
+            $ms1_intensity_ratio, $fast_mode,       $doublet_tolerance, $upload_format, $amber_codon, $proteinase_k
     );
 }
 
