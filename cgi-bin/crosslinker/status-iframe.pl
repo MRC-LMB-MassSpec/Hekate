@@ -23,23 +23,25 @@ my $table_name = $table_list->fetchrow_hashref;
 
 my $state;
 
-if ($table_name->{'finished'} == -1) {
-    $state = 'Done';
-} elsif ($table_name->{'finished'} == -2) {
-    $state = 'Waiting...';
-} elsif ($table_name->{'finished'} == -3) {
-    $state = 'Starting...';
-} elsif ($table_name->{'finished'} == -4) {
-    $state = 'Aborted';
-} elsif ($table_name->{'finished'} == -5) {
-    $state = 'Failed';
-} elsif ($table_name->{'finished'} == -6) {
-    $state = 'Importing...';
-}
+    my $state;
+    if ($table_name->{'finished'} == -1) {
+        $state = '<span class="label label-success">Done</span>';
+    } elsif ($table_name->{'finished'} == -2) {
+        $state = '<span class="label">Waiting...</span>';
+    } elsif ($table_name->{'finished'} == -3) {
+        $state = '<span class="label label-info">Starting...</span>';
+    } elsif ($table_name->{'finished'} == -4) {
+        $state = '<span class="label label-warning">Aborted</span>';
+    } elsif ($table_name->{'finished'} == -5) {
+        $state = '<span class="label label-important">Failed</span>';
+    } elsif ($table_name->{'finished'} == -6) {
+        $state = '<span class="label label-info">Importing...</span>';
+    }
 
-else {
-    $state = $table_name->{'finished'} * 100 . "%";
-}
+    else {
+        $state =  '<span class="label">' . $table_name->{'finished'} * 100 . "%</span>";
+    }
+
 
 if ($table_name->{'finished'} > -1 || $table_name->{'finished'} > -6 ) {
     print "Refresh: 30\n";
@@ -51,17 +53,18 @@ print "Content-type: text/html\n\n";
 
 print '<html>
 <head>
-<link rel="stylesheet" type="text/css" href="/' . $path . '/css/xlink.css" media="screen">
-<link rel="stylesheet" type="text/css" href="/' . $path . '/css/print.css" media="print">
+ <link href="/'.$path.'/bootstrap/css/bootstrap.css" rel="stylesheet"> 
+ <link href="/'.$path.'/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 </head>
 <style type="text/css">
 body {
-  background: d0d0d0;
+  background:none transparent;
   overflow:hidden;
+  margin: 0 0 0 0;
 }
 </style>
-<body>';
+<body><div style="text-align:left"';
 
 print $state;
 
-print "</body></html>";
+print "</div></body></html>";

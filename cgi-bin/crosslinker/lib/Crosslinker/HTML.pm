@@ -14,7 +14,8 @@ our @EXPORT = (
                'print_page_bottom',       'print_page_top_fancy',
                'print_page_bottom_fancy', 'mgf_doublet_search',
                'crosslink_digest',        'mgf_doublet_search_mgf_output',
-               'generate_page_single_scan'
+               'generate_page_single_scan', 'print_page_top_bootstrap',
+               'print_page_bottom_bootstrap',
 );
 ######
 #
@@ -722,6 +723,125 @@ Last update: 02-Jan-2012, &copy; Andrew N Holding, <br/>LTQ Orbitrap image CC <a
 
 </body>
 </html>
+ENDHTML
+
+}
+
+sub print_page_top_bootstrap    #Prints the end of the HTML page
+{
+    my $version = version();
+    my $path    = installed();
+    print <<ENDHTML;
+Content-type: text/html\n\n
+<!DOCTYPE html> 
+<html lang="en"> 
+  <head> 
+    <meta charset="utf-8"> 
+    <title>Crosslinker</title> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="description" content=""> 
+    <meta name="author" content=""> 
+ 
+    <!-- Le styles --> 
+    <link href="/$path/bootstrap/css/bootstrap.css" rel="stylesheet"> 
+    <style> 
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+	.green {
+	    	background-color: #50F05c;
+	}
+	.cyan {
+    		background-color: #50F0Fc;
+	}
+	#preview{
+		position:absolute;
+		border:1px solid #ccc;
+		background:#fff;
+		padding:5px;
+		display:none;
+		color:#fff;
+	}
+
+	#screenshot{
+		position:absolute;
+		border:1px solid #aaa;
+		background:#fff;
+		padding:5px;
+		display:none;
+		color:#fff;
+	}
+</style>
+    </style> 
+    <link href="/$path/bootstrap/css/bootstrap-responsive.css" rel="stylesheet"> 
+    <script src="/$path/java/jquery.js" type="text/javascript"></script>
+    <script src="/$path/java/main.js" type="text/javascript"></script> 
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements --> 
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--> 
+ 
+   
+  </head> 
+ 
+  <body> 
+ 
+    <div class="navbar navbar-inverse navbar-fixed-top"> 
+      <div class="navbar-inner"> 
+        <div class="container"> 
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> 
+            <span class="icon-bar"></span> 
+            <span class="icon-bar"></span> 
+            <span class="icon-bar"></span> 
+          </a> 
+          <a href="index.pl" class="brand inline" >Crosslinker</a> 
+          <div class="nav-collapse collapse"> 
+            <ul class="nav"> 
+              <li class="active"><a href="index.pl">Search</a></li> 
+              <li><a href="results.pl">Results</a></li> 
+              <li><a href="doublet_search.pl">Doublet</a></li> 
+              <li><a href="crosslink_digest.pl">Digest</a></li> 
+              <li><a href="crosslink_product.pl">Fragment</a></li> 
+              <li><a href="settings.pl">Score</a></li> 
+              <li><a href="#contact">Settings</a></li> 
+            </ul> 
+          </div><!--/.nav-collapse --> 
+        </div> 
+      </div> 
+    </div> 
+ 
+    <div class="container"> 
+
+ENDHTML
+
+}
+
+sub print_page_bottom_bootstrap    #Prints the end of the HTML page
+{
+    print <<ENDHTML;
+</div> <!-- /container --> 
+ 
+    <!-- Le javascript
+    ================================================== --> 
+    <!-- Placed at the end of the document so the pages load faster --> 
+    <script src="js/jquery.js"></script> 
+    <script src="js/bootstrap-transition.js"></script> 
+    <script src="js/bootstrap-alert.js"></script> 
+    <script src="js/bootstrap-modal.js"></script> 
+    <script src="js/bootstrap-dropdown.js"></script> 
+    <script src="js/bootstrap-scrollspy.js"></script> 
+    <script src="js/bootstrap-tab.js"></script> 
+    <script src="js/bootstrap-tooltip.js"></script> 
+    <script src="js/bootstrap-popover.js"></script> 
+    <script src="js/bootstrap-button.js"></script> 
+    <script src="js/bootstrap-collapse.js"></script> 
+    <script src="js/bootstrap-carousel.js"></script> 
+    <script src="js/bootstrap-typeahead.js"></script> 
+ 
+  </body> 
+</html> 
+
 ENDHTML
 
 }

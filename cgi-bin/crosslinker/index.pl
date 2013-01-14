@@ -25,23 +25,24 @@ my $path = installed;
 #                      #
 ########################
 
-print_page_top_fancy("Home");
+print_page_top_bootstrap("Home");
 my $version = version();
-print_heading('Crosslinker');
+    my $path    = installed();
 print <<ENDHTML;
+<div class="row">
+<div class="span8 offset2">
+<img class="span2" src="/$path/bootstrap/img/crosslinker.png"/>
+   <div class="page-header">
+  <h1>Crosslinker <small>by Andrew Holding</small></h1>
+</div>
+  <p>The details of this software are published are in preparation for publication. Once published there details will be placed here.</p>
 <form method="POST" enctype="multipart/form-data" action="crosslinker.pl" target="_blank">
-<table>
-
-<tr cellspacing="3">
-  <td  style="background: white;" > 
-  <table >
-    <tr>
-	<td  style="background: white;" >Settings:</td>
-    </tr>
-    <tr>
-    <td class="half"  >
-   Digest
-    <select name="enzyme">
+<fieldset>
+<legend>Settings</legend><br/>
+<div class="row">
+<div class="span4"> 
+   <label>Digest</label>
+    <select name="enzyme"> 
 ENDHTML
 
 my $dbh = connect_conf_db;
@@ -55,33 +56,46 @@ while ((my $enzyme = $enzymes->fetchrow_hashref)) {
 $enzymes->finish();
 
 print <<ENDHTML;
-    </select>
-    or Proteinase K <input type="checkbox" name="proteinase_k" value="true" ><br/>
-    MS2 accurracy (Da) <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/><br/>
-    Doublet Spacing Tollerance (ppm) <input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/><br/>
-    Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/> 
-    Intensity Match (MS1) : <input type="checkbox" name="intensity_match" value="true" >
-    Max-ratio:<input type="text" name="ms1_intensity_ratio" size="4" maxlength="4" value="0.8"/><br/>
-    Allow cross-linking at cut site : <input type="checkbox" name="allow_xlink_at_cut_site" value="true" ><br/>
-    </td>
-  <td class="half"  >
-    Max. Missed Cleavages    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="3"/><br/>
-    MS1 accurracy (ppm) <input type="text" name="ms1_ppm" size="2" maxlength="2" value="2"/><br/>
-     Max scan seperation<input type="text" name="scan_width" size="4" maxlength="4" value="60"/><br/>
-    Decoy Search: <input type="checkbox" name="decoy" value="true"><br/>       
-    Require Charge Match: <input type="checkbox" name="charge_match"  checked="checked" value="true"><br/>  
-    Detailed Score results (CSV only): <input type="checkbox" name="detailed_scoring"  value="true"><br/>    
-  </td>
-</tr>
-<tr>
-  <td class="half"  style="background: white;">
-      Modifcations:
-</td><td style="background: white;"></td>
-    </tr>
-    <tr>
-  <td class="half"  >
-    Dynamic Modifications:
-    <select style="width: 20em;" multiple="multiple" size="5"  name="dynamic_mod">
+     </select> 
+    <br/><label class="checkbox inline" ><input type="checkbox" name="proteinase_k" value="true" >
+    No&nbsp;enzyme</label>
+    <label>MS2 accurracy (Da)</label>
+    <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/> 
+    <label>Doublet Spacing Tollerance</label>
+    <div class="input-append"><input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/><span class="add-on">ppm</span></div>
+    <label>Threshold</label>
+    <input type="text" name="threshold" size="3" maxlength="3" value="2"/> 
+    <span class="help-block">as a % of the maximum intensity</span>
+</div>
+<div class="span4">
+    <label>Maximum Missed Cleavages</label>
+    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="3"/>
+    <label>MS1 accurracy</label>
+    <div class="input-append"><input type="text" name="ms1_ppm" size="2" maxlength="2" value="2"/><span class="add-on">ppm</span></div>
+    <label>Max scan seperation</label>
+    <input type="text" name="scan_width" size="4" maxlength="4" value="60"/><br/>
+    <label class="checkbox inline" ><input type="checkbox" name="decoy" value="true">Decoy&nbsp;Search</label><br/>  
+    <label class="checkbox inline" ><input type="checkbox" name="charge_match"  checked="checked" value="true">Require&nbsp;Charge&nbsp;Match</label><br/>
+    <label class="checkbox inline" ><input type="checkbox" name="allow_xlink_at_cut_site" value="true" >Allow&nbsp;cross&#8209;linking&nbsp;at&nbsp;cut&nbsp;site</label><br/>
+    <label class="checkbox inline" ><input type="checkbox" name="detailed_scoring"  value="true">Detailed&nbsp;scoring</label><br/>
+     <span class="help-block">these are found in the csv output only</span>
+</div>
+</div>
+
+<div class="row">
+<div class="span4">
+  <label class="checkbox inline" ><input type="checkbox" name="intensity_match" value="true" >Intensity&nbsp;Match&nbsp;(MS1)</label>
+</div>
+<div class="span4">
+    <label>Maximum intensity ratio</label><input type="text" name="ms1_intensity_ratio" size="4" maxlength="4" value="0.8"/>
+</div>
+</div>
+
+<legend>Modifications</legend>
+<div class="row">
+<div class="span4">
+    <label>Dynamic Modifications</label>
+    <select style="width: 20em;" multiple="multiple" size="5"  name="dynamic_mod"> 
 ENDHTML
 
 my $mods = get_conf($dbh, 'dynamic_mod');
@@ -91,10 +105,11 @@ while ((my $mod = $mods->fetchrow_hashref)) {
     print "<option $selected value='" . $mod->{'rowid'} . "'>" . $mod->{'name'} . "</option>";
 }
 print <<ENDHTML;
-  </select>
-</td><td>
-    Fixed Modifications:
-    <select style="width: 20em;" multiple="multiple" size="5"  name="fixed_mod">
+ </select> 
+</div>
+<div class="span4">
+    <label>Fixed Modifications</label>
+    <select style="width: 20em;" multiple="multiple" size="5"  name="fixed_mod"> 
 ENDHTML
 
 $mods = get_conf($dbh, 'fixed_mod');
@@ -105,12 +120,14 @@ while ((my $mod = $mods->fetchrow_hashref)) {
 }
 $mods->finish();
 print <<ENDHTML;
-  </select>
-</td>
-</tr>
- <tr>
-  <td class="half"  style="background: white;">
-    Crosslinking Reagent:<select name='crosslinker'>
+   </select> 
+</div>
+</div>
+<legend>Crosslinking Reagent</legend>
+<div class="row">
+<div class="span8">
+  <label>Crosslinking Reagent<label>
+  <select name='crosslinker'> 
 ENDHTML
 
 my $crosslinkers = get_conf($dbh, 'crosslinker');
@@ -120,82 +137,73 @@ while ((my $crosslinker = $crosslinkers->fetchrow_hashref)) {
 $crosslinkers->finish();
 print "<option value='-1' selected='true'>Custom (enter below)</option></select>";
 print <<ENDHTML;
-  </td><td style="background: white;"></td>
-    </tr>
-    <tr>
-  <td class="half"  >
-      Linker mass: <input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/>Da<br/>
-      Atoms on  <select
-name="isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select>
- 
-in heavy form: <input type="text" 
-name="seperation" size="2" maxlength="5" 
-value="4"/> 
-</td><td>
- Monolink mass: <input type="text" name="mono_mass_diff" size="10" maxlength="21" value="114.0316942"/>Da<br/>
-    Reactive amino acid: <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/><br/>
-</td>
-</tr>
-</tr>
-    <tr><td style="background: white;">Amber Codon Mode:  <input type="checkbox" name="amber_codon"   value="1"/>Enabled?</td>
-      <td style="background: white;"></td>
-      </tr>
-    <tr>
-  <td class="half"  >
-      Mass change on crosslinking: <input type="text" name="amber_xlink" size="10" maxlength="10" value="0"/>Da<br/>
-      Atoms on  <select
-name="amber_isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select>
- 
-in heavy form: <input type="text" 
-name="amber_seperation" size="2" maxlength="5" 
-value="11"/> 
-</td><td>
-    Amino acid residue mass: <input type="text" name="amber_residue_mass" size="10" maxlength="21" value="251.0946254"/>Da<br/>
-    Amber codon (Z) peptide sequence: <input type="text" name="amber_peptide" size="10" maxlength="20" value="FZPVINKPAK"/><br/>
-</td>
-</tr>
-<tr>
-  <td class="half"  style="background: white;">
-    Fragment Ions (Label):
-   </td>
-</tr>
-<tr>
-  <td class="half">
-    <input type="checkbox" name="aions" checked="checked"  value="1"/> A-ions
-    <input type="checkbox" name="bions" checked="checked"  value="1"/> B-ions
-    <input type="checkbox" name="yions" checked="checked"  value="1"/> Y-ions
-</td>
-<td class="half">
-   <input type="checkbox" name="waterloss" checked="checked" value="1">Water Loss
-   <input type="checkbox" name="ammonialoss"checked="checked" value="1"> Ammonia Loss
-</td>
-</tr>
-<tr>
-  <td class="half"  style="background: white;">
-    Fragment Ions (Score):
-   </td>
-</tr>
-<tr>
-  <td class="half">
-    <input type="checkbox" name="aions-score" value="1"/> A-ions
-    <input type="checkbox" name="bions-score" checked="checked"  value="1"/> B-ions
-    <input type="checkbox" name="yions-score" checked="checked"  value="1"/> Y-ions
-</td>
-<td class="half">
-   <input type="checkbox" name="waterloss-score"  value="1">Water Loss
-   <input type="checkbox" name="ammonialoss-score" value="1"> Ammonia Loss
-</td>
-</tr>
-</table>
-<table>
-<tr>
-  <td  style="background: white;">
-  Protein Sequences
-  </td>
-</tr>
-<tr>
-  <td>
- <select name="sequence">
+</div>
+</div>
+<div class="row">
+<div class="span4">
+  <label>Linker mass</label>
+  <div class="input-append"><input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/><span class="add-on">Da</span></div><br/> 
+  <label>Isotope type</label> 
+  <select name="isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select> 
+  <label>Number of labelled atoms in isotopic form</label>
+  <input type="text" name="seperation" size="2" maxlength="5" value="4"/> 
+</div>
+<div class="span4">
+ <label>Monolink mass</label>
+ <div class="input-append"><input type="text" name="mono_mass_diff" size="10" maxlength="21" value="114.0316942"/><span class="add-on">Da</span></div>
+ <label>Reactive amino acid</label>
+ <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/>
+</div>
+</div>
+<legend>Amber Codon Mode</legend>
+<div class="row">
+<div class="span8">
+  <label class="checkbox inline span8" ><input type="checkbox" name="amber_codon"   value="1"/>Enable use of amber codon settings.</label><br/><br/>
+</div>
+<div class="span4">      
+  <label>Mass change on crosslinking</label>
+  <input type="text" name="amber_xlink" size="10" maxlength="10" value="0"/>Da<br/> 
+  <label>Isotope type</label>
+  <select name="amber_isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select> 
+  <label>Number of labelled atoms in isotopic form</label>
+  <input type="text" name="amber_seperation" size="2" maxlength="5" value="11"/> 
+</div>
+<div class="span4">  
+    Amino acid residue mass: <input type="text" name="amber_residue_mass" size="10" maxlength="21" value="251.0946254"/>Da<br/> 
+    Amber codon (Z) peptide sequence: <input type="text" name="amber_peptide" size="10" maxlength="20" value="FZPVINKPAK"/><br/> 
+</div>
+</div>
+<Legend>Fragment Ions</legend>
+<div class="row">
+<div class="span3"> 
+  <h4>Label ions on figures</h4> 
+</div>
+<div class="span3 ">
+ <h4>Use ions to calculate score</h4>
+</div>
+</div>
+<div class="row">
+<div class="span2 offset1">
+    <label class="span2 checkbox" ><input type="checkbox" name="aions" checked="checked"  value="1"/>A-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="bions" checked="checked"  value="1"/> B-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="yions" checked="checked"  value="1"/> Y-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="waterloss" checked="checked" value="1">Water Loss</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="ammonialoss"checked="checked" value="1"> Ammonia Loss</label>
+</div>
+   
+<div class="span2 offset1">
+    <label class="span2 checkbox" ><input type="checkbox" name="aions-score" value="1"/> A-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="bions-score" checked="checked"  value="1"/> B-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="yions-score" checked="checked"  value="1"/> Y-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="waterloss-score"  value="1">Water Loss</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="ammonialoss-score" value="1"> Ammonia Loss</label>
+</div>
+</div>
+<legend>Protein Sequences</legend>
+<div class="row">
+<div class="span8">
+<label>Sequence</label>
+<select name="sequence"> 
 ENDHTML
 
 my $sequences = get_conf($dbh, 'sequence');
@@ -205,55 +213,56 @@ while ((my $sequence = $sequences->fetchrow_hashref)) {
 $sequences->finish();
 print "<option value='-1' selected='true'>Custom (enter below in FASTA format)</option>";
 print <<ENDHTML;
-    </select>
-    <textarea name="user_protein_sequence" rows="12" cols="72">
->PolIII
-MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGHGAGIKPIVGADFNVQCDLLGDELTHLTVLAANNTGYQNLTLLISKAYQRGYGAAGPIIDRDWLIELNEGLILLSGGRMGDVGRSLLRGNSALVDECVAFYEEHFPDRYFLELIRTGRPDEESYLHAAVELAEARGLPVVATNDVRFIDSSDFDAHEIRVAIHDGFTLDDPKRPRNYSPQQYMRSEEEMCELFADIPEALANTVEIAKRCNVTVRLGEYFLPQFPTGDMSTEDYLVKRAKEGLEERLAFLFPDEEERLKRRPEYDERLETELQVINQMGFPGYFLIVMEFIQWSKDNGVPVGPGRGSGAGSLVAYALKITDLDPLEFDLLFERFLNPERVSMPDFDVDFCMEKRDQVIEHVADMYGRDAVSQIITFGTMAAKAVIRDVGRVLGHPYGFVDRISKLIPPDPGMTLAKAFEAEPQLPEIYEADEEVKALIDMARKLEGVTRNAGKHAGGVVIAPTKITDFAPLYCDEEGKHPVTQFDKSDVEYAGLVKFDFLGLRTLTIINWALEMINKRRAKNGEPPLDIAAIPLDDKKSFDMLQRSETTAVFQLESRGMKDLIKRLQPDCFEDMIALVALFRPGPLQSGMVDNFIDRKHGREEISYPDVQWQHESLKPVLEPTYGIILYQEQVMQIAQVLSGYTLGGADMLRRAMGKKKPEEMAKQRSVFAEGAEKNGINAELAMKIFDLVEKFAGYGFNKSHSAAYALVSYQTLWLKAHYPAEFMAAVMTADMDNTEKVVGLVDECWRMGLKILPPDINSGLYHFHVNDDGEIVYGIGAIKGVGEGPIEAIIEARNKGGYFRELFDLCARTDTKKLNRRVLEKLIMSGAFDRLGPHRAALMNSLGDALKAADQHAKAEAIGQADMFGVLAEEPEQIEQSYASCQPWPEQVVLDGERETLGLYLTGHPINQYLKEIERYVGGVRLKDMHPTERGKVITAAGLVVAARVMVTKRGNRIGICTLDDRSGRLEVMLFTDALDKYQQLLEKDRILIVSGQVSFDDFSGGLKMTAREVMDIDEAREKYARGLAISLTDRQIDDQLLNRLRQSLEPHRSGTIPVHLYYQRADARARLRFGATWRVSPSDRLLNDLRGLIGSEQVELEFD 
-    </textarea>
-  </td>
-</tr>
-</table>
-</td  style="background: white;">
-</tr>
-<tr>
-<td colspan="2"  style="background: white;text-align: center";>
-<p>Description: <input style=" border:1px solid black;" type="text" name="user_desc" size="26" maxlength="32" value="None"/></p>    
-</td>
-</tr>
-<tr><td  style="background: white;">
-
-    <center><input type="submit" value="Perform Xlink" /></center>
-</td>
-</tr>
-<tr><td  style="background: white; margin:0">
-<table>
-<tr><td>
-Format</td>
-<td>
-<input type="radio" name="data_format" value="MGF" checked>MGF<br>
-<input type="radio" name="data_format" value="mzXML" >mzXML (32-bit precision)<br>
-</td></tr>
-</table><br/>
+</select> 
 </div>
-<table>
-  <tr><td style="background: white; padding:0">Fraction 1:</td><td style="background: white;padding:0"> <input type="file" name="mgf"/><br/></td></tr>
-  <tr><td style="background: white; padding:0">Fraction 2:</td><td style="background: white;padding:0"> <input type="file" name="mgf2" /><br/></td></tr>
-  <tr><td style="background: white; padding:0">Fraction 3:</td><td style="background: white;padding:0"> <input type="file" name="mgf3" /><br/></td></tr>
-  <tr><td style="background: white; padding:0">Fraction 4:</td><td style="background: white;padding:0"> <input type="file" name="mgf4" /><br/></td></tr>
-  <tr><td style="background: white; padding:0">Fraction 5:</td><td style="background: white;padding:0"> <input type="file" name="mgf5" /><br/></td></tr>
-  <tr><td style="background: white; padding:0">Fraction 6:</td><td style="background: white;padding:0"> <input type="file" name="mgf6" /><br/></td></tr>
-  <tr><td style="background: white; padding:0">Fraction 7:</td><td style="background: white;padding:0"> <input type="file" name="mgf7" /><br/></td></tr>
-  <tr><td style="background: white; padding:0">Fraction 8:</td><td style="background: white;padding:0"> <input type="file" name="mgf8" /><br/></td></tr>
-  
-</table>
-</td></tr>
-
-</table>
-</form>
-
+</div>
+<div class="row">
+<div class="span8">
+<textarea name="user_protein_sequence" rows="12" class="span8">>PolIII
+MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGHGAGIKPIVGADFNVQCDLLGDELTHLTVLAANNTGYQNLTLLISKAYQRGYGAAGPIIDRDWLIELNEGLILLSGGRMGDVGRSLLRGNSALVDECVAFYEEHFPDRYFLELIRTGRPDEESYLHAAVELAEARGLPVVATNDVRFIDSSDFDAHEIRVAIHDGFTLDDPKRPRNYSPQQYMRSEEEMCELFADIPEALANTVEIAKRCNVTVRLGEYFLPQFPTGDMSTEDYLVKRAKEGLEERLAFLFPDEEERLKRRPEYDERLETELQVINQMGFPGYFLIVMEFIQWSKDNGVPVGPGRGSGAGSLVAYALKITDLDPLEFDLLFERFLNPERVSMPDFDVDFCMEKRDQVIEHVADMYGRDAVSQIITFGTMAAKAVIRDVGRVLGHPYGFVDRISKLIPPDPGMTLAKAFEAEPQLPEIYEADEEVKALIDMARKLEGVTRNAGKHAGGVVIAPTKITDFAPLYCDEEGKHPVTQFDKSDVEYAGLVKFDFLGLRTLTIINWALEMINKRRAKNGEPPLDIAAIPLDDKKSFDMLQRSETTAVFQLESRGMKDLIKRLQPDCFEDMIALVALFRPGPLQSGMVDNFIDRKHGREEISYPDVQWQHESLKPVLEPTYGIILYQEQVMQIAQVLSGYTLGGADMLRRAMGKKKPEEMAKQRSVFAEGAEKNGINAELAMKIFDLVEKFAGYGFNKSHSAAYALVSYQTLWLKAHYPAEFMAAVMTADMDNTEKVVGLVDECWRMGLKILPPDINSGLYHFHVNDDGEIVYGIGAIKGVGEGPIEAIIEARNKGGYFRELFDLCARTDTKKLNRRVLEKLIMSGAFDRLGPHRAALMNSLGDALKAADQHAKAEAIGQADMFGVLAEEPEQIEQSYASCQPWPEQVVLDGERETLGLYLTGHPINQYLKEIERYVGGVRLKDMHPTERGKVITAAGLVVAARVMVTKRGNRIGICTLDDRSGRLEVMLFTDALDKYQQLLEKDRILIVSGQVSFDDFSGGLKMTAREVMDIDEAREKYARGLAISLTDRQIDDQLLNRLRQSLEPHRSGTIPVHLYYQRADARARLRFGATWRVSPSDRLLNDLRGLIGSEQVELEFD 
+    </textarea> 
+</div>
+</div>
+<legend>Search</legend>
+<div class="row">
+<div class="span4 offset1">
+  <label>Description</label>
+  <input type="text" name="user_desc" size="26" maxlength="32" value="None"/>
+</div>
+<div class="span3 ">
+  <label>Crosslinker Search</label><input type="submit" class="btn btn-primary" value="Upload and search data" />
+</div>
+</div>
+<Legend>Format</legend> 
+<div class="row">
+<div class="span4 offset1">
+  <label class="inline checkbox"><input type="radio" name="data_format" value="MGF" checked> MGF</label>
+</div>
+<div class="span3"> 
+  <label class="inline checkbox"><input type="radio" name="data_format" value="mzXML" > mzXML (32-bit precision)</label>
+</div> 
+</div> 
+<legend>Files</legend>
+<div class="row">
+<div class="offset2 span4">
+  <label>Fraction 1 <input type="file" name="mgf"/></label>
+  <label>Fraction 2 <input type="file" name="mgf2"/></label>
+  <label>Fraction 3 <input type="file" name="mgf3"/></label>
+  <label>Fraction 4 <input type="file" name="mgf4"/></label>
+  <label>Fraction 5 <input type="file" name="mgf5"/></label>
+  <label>Fraction 6 <input type="file" name="mgf6"/></label>
+  <label>Fraction 7 <input type="file" name="mgf7"/></label>
+  <label>Fraction 8 <input type="file" name="mgf8"/></label>
+</div>
+</div>
+</fieldset> 
+</form> 
+</div> 
+</div> 
+ 
 ENDHTML
 
 $dbh->disconnect();
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 exit;

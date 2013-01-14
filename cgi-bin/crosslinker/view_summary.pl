@@ -98,18 +98,24 @@ my (
 #                      #
 ########################
 
-print_page_top_fancy('Summary');
+print_page_top_bootstrap('Summary');
+
+
+print_heading('Results');
 
 if ($is_finished != '-1') {
-    print '<div style="text-align:center"><h2 style="color:red;">Warning: Data analysis not finished</h2></div>';
+print "<div class='alert alert-error'>
+  <h4>Warning</h4>Data Analysis not finished
+</div>";
+
 }
 
-print_heading('Settings');
+print "<br/><h4>Settings</h4>";
 
 if   (defined $decoy && $decoy eq "true") { $decoy = "Yes" }
 else                                      { $decoy = "No" }
 
-print "<Table>
+print "<Table class='table table-striped'>
 <tr><td style='font-weight: bold;'>Name:</td><td>$name</td><td style='font-weight: bold;'>Description</td><td>$desc</td></tr>
 <tr><td style='font-weight: bold;'>Cut:</td><td>$cut_residues</td><td style='font-weight: bold;'>Xlink Site</td><td>$reactive_site</td></tr>
 <tr><td style='font-weight: bold;'>Xlinker Mass:</td><td>$xlinker_mass</td><td style='font-weight: bold;'>Monolink</td><td>$mono_mass_diff</td></tr>
@@ -121,8 +127,8 @@ print "<Table>
 
 my $varible_mod_string = '';
 
-print_heading('Dynamic Modifications');
-print "<table>";
+print "<h4>Dynamic Modifications</h4>";
+print "<table class='table table-striped'>";
 print "<tr><td>ID</td><td>Name</td><td>Mass</td><td>Residue</td></tr>";
 my $dynamic_mods = get_mods($table, 'dynamic');
 while ((my $dynamic_mod = $dynamic_mods->fetchrow_hashref)) {
@@ -133,8 +139,8 @@ while ((my $dynamic_mod = $dynamic_mods->fetchrow_hashref)) {
 print "</table>";
 
 my $static_mod_string = '';
-print_heading('Fixed Modifications');
-print "<table>";
+print "<h4>Fixed Modifications</h4>";
+print "<table class='table table-striped'>";
 print "<tr><td>ID</td><td>Name</td><td>Mass</td><td>Residue</td></tr>";
 my $fixed_mods = get_mods($table, 'fixed');
 while ((my $fixed_mod = $fixed_mods->fetchrow_hashref)) {
@@ -145,9 +151,9 @@ while ((my $fixed_mod = $fixed_mods->fetchrow_hashref)) {
 print "</table>";
 
 if ($short == 1) {
-    print_heading('Top Scoring Crosslink Matches <a href="view_summary.pl?table=' . $name . '&more=1">View all</a>');
+    print '<h4 class="inline">Top Scoring Crosslink Matches</h4> <a class="btn btn-primary offset10 span1" href="view_summary.pl?table=' . $name . '&more=1">View all</a><br/><br/>';
 } else {
-    print_heading('Crosslink Matches');
+    print '<h4>Crosslink Matches</h4>';
 }
 my $top_hits;
 if (defined $order) {
@@ -169,9 +175,9 @@ print_results(
 );
 
 if ($short == 1) {
-    print_heading('Top Scoring Monolink Matches <a href="view_summary.pl?table=' . $name . '&more=1">View all</a>');
+    print '<h4>Top Scoring Monolink Matches</h4> <a class="btn btn-primary offset10 span1" href="view_summary.pl?table=' . $name . '&more=1">View all</a><br/><br/>';
 } else {
-    print_heading('Monolink Matches');
+    print '<h4>Monolink Matches</h4>';
 }
 if (defined $order) {
     $top_hits = $results_dbh->prepare(
@@ -190,7 +196,7 @@ print_results(
               1,                 $decoy
 );
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 $top_hits->finish();
 $results_dbh->disconnect();
 exit;

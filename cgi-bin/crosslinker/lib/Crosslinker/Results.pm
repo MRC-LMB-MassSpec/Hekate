@@ -507,10 +507,10 @@ sub print_results {
 
     if ($no_tables == 0) {
         print
-'<table><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td>';
+'<table class="table table-striped"><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td>';
         if ($monolink == 1) { print '<td>Monolink Mass</td>'; }
         print
-'<td>Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>MS/2</td>';
+'<td class="table table-striped">Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>MS/2</td>';
         if ($decoy eq 'Yes') { print '<td>FDR</td>' }
         print '</tr>';
     }
@@ -673,17 +673,17 @@ sub print_results {
                            $table
             );
 
-            print_xquest_link(
-                              $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'},
-                              $top_hits_results->{'mz'},         $top_hits_results->{'charge'},
-                              $top_hits_results->{'fragment'},   $mass_seperation,
-                              $mass_of_deuterium,                $mass_of_hydrogen,
-                              $mass_of_carbon13,                 $mass_of_carbon12,
-                              $cut_residues,                     $xlinker_mass,
-                              $mono_mass_diff,                   $reactive_site,
-                              $fasta,                            $static_mod_string,
-                              $varible_mod_string
-            );
+#             print_xquest_link(
+#                               $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'},
+#                               $top_hits_results->{'mz'},         $top_hits_results->{'charge'},
+#                               $top_hits_results->{'fragment'},   $mass_seperation,
+#                               $mass_of_deuterium,                $mass_of_hydrogen,
+#                               $mass_of_carbon13,                 $mass_of_carbon12,
+#                               $cut_residues,                     $xlinker_mass,
+#                               $mono_mass_diff,                   $reactive_site,
+#                               $fasta,                            $static_mod_string,
+#                               $varible_mod_string
+#             );
 
             print "</td>";
 

@@ -19,12 +19,12 @@ use Crosslinker::HTML;
 $SIG{CHLD} = 'IGNORE';
 defined(my $child = fork) or die "Cannot fork: $!\n";
 if ($child) {
-    print_page_top_fancy;
+    print_page_top_bootstrap;
     print_heading('File Upload');
     print
 "<p>File upload complete, your search has been added to the queue and should appear on the results page soon.</p>";
 
-    print_page_bottom_fancy;
+    print_page_bottom_bootstrap;
 } else {
     my $query = new CGI;
     $CGI::POST_MAX = 1024 * 50000;
