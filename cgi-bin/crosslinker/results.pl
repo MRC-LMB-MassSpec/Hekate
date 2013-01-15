@@ -57,7 +57,7 @@ while (my $table_name = $table_list->fetchrow_hashref) {
 #     }
 
     print
-"</td><td> <a href='view_summary.pl?table=$table_name->{'name'}'>Summary</a> </td><td> <a href='view_pymol.pl?table=$table_name->{'name'}'>Pymol</a> </td><td> <a href='view_paper.pl?table=$table_name->{'name'}'>Sorted</a> </td><td> <a href='view_all.pl?table=$table_name->{'name'}' >Full</a> </td><td> <a href='view_report.pl?table=$table_name->{'name'}' >Report</a></td><td><a href='view_txt.pl?table=$table_name->{'name'}'>CSV</a></td><td><a class='btn btn-danger' href='delete.pl?table=$table_name->{'name'}' >Delete</a> <a class='btn btn-warning' href='abort.pl?table=$table_name->{'name'}' >Abort</a></td></tr>";
+"</td><td> <a href='view_summary.pl?table=$table_name->{'name'}'>Summary</a> </td><td> <a href='view_pymol.pl?table=$table_name->{'name'}'>Pymol</a> </td><td> <a href='view_paper.pl?table=$table_name->{'name'}'>Sorted</a> </td><td> <a href='view_report.pl?table=$table_name->{'name'}' >Report</a></td><td><a href='view_txt.pl?table=$table_name->{'name'}'>CSV</a></td><td><a class='btn btn-danger' href='delete.pl?table=$table_name->{'name'}' >Delete</a> <a class='btn btn-warning' href='abort.pl?table=$table_name->{'name'}' >Abort</a></td></tr>";
 }
 
 print "</table>";

@@ -728,7 +728,7 @@ sub print_results_combined {
 
     if ($no_tables == 0) {
         print
-'<table><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td><td>Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>MS/2</td></tr>';
+'<table class="table table-striped"><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td><td>Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>MS/2</td></tr>';
     }
 
     while ((my $top_hits_results = $top_hits->fetchrow_hashref))    #&& ($printed_hits <= 50)
@@ -828,17 +828,17 @@ sub print_results_combined {
                       $static_mod_string . $fixed_mod->{'mod_residue'} . ":" . $fixed_mod->{'mod_mass'} . ",";
                 }
 
-                print_xquest_link(
-                                  $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'},
-                                  $top_hits_results->{'mz'},         $top_hits_results->{'charge'},
-                                  $top_hits_results->{'fragment'},   $mass_seperation{ $top_hits_results->{'name'} },
-                                  $mass_of_deuterium,                $mass_of_hydrogen,
-                                  $mass_of_carbon13,                 $mass_of_carbon12,
-                                  $cut_residues,                     $xlinker_mass,
-                                  $mono_mass_diff,                   $reactive_site,
-                                  $fasta,                            $static_mod_string,
-                                  $varible_mod_string
-                );
+#                 print_xquest_link(
+#                                   $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'},
+#                                   $top_hits_results->{'mz'},         $top_hits_results->{'charge'},
+#                                   $top_hits_results->{'fragment'},   $mass_seperation{ $top_hits_results->{'name'} },
+#                                   $mass_of_deuterium,                $mass_of_hydrogen,
+#                                   $mass_of_carbon13,                 $mass_of_carbon12,
+#                                   $cut_residues,                     $xlinker_mass,
+#                                   $mono_mass_diff,                   $reactive_site,
+#                                   $fasta,                            $static_mod_string,
+#                                   $varible_mod_string
+#                 );
 
                 print "</td></tr>";
             } else {

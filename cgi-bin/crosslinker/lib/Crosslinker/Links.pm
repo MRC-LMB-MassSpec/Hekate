@@ -35,7 +35,7 @@ sub print_ms2_link    #Creates link to ms/2
 <input type="hidden" name="table" value="',        $table,          '" />
 
 
-<input type="submit" name="update" value="ms2" />
+<input class="btn btn-info" type="submit" name="update" value="ms2" />
 </form>
 ';
 
