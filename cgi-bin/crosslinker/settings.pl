@@ -27,29 +27,34 @@ print_page_top_bootstrap("Settings");
 my $version = version();
 
 my $query = new CGI;
-if (!defined $query->param('page')) {
+
     print <<ENDHTML;
-	
 	<h1>Crosslinker Settings</h1>
-	<p>
-	<ul>
+    <div class="row">
+    <div class="span2">
+    <div class="well">
+	<ul class="nav nav-list" styling="padding:0px; margin:0px;">
 	<li><a href="settings.pl?page=enzymes">Enzymes</a></li>
-	<li>Modifications
-	<ul>
+	<li class="nav-header">Modifications</li>
+	<ul class="nav nav-list">
 	<li><a href="settings.pl?page=dynamic_mods">Dynamic</a></li>
 	<li><a href="settings.pl?page=fixed_mods">Fixed</a></li>
 	</ul>
-	</li>
 	<li><a href="settings.pl?page=sequences">Sequences</a></li>	
-	<li><a href="settings.pl?page=crosslinkers">Crosslink Reagents</a></li>
-	</p>
+	<li><a href="settings.pl?page=crosslinkers">Reagents</a></li>
+	</ul>
+  </div>
+  </div>
+  <div class="span10">
 	
 ENDHTML
+if (!defined $query->param('page')) {
+
 } elsif ($query->param('page') eq 'enzymes') {
     my $dbh = connect_conf_db;
     my $enzymes = get_conf($dbh, 'enzyme');
     print '<form method="POST" enctype="multipart/form-data" action="settings_add.pl" >';
-    print "<h2>Enzymes</h2>";
+    print "<h4>Enzymes</h4>";
     print "<table class='table table-striped'><tr><td>Enzyme</td><td>Cleave at</td><td>Restrict</td><td>N or C</td><td>Edit/Delete</td></tr>";
 
     while ((my $enzyme = $enzymes->fetchrow_hashref)) {
@@ -58,7 +63,7 @@ ENDHTML
     }
 
     print
-"<tr><td><input type='hidden' name='type' size='10' maxlength='10' value='enzyme'/><input type='text' name='name' size='10' maxlength='20' value='Name'/></td><td><input type='text' name='setting1' size='10' maxlength='25' value='KR'/></td><td><input type='text' name='setting2' size='5' maxlength='1' value='P'/></td><td><select name='setting3'><option>C</option><option>N</option></select></td><td><input class='btn btn-primary' type='submit' value='Add' /></td></tr>";
+"<tr><td><input type='hidden' name='type' size='10' maxlength='10' value='enzyme'/><input type='text' name='name' size='10' maxlength='20' value='Name'/></td><td><input class='input-small' type='text' name='setting1' size='10' maxlength='25' value='KR'/></td><td><input class='input-small'  type='text' name='setting2' size='5' maxlength='1' value='P'/></td><td><select name='setting3'><option>C</option><option>N</option></select></td><td><input class='btn btn-primary' type='submit' value='Add' /></td></tr>";
     print "</table></form>";
     $enzymes->finish;
     $dbh->disconnect;
@@ -67,7 +72,7 @@ ENDHTML
     my $dbh = connect_conf_db;
     my $sequences = get_conf($dbh, 'sequence');
     print '<form method="POST" enctype="multipart/form-data" action="settings_add.pl" >';
-    print "<h2>Sequences</h2>";
+    print "<h4>Sequences</h4>";
     print "<div class='row'><table class='table table-striped span8 offset2'><tr><td>Sequence Database Name</td><td>Edit/Delete</td></tr>";
 
     while ((my $sequence = $sequences->fetchrow_hashref)) {
@@ -89,7 +94,7 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
     my $dbh = connect_conf_db;
     my $crosslinkers = get_conf($dbh, 'crosslinker');
     print '<form method="POST" enctype="multipart/form-data" action="settings_add.pl" >';
-    print "<h2>Crosslinking Reagents</h2>";
+    print "<h4>Crosslinking Reagents</h4>";
     print
 "<table class='table table-striped'><tr><td>Name</td><td>Reactivity</td><td>Mass</td><td>MonoLink Mass</td><td>Isotope</td><td>Seperation</d><td>Edit/Delete</td></tr>";
 
@@ -103,7 +108,7 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
 <td><input class='input-small' type='text' name='setting1' size='10' maxlength='1' value='K'/></td>
 <td><input class='input-small' type='text' name='setting2' size='10' maxlength='10' value='96.0211296'/></td>
 <td><input class='input-small' type='text' name='setting3' size='10' maxlength='50' value='114.0316942'/></td>
-<td><select  name='setting4'><option>deuterium</option><option>carbon-13</option><option>none</option></select></td>
+<td><select class='input-small'  name='setting4'><option>deuterium</option><option>carbon-13</option><option>none</option></select></td>
 <td><input class='input-small' type='text' name='setting5' size='10' maxlength='10' value='4'/></td>
 <td><input class='btn btn-primary' type='submit' value='Add' /></td></tr>";
     print "</table></form>";
@@ -115,7 +120,7 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
     my $fixed_mods = get_conf($dbh, 'fixed_mod');
     print '<form method="POST" enctype="multipart/form-data" action="settings_add.pl" >';
     print "<input type='hidden' name='type' value='fixed_mod'/>";
-    print "<h2>Fixed Modifications</h2>";
+    print "<h4>Fixed Modifications</h4>";
     print "<table class='table table-striped'>";
     print "<tr><td>Name</td><td>Mass</td><td>Residue</td><td>Default</td><td>Edit/Delete</td></tr>";
     while ((my $fixed_mod = $fixed_mods->fetchrow_hashref)) {
@@ -139,7 +144,7 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
     my $dynamic_mods = get_conf($dbh, 'dynamic_mod');
     print '<form method="POST" enctype="multipart/form-data" action="settings_add.pl" >';
     print "<input type='hidden' name='type' value='dynamic_mod'/>";
-    print "<h2>Dynamic Modifications</h2>";
+    print "<h4>Dynamic Modifications</h4>";
     print "<table class='table table-striped'>";
     print "<tr><td>Name</td><td>Mass</td><td>Residue</td><td>Default?</td><td>Edit/Delete</td></tr>";
     while ((my $dynamic_mod = $dynamic_mods->fetchrow_hashref)) {
@@ -159,5 +164,8 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
     $dbh->disconnect;
 
 }
+
+print "</div></div>";
+
 print_page_bottom_bootstrap;
 exit;
