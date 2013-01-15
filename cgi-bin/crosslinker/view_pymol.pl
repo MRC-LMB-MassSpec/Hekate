@@ -43,7 +43,7 @@ my $settings_dbh = DBI->connect("dbi:SQLite:dbname=db/settings", "", "", { Raise
 my $settings_sql = $settings_dbh->prepare("SELECT name FROM settings WHERE name = ?");
 $settings_sql->execute($table);
 my @data = $settings_sql->fetchrow_array();
-if (@data[0] != $table) {
+if ($data[0] != $table) {
     print "Content-Type: text/plain\n\n";
     print "Cannont find results database";
     exit;
@@ -199,6 +199,7 @@ while ((my $sequences_results = $sequences->fetchrow_hashref)) {
       . '"/></td></tr>';
 }
 $settings->finish();
+$settings_sql->finish();
 $settings_dbh->disconnect();
 
 print '</table><div class="row"><div class="span1 offset9"><input class="btn btn-primary" type="submit" value="Submit" /></div></div></from>';

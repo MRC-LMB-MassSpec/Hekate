@@ -81,7 +81,7 @@ for (my $table_no = 0 ; $table_no < @table ; $table_no++) {
     my $settings_sql = $settings_dbh->prepare("SELECT name FROM settings WHERE name = ?");
     $settings_sql->execute($table[$table_no]);
     my @data = $settings_sql->fetchrow_array();
-    if (@data[0] != $table[$table_no]) {
+    if ($data[0] != $table[$table_no]) {
         print "Content-Type: text/plain\n\n";
         print "Cannont find results database";
         exit;

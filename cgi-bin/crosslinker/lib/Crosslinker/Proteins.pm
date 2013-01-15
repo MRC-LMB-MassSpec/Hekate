@@ -184,9 +184,9 @@ sub residue_position    #locates peptides in proteins
     my ($fragment, $protien_sequences) = @_;
     my @sequences = split('>', $protien_sequences);
     my $sequence_no;
-    my $residue_no;
+    my $residue_no = 0 ;
 
-    for (my $n = 0 ; $n <= @sequences ; $n++) {
+    for (my $n = 0 ; $n < @sequences ; $n++) {
         if (index($sequences[$n], $fragment) != -1) {
             $residue_no = index($sequences[$n], $fragment);
             $sequence_no = $n;

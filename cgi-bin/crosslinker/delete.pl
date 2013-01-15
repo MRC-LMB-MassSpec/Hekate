@@ -31,7 +31,7 @@ print_page_top_bootstrap('Delete');
 my $settings_sql = $settings_dbh->prepare("SELECT name FROM settings WHERE name = ?");
 $settings_sql->execute($table);
 my @data = $settings_sql->fetchrow_array();
-if (@data[0] != $table) {
+if ($data[0] != $table) {
     print "<p> Cannont find results database </p>";
     print_page_bottom_fancy;
     exit;

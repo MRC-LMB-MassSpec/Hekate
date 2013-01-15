@@ -17,7 +17,7 @@ use Crosslinker::Constants;
 use Crosslinker::Data;
 use Crosslinker::Config;
 
-my $path = installed;
+my $path = installed();
 
 ########################
 #                      #
@@ -27,7 +27,7 @@ my $path = installed;
 
 print_page_top_bootstrap("Home");
 my $version = version();
-    my $path    = installed();
+
 print <<ENDHTML;
 <div class="row">
 <div class="span8 offset2">

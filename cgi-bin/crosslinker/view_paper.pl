@@ -188,11 +188,13 @@ sub print_results_paper {
                     print "</td>";
                     print "<td>$unmodified_fragments[0]&#8209;$unmodified_fragments[1]</td>";
                 } else {
-                    print residue_position ($unmodified_fragments[1], $top_hits_results->{'sequence1'}) +
+                    print residue_position ($unmodified_fragments[1], $top_hits_results->{'sequence2'}) +
                       $top_hits_results->{'best_y'} + 1 +
                       $error{ substr($top_hits_results->{'sequence2_name'}, 1) };
-                    print "</td><td>"; 
-                    print residue_position ($unmodified_fragments[0], $top_hits_results->{'sequence2'}) +
+                    print "</td><td>"; 	   
+
+
+                    print residue_position ($unmodified_fragments[0], $top_hits_results->{'sequence1'}) +
                       $top_hits_results->{'best_x'} + 1 +
                       $error{ substr($top_hits_results->{'sequence1_name'}, 1) }; 
                     print "</td>";;
@@ -270,7 +272,7 @@ while ((my $sequences_results = $sequences->fetchrow_hashref)) {
 
         $settings_sql->execute($name,
                                substr($sequences_results->{'seq'}, 1),
-                               $error{ substr($sequences_results->{'seq'}, 1) });
+                               $error{ substr($sequences_results->{'seq'}, 1) } +=0);
 
     } else {
 

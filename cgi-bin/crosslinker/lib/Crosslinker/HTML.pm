@@ -730,6 +730,8 @@ ENDHTML
 sub print_page_top_bootstrap    #Prints the end of the HTML page
 {
     my ($page) = @_;
+
+
     my $version = version();
     my $path    = installed();
     print <<ENDHTML;
@@ -825,8 +827,8 @@ sub print_page_bottom_bootstrap    #Prints the end of the HTML page
    my $path    = installed();
     print <<ENDHTML;
 </div> <!-- /container --> 
-<div class="span8 offset2" 
-   <hr>
+<div class="span8 offset2"> 
+   <hr/><br/>
    <footer> 
         <p class="pull-right"><a href="#">Back to top</a></p> 
         <p>Developed by Andrew Holding at <strong>MRC Laboratory of Molecular Biology</strong>.</p> 
