@@ -31,7 +31,7 @@ my $version = version();
 print <<ENDHTML;
 <div class="row">
 <div class="span8 offset2">
-<img class="span2" src="/$path/bootstrap/img/crosslinker.png"/>
+<img class="span2" style="max-width: 240px" src="/$path/bootstrap/img/crosslinker.png"/>
    <div class="page-header">
   <h1>Crosslinker <small>by Andrew Holding</small></h1>
 </div>

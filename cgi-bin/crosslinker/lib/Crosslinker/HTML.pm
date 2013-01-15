@@ -742,7 +742,10 @@ Content-type: text/html\n\n
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <meta name="description" content=""> 
     <meta name="author" content=""> 
- 
+    <script src="/$path/java/jquery.js" type="text/javascript"></script>
+    <script src="/$path/bootstrap/js/bootstrap.js"></script> 
+    <script src="/$path/java/main.js" type="text/javascript"></script> 
+
     <!-- Le styles --> 
     <link href="/$path/bootstrap/css/bootstrap.css" rel="stylesheet"> 
     <style> 
@@ -775,9 +778,6 @@ Content-type: text/html\n\n
 </style>
     </style> 
     <link href="/$path/bootstrap/css/bootstrap-responsive.css" rel="stylesheet"> 
-    <script src="/$path/java/jquery.js" type="text/javascript"></script>
-    <script src="/$path/java/main.js" type="text/javascript"></script> 
-
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements --> 
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -826,22 +826,6 @@ sub print_page_bottom_bootstrap    #Prints the end of the HTML page
     print <<ENDHTML;
 </div> <!-- /container --> 
  
-    <!-- Le javascript
-    ================================================== --> 
-    <!-- Placed at the end of the document so the pages load faster --> 
-    <script src="/$path/bootstrap/js/jquery.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-transition.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-alert.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-modal.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-dropdown.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-scrollspy.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-tab.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-tooltip.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-popover.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-button.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-collapse.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-carousel.js"></script> 
-    <script src="/$path/bootstrap/js/bootstrap-typeahead.js"></script> 
  
   </body> 
 </html> 
