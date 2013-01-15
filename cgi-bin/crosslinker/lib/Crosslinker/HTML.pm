@@ -825,8 +825,13 @@ sub print_page_bottom_bootstrap    #Prints the end of the HTML page
    my $path    = installed();
     print <<ENDHTML;
 </div> <!-- /container --> 
- 
- 
+<div class="span8 offset2" 
+   <hr>
+   <footer> 
+        <p class="pull-right"><a href="#">Back to top</a></p> 
+        <p>Developed by Andrew Holding at <strong>MRC Laboratory of Molecular Biology</strong>.</p> 
+      </footer>
+</div> 
   </body> 
 </html> 
 
