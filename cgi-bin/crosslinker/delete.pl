@@ -26,7 +26,7 @@ my $areyousure = $query->param('areyousure');
 
 my $settings_dbh = DBI->connect("dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 });
 
-print_page_top_fancy('Delete');
+print_page_top_bootstrap('Delete');
 
 my $settings_sql = $settings_dbh->prepare("SELECT name FROM settings WHERE name = ?");
 $settings_sql->execute($table);
@@ -60,8 +60,8 @@ if ($data[0] != -1 && $data[0] != -4 && $data[0] != -5) {
 
     #    print $data[0];
     print "<p>Are you sure you want to delete $table?</p>";
-    print "<p><a href='delete.pl?table=$table&areyousure=yes'>Yes</a>  or <a href='results.pl'>No</a></p>";
+    print "<p><a class='btn btn-danger' href='delete.pl?table=$table&areyousure=yes'>Yes</a>  or <a class='btn' href='results.pl'>No</a></p>";
 }
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 $results_dbh->disconnect();
 exit;

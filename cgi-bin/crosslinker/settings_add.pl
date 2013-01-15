@@ -23,7 +23,7 @@ use Crosslinker::Config;
 #                      #
 ########################
 
-print_page_top_fancy("Settings");
+print_page_top_bootstrap("Settings");
 my $version = version();
 
 my $query = new CGI;
@@ -83,5 +83,5 @@ if (!defined $query->param('type')) {
 
 }
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 exit;

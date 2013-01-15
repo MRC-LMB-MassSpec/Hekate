@@ -26,7 +26,7 @@ my $table = $query->param('table');
 my $results_dbh  = DBI->connect("dbi:SQLite:dbname=db/results",  "", "", { RaiseError => 1, AutoCommit => 1 });
 my $settings_dbh = DBI->connect("dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 });
 
-print_page_top_fancy('Rename');
+print_page_top_bootstrap('Rename');
 
 my $table_list = $settings_dbh->prepare(
                         "SELECT name, desc, finished FROM settings WHERE name=? ORDER BY length(name) DESC, name DESC");
@@ -49,6 +49,6 @@ if ($table_settings->{'finished'} != -1) {
 
 print "<p>Return to <a href='results.pl'>results</a>?</p>";
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 $results_dbh->disconnect();
 exit;

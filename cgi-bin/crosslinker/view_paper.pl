@@ -108,7 +108,7 @@ sub print_results_paper {
 
     if ($no_tables == 0) {
         print
-'<table><tr><td></td><td>Chain 1</td><td>Chain 2</td><td>Position1</td><td>Position2</td><td>Fragment&nbsp;and&nbsp;Position</td><td>Score</td><td>Mass</td><td>Charge<td>PPM</td></td></td><td>Mod</td></tr>';
+'<br/><div class="row"><div class="span12"><table class="table table-stripped"><tr><td></td><td>Chain 1</td><td>Chain 2</td><td>Position1</td><td>Position2</td><td>Fragment&nbsp;and&nbsp;Position</td><td>Score</td><td>Mass</td><td>Charge<td>PPM</td></td></td><td>Mod</td></tr>';
     }
 
     while (   (my $top_hits_results = $top_hits->fetchrow_hashref)
@@ -219,7 +219,7 @@ sub print_results_paper {
         }
     }
 
-    print '</table>';
+    print '</table></div></div>';
 
 }
 
@@ -229,15 +229,22 @@ sub print_results_paper {
 #                      #
 ########################
 
-print_page_top_fancy('All Results');
+print_page_top_bootstrap('All Results');
 print_heading('Sorted Crosslink Data');
+
+
+if ($is_finished != -1) {
+print "<div class='row'><div class='alert alert-error'>
+  <h4>Warning</h4>Data Analysis not finished
+</div></div>";
+}
 
 my $sequences = $results_dbh->prepare(
 "SELECT DISTINCT seq FROM (Select distinct sequence1_name as seq, name from results where name=? union select distinct sequence2_name, name as seq from results WHERE name=?)"
 );
 $sequences->execute($table, $table);
 
-print '<br/><form name="input" action="" method="post"><table>';
+print '<br/><form name="input" action="" method="post"><table class="table span8 offset2">';
 print '<tr><td style="font-weight: bold;" colspan="3">Set Alignment Correction and Name:</td></tr>';
 print '<input type="hidden" name="table" value="' . $table . '"/>';
 
@@ -321,13 +328,13 @@ while ((my $sequences_results = $sequences->fetchrow_hashref)) {
         }
     }
 
-    print '<tr><td>'
+    print '<tr><td><label class="inline checkbox">'
       . substr($sequences_results->{'seq'}, 1)
-      . '</td><td><input type="text" name="'
+      . '</label></td><td><input   type="text" name="'
       . substr($sequences_results->{'seq'}, 1)
       . '_name" value="'
       . $names{ substr($sequences_results->{'seq'}, 1) }
-      . '"/></td><td><input type="text" name='
+      . '"/></td><td><input class="input-small"  type="text" name='
       . substr($sequences_results->{'seq'}, 1)
       . ' value="'
       . $error{ substr($sequences_results->{'seq'}, 1) }
@@ -337,12 +344,8 @@ $settings->finish();
 $settings_sql->finish();
 $settings_dbh->disconnect();
 
-print '<tr><td colspan="3"><input type="submit" value="Submit" /></td></tr></table></from>';
+print '</table><div class="row"><div class="span1 offset9"><input class="btn btn-primary" type="submit" value="Submit" /></div></div></from>';
 $sequences->finish();
-
-if ($is_finished != '-1') {
-    print '<div style="text-align:center"><h2 style="color:red;">Warning: Data analysis not finished</h2></div>';
-}
 
 my $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND  SCORE > 0 ORDER BY score+0 DESC");
 $top_hits->execute($table);
@@ -354,7 +357,7 @@ print_results_paper(
                     \%names,           2
 );
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 $top_hits->finish();
 $results_dbh->disconnect();
 exit;

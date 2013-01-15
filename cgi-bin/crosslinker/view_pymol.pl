@@ -80,27 +80,31 @@ my (
 #                      #
 ########################
 
-print_page_top_fancy('Summary');
+print_page_top_bootstrap('Summary');
 
-if ($is_finished == '0') {
-    print '<div style="text-align:center"><h2 style="color:red;">Warning: Data analysis not finished</h2></div>';
+print_heading('Results');
+
+if ($is_finished != -1) {
+print "<div class='alert alert-error'>
+  <h4>Warning</h4>Data Analysis not finished
+</div>";
 }
 
-print_heading('Settings');
-
-print "<Table>
-<tr><td style='font-weight: bold;'>Name:</td><td>$name</td><td style='font-weight: bold;'>Description</td><td>$desc</td></tr>
-<tr><td style='font-weight: bold;'>Cut:</td><td>$cut_residues</td><td style='font-weight: bold;'>Xlink Site</td><td>$reactive_site</td></tr>
-<tr><td style='font-weight: bold;'>Xlinker Mass:</td><td>$xlinker_mass</td><td style='font-weight: bold;'>Monolink</td><td>$mono_mass_diff</td></tr></table>";
+print '<div class="row"><div class="offset2 span8"><h4>Sample details</h4></div></div>';
+print "<Table class='table offset2 table-striped span8'>
+<tr><td style='font-weight: bold;'>Name</td><td>$name</td><td style='font-weight: bold;'>Description</td><td>$desc</td></tr>
+<tr><td style='font-weight: bold;'>Cut</td><td>$cut_residues</td><td style='font-weight: bold;'>Xlink Site</td><td>$reactive_site</td></tr>
+<tr><td style='font-weight: bold;'>Xlinker Mass</td><td>$xlinker_mass</td><td style='font-weight: bold;'>Monolink</td><td>$mono_mass_diff</td></tr></table>";
 
 my $sequences = $results_dbh->prepare(
 "SELECT DISTINCT seq FROM (Select distinct sequence1_name as seq, name from results where name=? union select distinct sequence2_name, name as seq from results WHERE name=?)"
 );
 $sequences->execute($table, $table);
 
-print '<br/><form name="input" action="" method="post"><table>';
-print '<tr><td style="font-weight: bold;" colspan="3">Set Alignment Correction and Name:</td></tr>';
-print '<input type="hidden" name="table" value="' . $table . '"/>';
+print '<br/><div class="row"><div class="offset2 span8"><h4>Set Alignment Correction and Name</h4></div></div>
+	<form name="input" action="" method="post">
+	<table class="table offset2 tabel-strped span8">';
+print '<input class="input-small" type="hidden" name="table" value="' . $table . '"/>';
 
 my %error;
 my %names;
@@ -182,13 +186,13 @@ while ((my $sequences_results = $sequences->fetchrow_hashref)) {
         }
     }
 
-    print '<tr><td>'
+    print '<tr><td><label class="checkbox inline">'
       . substr($sequences_results->{'seq'}, 1)
-      . '</td><td><input type="text" name="'
+      . '</label></td><td><input class="input-small" type="text" name="'
       . substr($sequences_results->{'seq'}, 1)
       . '_name" value="'
       . $names{$name}{ substr($sequences_results->{'seq'}, 1) }
-      . '"/></td><td><input type="text" name='
+      . '"/></td><td><input ="input-small" type="text" name='
       . substr($sequences_results->{'seq'}, 1)
       . ' value="'
       . $error{$name}{ substr($sequences_results->{'seq'}, 1) }
@@ -197,10 +201,13 @@ while ((my $sequences_results = $sequences->fetchrow_hashref)) {
 $settings->finish();
 $settings_dbh->disconnect();
 
-print '<tr><td colspan="3"><input type="submit" value="Submit" /></td></tr></table></from>';
+print '</table><div class="row"><div class="span1 offset9"><input class="btn btn-primary" type="submit" value="Submit" /></div></div></from>';
 $sequences->finish();
 
-print_heading('Pymol Scripts');
+print '<div class="row"><div class="span8 offset2"><h4>Pymol Scripts</h4></div></div>';
+
+print "<div style='row'><div class='offset2 span8'>";
+
 my $top_hits;
 if (defined $order) {
     $top_hits = $results_dbh->prepare(
@@ -224,6 +231,8 @@ if (defined $order) {
     $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC");   
 }
 
+
+
 $top_hits->execute($table);
 print_pymol(
             $top_hits,         $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12,
@@ -232,7 +241,9 @@ print_pymol(
             0,                 \%error,           \%names,            1
 );
 
-print_page_bottom_fancy;
+print "</div></div>";
+
+print_page_bottom_bootstrap;
 $top_hits->finish();
 $results_dbh->disconnect();
 exit;

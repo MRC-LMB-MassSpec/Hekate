@@ -36,7 +36,7 @@ sub print_pymol {
     my @scan_so_far;
     my $printed_hits = 0;
 
-    print "<div style='margin: 2em'><textarea cols=80 rows=20>";
+    print "<div><textarea cols=80 rows=20 class='span8'>";
 
     my $new_line        = "\n";
     my $new_division    = "";

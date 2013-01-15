@@ -23,7 +23,7 @@ use Crosslinker::Config;
 #                      #
 ########################
 
-print_page_top_fancy("Settings");
+print_page_top_bootstrap("Settings");
 my $version    = version();
 my $query      = new CGI;
 my $areyousure = $query->param('areyousure');
@@ -38,14 +38,14 @@ if (!defined $query->param('ID')) {
       . "s'>previous page?</a></p>";
 } else {
     print "<p>Are you sure you want to delete this " . $query->param('type') . "?</p>";
-    print "<p><a href='settings_delete.pl?ID="
+    print "<p><a class='btn btn-danger' href='settings_delete.pl?ID="
       . $query->param('ID')
       . "&type="
       . $query->param('type')
-      . "&areyousure=yes'>Yes</a>  or <a href='settings.pl?page="
+      . "&areyousure=yes'>Yes</a>  or <a class='btn' href='settings.pl?page="
       . $query->param('type')
       . "s'>No</a></p>";
 }
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 exit;

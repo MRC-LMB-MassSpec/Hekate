@@ -729,6 +729,7 @@ ENDHTML
 
 sub print_page_top_bootstrap    #Prints the end of the HTML page
 {
+    my ($page) = @_;
     my $version = version();
     my $path    = installed();
     print <<ENDHTML;
@@ -798,13 +799,14 @@ Content-type: text/html\n\n
           <a href="index.pl" class="brand inline" >Crosslinker</a> 
           <div class="nav-collapse collapse"> 
             <ul class="nav"> 
-              <li class="active"><a href="index.pl">Search</a></li> 
-              <li><a href="results.pl">Results</a></li> 
-              <li><a href="doublet_search.pl">Doublet</a></li> 
-              <li><a href="crosslink_digest.pl">Digest</a></li> 
-              <li><a href="crosslink_product.pl">Fragment</a></li> 
-              <li><a href="settings.pl">Score</a></li> 
-              <li><a href="#contact">Settings</a></li> 
+ENDHTML
+
+
+print '              <li '; if ($page eq 'Home') {print 'class="active"' }; print '><a href="index.pl">Search</a></li>'; 
+print '              <li '; if ($page eq 'Results') {print 'class="active"' }; print '><a href="results.pl">Results</a></li>'; 
+print '              <li '; if ($page eq 'Settings') {print 'class="active"' }; print '><a href="settings.pl">Settings</a></li>'; 
+
+print <<ENDHTML;
             </ul> 
           </div><!--/.nav-collapse --> 
         </div> 
