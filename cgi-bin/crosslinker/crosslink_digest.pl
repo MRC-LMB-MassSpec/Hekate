@@ -114,14 +114,14 @@ print <<ENDHTML;
 <div class="row">
 <div class="span4">
 <label>Linker mass</label>
-<input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/>Da<br/>
+<div class="input-append"><input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/><span class="add-on">ppm</span></div><br/>
 <label>Isotope</label>  <select
 name="isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select>
 <label>Number of labelled atoms</label> <input type="text" 
 name="seperation" size="2" maxlength="5" 
 value="4"/> 
 </div><div class="span4"> 
-<label> Monolink mass</label> <input type="text" name="mono_mass_diff" size="10" maxlength="21" value="114.0316942"/>Da<br/>
+<label> Monolink mass</label><div class="input-append"> <input type="text" name="mono_mass_diff" size="10" maxlength="21" value="114.0316942"/><span class="add-on">ppm</span></div><br/>
 <label>Reactive amino acid</label> <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/><br/>
 </div>
 </div>

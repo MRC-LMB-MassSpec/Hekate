@@ -27,9 +27,13 @@ use Crosslinker::Scoring;
 use Crosslinker::Config;
 use Crosslinker::Results;
 
-print_page_top_fancy("Scan Search");
+print_page_top_bootstrap("Score");
+print '<div class="row">
+<div class="span8 offset2">
+   <div class="page-header">
+  <h1>Crosslinker <small>Score</small></h1>
+</div></div></div>';
 my $version = version();
-print_heading('Scan Search');
 
 # Constants
 my (
@@ -133,6 +137,6 @@ print_results(
 
 disconnect_db($dbh, $settings_dbh, $results_dbh);
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 exit;
 

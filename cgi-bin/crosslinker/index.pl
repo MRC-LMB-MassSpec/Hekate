@@ -162,15 +162,15 @@ print <<ENDHTML;
 </div>
 <div class="span4">      
   <label>Mass change on crosslinking</label>
-  <input type="text" name="amber_xlink" size="10" maxlength="10" value="0"/>Da<br/> 
+  <div class="input-append"><input type="text" name="amber_xlink" size="10" maxlength="10" value="0"/><span class="add-on">ppm</span></div><br/> 
   <label>Isotope type</label>
   <select name="amber_isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select> 
   <label>Number of labelled atoms in isotopic form</label>
   <input type="text" name="amber_seperation" size="2" maxlength="5" value="11"/> 
 </div>
 <div class="span4">  
-    Amino acid residue mass: <input type="text" name="amber_residue_mass" size="10" maxlength="21" value="251.0946254"/>Da<br/> 
-    Amber codon (Z) peptide sequence: <input type="text" name="amber_peptide" size="10" maxlength="20" value="FZPVINKPAK"/><br/> 
+    <label>Amino acid residue mass</label> <div class="input-append"><input type="text" name="amber_residue_mass" size="10" maxlength="21" value="251.0946254"/><span class="add-on">ppm</span></div><br/> 
+    <label>Amber codon (Z) peptide sequence</label> <input type="text" name="amber_peptide" size="10" maxlength="20" value="FZPVINKPAK"/><br/> 
 </div>
 </div>
 <Legend>Fragment Ions</legend>

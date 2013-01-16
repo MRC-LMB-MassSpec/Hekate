@@ -42,7 +42,7 @@ print <<ENDHTML;
 <div class="row">
 <div class="span8"> 
 <label>Linker mass<label>
-<input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/>Da<br/>
+<div class="input-append"><input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/><span class="add-on">ppm</span></div><br/>
 <label>Reactive amino acid</label>
 <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/><br/>
 </div>

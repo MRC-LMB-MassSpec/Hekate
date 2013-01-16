@@ -809,6 +809,7 @@ print '              <li '; if ($page eq 'Results') {print 'class="active"' }; p
 print '              <li '; if ($page eq 'Doublet') {print 'class="active"' }; print '><a href="doublet_search.pl">Doublet</a></li>';
 print '              <li '; if ($page eq 'Digest') {print 'class="active"' }; print '><a href="crosslink_digest.pl">Digest</a></li>';
 print '              <li '; if ($page eq 'Fragment') {print 'class="active"' }; print '><a href="crosslink_product.pl">Fragment</a></li>';
+print '              <li '; if ($page eq 'Score') {print 'class="active"' }; print '><a href="singlescan.pl">Score</a></li>'; 
 print '              <li '; if ($page eq 'Settings') {print 'class="active"' }; print '><a href="settings.pl">Settings</a></li>'; 
 
 print <<ENDHTML;

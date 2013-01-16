@@ -25,23 +25,24 @@ my $path = installed;
 #                      #
 ########################
 
-print_page_top_fancy("Score Scan");
+print_page_top_bootstrap("Score");
 my $version = version();
-print_heading('Score Scan');
+print '<div class="row">
+<div class="span8 offset2">
+   <div class="page-header">
+  <h1>Crosslinker <small>Score</small></h1>
+</div></div></div>';
 print <<ENDHTML;
-<form method="POST" enctype="multipart/form-data" action="singlescan_search.pl" >
-<table>
+<div class="row">
+<div class="span8 offset2">
 
-<tr cellspacing="3">
-  <td  style="background: white;" > 
-  <table >
-    <tr>
-	<td  style="background: white;" >Settings:</td>
-    </tr>
-    <tr>
-    <td class="half"  >
-   Digest
-    <select name="enzyme">
+<form method="POST" enctype="multipart/form-data" action="singlescan_search.pl">
+<fieldset>
+<legend>Settings</legend><br/>
+<div class="row">
+<div class="span4"> 
+   <label>Digest</label>
+    <select name="enzyme"> 
 ENDHTML
 
 my $dbh = connect_conf_db;
@@ -52,31 +53,48 @@ while ((my $enzyme = $enzymes->fetchrow_hashref)) {
     if ($enzyme->{'name'} eq 'Trypsin') { print "selected='true'" }
     print ">" . $enzyme->{'name'} . " </option>";
 }
-
 $enzymes->finish();
 
 print <<ENDHTML;
-    </select><br/>
-    
-     MS2 accurracy (Da) <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/><br/>
-     Threshold (% of max intensity) <input type="text" name="threshold" size="3" maxlength="3" value="2"/><br/>
-    Allow cross-linking at cut site : <input type="checkbox" name="allow_xlink_at_cut_site" value="true" ><br/> 
-    </td>
-  <td class="half"  >
-    Max. Missed Cleavages    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="2"/><br/>
-    MS1 accurracy (ppm) <input type="text" name="ms1_ppm" size="2" maxlength="2" value="2"/><br/>
-    Decoy Search: <input type="checkbox" name="decoy" value="true"><br/>       
-  </td>
-</tr>
-<tr>
-  <td class="half"  style="background: white;">
-      Modifcations:
-</td><td style="background: white;"></td>
-    </tr>
-    <tr>
-  <td class="half"  >
-    Dynamic Modifications:
-    <select style="width: 20em;" multiple="multiple" size="5"  name="dynamic_mod">
+     </select> 
+   
+    <label>MS2 accurracy (Da)</label>
+    <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/> 
+    <label>Doublet Spacing Tollerance</label>
+    <div class="input-append"><input type="text" name="ms_ppm" size="4" maxlength="4" value="50"/><span class="add-on">ppm</span></div>
+    <label>Threshold</label>
+    <input type="text" name="threshold" size="3" maxlength="3" value="2"/> 
+    <span class="help-block">as a % of the maximum intensity</span>
+</div>
+<div class="span4">
+    <label>Maximum Missed Cleavages</label>
+    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="3"/>
+    <label>MS1 accurracy</label>
+    <div class="input-append"><input type="text" name="ms1_ppm" size="2" maxlength="2" value="2"/><span class="add-on">ppm</span></div>
+    <label>Max scan seperation</label>
+    <input type="text" name="scan_width" size="4" maxlength="4" value="60"/><br/>
+    <label class="checkbox inline" ><input type="checkbox" name="decoy" value="true">Decoy&nbsp;Search</label><br/>  
+    <label class="checkbox inline" ><input type="checkbox" name="charge_match"  checked="checked" value="true">Require&nbsp;Charge&nbsp;Match</label><br/>
+    <label class="checkbox inline" ><input type="checkbox" name="allow_xlink_at_cut_site" value="true" >Allow&nbsp;cross&#8209;linking&nbsp;at&nbsp;cut&nbsp;site</label><br/>
+    <label class="checkbox inline" ><input type="checkbox" name="detailed_scoring"  value="true">Detailed&nbsp;scoring</label><br/>
+     <span class="help-block">these are found in the csv output only</span>
+</div>
+</div>
+
+<div class="row">
+<div class="span4">
+  <label class="checkbox inline" ><input type="checkbox" name="intensity_match" value="true" >Intensity&nbsp;Match&nbsp;(MS1)</label>
+</div>
+<div class="span4">
+    <label>Maximum intensity ratio</label><input type="text" name="ms1_intensity_ratio" size="4" maxlength="4" value="0.8"/>
+</div>
+</div>
+
+<legend>Modifications</legend>
+<div class="row">
+<div class="span4">
+    <label>Dynamic Modifications</label>
+    <select style="width: 20em;" multiple="multiple" size="5"  name="dynamic_mod"> 
 ENDHTML
 
 my $mods = get_conf($dbh, 'dynamic_mod');
@@ -86,10 +104,11 @@ while ((my $mod = $mods->fetchrow_hashref)) {
     print "<option $selected value='" . $mod->{'rowid'} . "'>" . $mod->{'name'} . "</option>";
 }
 print <<ENDHTML;
-  </select>
-</td><td>
-    Fixed Modifications:
-    <select style="width: 20em;" multiple="multiple" size="5"  name="fixed_mod">
+ </select> 
+</div>
+<div class="span4">
+    <label>Fixed Modifications</label>
+    <select style="width: 20em;" multiple="multiple" size="5"  name="fixed_mod"> 
 ENDHTML
 
 $mods = get_conf($dbh, 'fixed_mod');
@@ -100,12 +119,14 @@ while ((my $mod = $mods->fetchrow_hashref)) {
 }
 $mods->finish();
 print <<ENDHTML;
-  </select>
-</td>
-</tr>
- <tr>
-  <td class="half"  style="background: white;">
-    Crosslinking Reagent:<select name='crosslinker'>
+   </select> 
+</div>
+</div>
+<legend>Crosslinking Reagent</legend>
+<div class="row">
+<div class="span8">
+  <label>Crosslinking Reagent<label>
+  <select name='crosslinker'> 
 ENDHTML
 
 my $crosslinkers = get_conf($dbh, 'crosslinker');
@@ -115,64 +136,56 @@ while ((my $crosslinker = $crosslinkers->fetchrow_hashref)) {
 $crosslinkers->finish();
 print "<option value='-1' selected='true'>Custom (enter below)</option></select>";
 print <<ENDHTML;
-  </td><td style="background: white;"></td>
-    </tr>
-    <tr>
-  <td class="half"  >
-      Linker mass: <input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/>Da<br/>
-      Atoms on  <select
-name="isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select>
- 
-in heavy form: <input type="text" 
-name="seperation" size="2" maxlength="5" 
-value="4"/> 
-</td><td>
- Monolink mass: <input type="text" name="mono_mass_diff" size="10" maxlength="21" value="114.0316942"/>Da<br/>
-    Reactive amino acid: <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/><br/>
-</td>
-</tr>
-<tr>
-  <td class="half"  style="background: white;">
-    Fragment Ions (Label):
-   </td>
-</tr>
-<tr>
-  <td class="half">
-    <input type="checkbox" name="aions" checked="checked"  value="1"/> A-ions
-    <input type="checkbox" name="bions" checked="checked"  value="1"/> B-ions
-    <input type="checkbox" name="yions" checked="checked"  value="1"/> Y-ions
-</td>
-<td class="half">
-   <input type="checkbox" name="waterloss" checked="checked" value="1">Water Loss
-   <input type="checkbox" name="ammonialoss"checked="checked" value="1"> Ammonia Loss
-</td>
-</tr>
-<tr>
-  <td class="half"  style="background: white;">
-    Fragment Ions (Score):
-   </td>
-</tr>
-<tr>
-  <td class="half">
-    <input type="checkbox" name="aions-score" value="1"/> A-ions
-    <input type="checkbox" name="bions-score" checked="checked"  value="1"/> B-ions
-    <input type="checkbox" name="yions-score" checked="checked"  value="1"/> Y-ions
-</td>
-<td class="half">
-   <input type="checkbox" name="waterloss-score"  value="1">Water Loss
-   <input type="checkbox" name="ammonialoss-score" value="1"> Ammonia Loss
-</td>
-</tr>
-</table>
-<table>
-<tr>
-  <td  style="background: white;">
-  Protein Sequences
-  </td>
-</tr>
-<tr>
-  <td>
- <select name="sequence">
+</div>
+</div>
+<div class="row">
+<div class="span4">
+  <label>Linker mass</label>
+  <div class="input-append"><input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/><span class="add-on">Da</span></div><br/> 
+  <label>Isotope type</label> 
+  <select name="isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select> 
+  <label>Number of labelled atoms in isotopic form</label>
+  <input type="text" name="seperation" size="2" maxlength="5" value="4"/> 
+</div>
+<div class="span4">
+ <label>Monolink mass</label>
+ <div class="input-append"><input type="text" name="mono_mass_diff" size="10" maxlength="21" value="114.0316942"/><span class="add-on">Da</span></div>
+ <label>Reactive amino acid</label>
+ <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/>
+</div>
+</div>
+
+<Legend>Fragment Ions</legend>
+<div class="row">
+<div class="span3"> 
+  <h4>Label ions on figures</h4> 
+</div>
+<div class="span3 ">
+ <h4>Use ions to calculate score</h4>
+</div>
+</div>
+<div class="row">
+<div class="span2 offset1">
+    <label class="span2 checkbox" ><input type="checkbox" name="aions" checked="checked"  value="1"/>A-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="bions" checked="checked"  value="1"/> B-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="yions" checked="checked"  value="1"/> Y-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="waterloss" checked="checked" value="1">Water Loss</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="ammonialoss"checked="checked" value="1"> Ammonia Loss</label>
+</div>
+   
+<div class="span2 offset1">
+    <label class="span2 checkbox" ><input type="checkbox" name="aions-score" value="1"/> A-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="bions-score" checked="checked"  value="1"/> B-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="yions-score" checked="checked"  value="1"/> Y-ions</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="waterloss-score"  value="1">Water Loss</label>
+    <label class="span2 checkbox" ><input type="checkbox" name="ammonialoss-score" value="1"> Ammonia Loss</label>
+</div>
+</div>
+<legend>Protein Sequences</legend>
+<div class="row">
+<div class="span8">
+<label>Sequence</label>
+<select name="sequence"> 
 ENDHTML
 
 my $sequences = get_conf($dbh, 'sequence');
@@ -182,23 +195,25 @@ while ((my $sequence = $sequences->fetchrow_hashref)) {
 $sequences->finish();
 print "<option value='-1' selected='true'>Custom (enter below in FASTA format)</option>";
 print <<ENDHTML;
-    </select>
-    <textarea name="user_protein_sequence" rows="12" cols="72">
->PolIII
+</select> 
+</div>
+</div>
+<div class="row">
+<div class="span8">
+<textarea name="user_protein_sequence" rows="12" class="span8">>PolIII
 MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGHGAGIKPIVGADFNVQCDLLGDELTHLTVLAANNTGYQNLTLLISKAYQRGYGAAGPIIDRDWLIELNEGLILLSGGRMGDVGRSLLRGNSALVDECVAFYEEHFPDRYFLELIRTGRPDEESYLHAAVELAEARGLPVVATNDVRFIDSSDFDAHEIRVAIHDGFTLDDPKRPRNYSPQQYMRSEEEMCELFADIPEALANTVEIAKRCNVTVRLGEYFLPQFPTGDMSTEDYLVKRAKEGLEERLAFLFPDEEERLKRRPEYDERLETELQVINQMGFPGYFLIVMEFIQWSKDNGVPVGPGRGSGAGSLVAYALKITDLDPLEFDLLFERFLNPERVSMPDFDVDFCMEKRDQVIEHVADMYGRDAVSQIITFGTMAAKAVIRDVGRVLGHPYGFVDRISKLIPPDPGMTLAKAFEAEPQLPEIYEADEEVKALIDMARKLEGVTRNAGKHAGGVVIAPTKITDFAPLYCDEEGKHPVTQFDKSDVEYAGLVKFDFLGLRTLTIINWALEMINKRRAKNGEPPLDIAAIPLDDKKSFDMLQRSETTAVFQLESRGMKDLIKRLQPDCFEDMIALVALFRPGPLQSGMVDNFIDRKHGREEISYPDVQWQHESLKPVLEPTYGIILYQEQVMQIAQVLSGYTLGGADMLRRAMGKKKPEEMAKQRSVFAEGAEKNGINAELAMKIFDLVEKFAGYGFNKSHSAAYALVSYQTLWLKAHYPAEFMAAVMTADMDNTEKVVGLVDECWRMGLKILPPDINSGLYHFHVNDDGEIVYGIGAIKGVGEGPIEAIIEARNKGGYFRELFDLCARTDTKKLNRRVLEKLIMSGAFDRLGPHRAALMNSLGDALKAADQHAKAEAIGQADMFGVLAEEPEQIEQSYASCQPWPEQVVLDGERETLGLYLTGHPINQYLKEIERYVGGVRLKDMHPTERGKVITAAGLVVAARVMVTKRGNRIGICTLDDRSGRLEVMLFTDALDKYQQLLEKDRILIVSGQVSFDDFSGGLKMTAREVMDIDEAREKYARGLAISLTDRQIDDQLLNRLRQSLEPHRSGTIPVHLYYQRADARARLRFGATWRVSPSDRLLNDLRGLIGSEQVELEFD 
-    </textarea>
-  </td>
-</tr>
-<tr>
-  <td  style="background: white;">
-  Scan Data (Light/Heavy)
-  </td>
-</tr>
-<tr><td>
-Precursor M/Z: <input type="text" name="precursor_mass" size="10" maxlength="10" value="906.51953"/> Th Charge:<input type="text" name="precursor_charge" size="2" maxlength="1" value="2"/> 
-</td></tr>
-<tr><td>
-    <textarea name="light_scan" rows="12" cols="72">
+    </textarea> 
+</div>
+</div>
+<legend>Data</legend>
+<div class="row">
+<div class="span8">
+<label>Precursor M/Z</label>
+ <div class="input-append"><input type="text" name="precursor_mass" size="10" maxlength="10" value="906.51953"/><span class="add-on">Th</span></div>
+<label>Charge</label>
+ <div class="input-append"><input type="text" name="precursor_charge" size="2" maxlength="1" value="2"/> <span class="add-on">+</span></div>
+<label>Spectra data</label>
+<textarea  class="span4" name="light_scan" rows="12" cols="72">
 262.218 27.9153
 264.022 10.4977
 282.064 5.20182
@@ -587,7 +602,7 @@ Precursor M/Z: <input type="text" name="precursor_mass" size="10" maxlength="10"
 1626.993 5.43357
 1629.904 7.75357
 1639.900 35.0759</textarea>
-    <textarea name="heavy_scan" rows="12" cols="72">
+    <textarea class="span4" name="heavy_scan" rows="12" cols="72">
 254.318 12.9435
 263.997 10.6159
 265.121 10.5421
@@ -1204,22 +1219,21 @@ Precursor M/Z: <input type="text" name="precursor_mass" size="10" maxlength="10"
 1765.347 13.6168
 1778.694 5.74963</textarea>
   
-</td></tr>
-</table>
-</td  style="background: white;">
-</tr>
-
-<tr><td  style="background: white;">
-
-    <center><input type="submit" value="Perform Xlink" /></center>
-</td>
-</tr>
-</table>
-</form>
+</div>
+</div>
+<div class="row"
+<div class="span8">
+<center><input class="btn btn-primary" type="submit" value="Perform Xlink" /></center> 
+</div>
+</div>
+</fieldset> 
+</form> 
+</div> 
+</div> 
 
 ENDHTML
 
 $dbh->disconnect();
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 exit;
