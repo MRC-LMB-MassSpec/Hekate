@@ -474,12 +474,12 @@ sub mgf_doublet_search {
 
     #   print "Match charge: $match_charge";
 
-    print "<table><tr><td>mz</td><td>Monoisoptic mass</td><td>Charge</td><td>Scan 1</td><td>Scan 2</td></tr>";
+    print "<div class='row'><div class='span8 offset2'><table class='table table-striped'><tr><td>mz</td><td>Monoisoptic mass</td><td>Charge</td><td>Scan 1</td><td>Scan 2</td></tr>";
     foreach my $peak (@peaklist) {
         print
 "<tr><td>$peak->{'mz'} </td><td> $peak->{monoisotopic_mw} </td><td> $peak->{charge}+ </td><td> $peak->{scan_num}</td><td> $peak->{d2_scan_num} </td></tr>";
     }
-    print "</table>";
+    print "</table></div></div>";
 
 }
 
@@ -806,6 +806,8 @@ ENDHTML
 
 print '              <li '; if ($page eq 'Home') {print 'class="active"' }; print '><a href="index.pl">Search</a></li>'; 
 print '              <li '; if ($page eq 'Results') {print 'class="active"' }; print '><a href="results.pl">Results</a></li>'; 
+print '              <li '; if ($page eq 'Doublet') {print 'class="active"' }; print '><a href="doublet_search.pl">Doublet</a></li>';
+print '              <li '; if ($page eq 'Digest') {print 'class="active"' }; print '><a href="crosslink_digest.pl">Digest</a></li>';
 print '              <li '; if ($page eq 'Settings') {print 'class="active"' }; print '><a href="settings.pl">Settings</a></li>'; 
 
 print <<ENDHTML;

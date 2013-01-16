@@ -33,7 +33,7 @@ print <<ENDHTML;
 <div class="span8 offset2">
 <img class="span2" style="max-width: 240px" src="/$path/bootstrap/img/crosslinker.png"/>
    <div class="page-header">
-  <h1>Crosslinker <small>for the analysis of XCMS data</small></h1>
+  <h1>Crosslinker <small>Search</small></h1>
 </div>
   <p>The details of this software are in preparation for publication. Once published there details will be placed here.</p>
 <form method="POST" enctype="multipart/form-data" action="crosslinker.pl" target="_blank">

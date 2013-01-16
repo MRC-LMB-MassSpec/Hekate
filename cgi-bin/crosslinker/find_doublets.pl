@@ -41,9 +41,13 @@ my @upload_filehandle = @{$upload_filehandle_ref};
 
 if ($output_format eq 'HTML') {
 
-    print_page_top_fancy("Doublet Search");
+    print_page_top_bootstrap("Doublet");
     my $version = version();
-    print_heading('Results');
+print '<div class="row">
+<div class="span8 offset2">
+   <div class="page-header">
+  <h1>Crosslinker <small>Doublet</small></h1>
+</div></div></div>';
 
     mgf_doublet_search(
                        \@upload_filehandle, $doublet_tolerance, $linkspacing,       $isotope,
@@ -51,7 +55,7 @@ if ($output_format eq 'HTML') {
                        $mass_of_carbon13,   $mass_of_carbon12,  $scan_width,        $match_charge,
                        $match_intensity,    $ms1_intensity_ratio
     );
-    print_page_bottom_fancy;
+    print_page_bottom_bootstrap;
 } else {
 
     print "Content-type: text/plain\n\n";
@@ -63,9 +67,7 @@ if ($output_format eq 'HTML') {
                                   $match_intensity,    $ms1_intensity_ratio
     );
 }
-
-#Tidy up
-disconnect_db($dbh, $settings_dbh, $results_dbh);
+ 
 
 exit;
 

@@ -25,22 +25,21 @@ my $path = installed;
 #                      #
 ########################
 
-print_page_top_fancy("Crosslink Digest");
+print_page_top_bootstrap("Digest");
 my $version = version();
-print_heading('Crosslink Digest');
+print '<div class="row">
+<div class="span8 offset2">
+   <div class="page-header">
+  <h1>Crosslinker <small>Digest</small></h1>
+</div></div></div>';
 print <<ENDHTML;
-<form method="POST" enctype="multipart/form-data" action="digest.pl" >
-<table>
-
-<tr cellspacing="3">
-  <td  style="background: white;" > 
-  <table >
-    <tr>
-	<td  style="background: white;" >Settings:</td>
-    </tr>
-    <tr>
-    <td class="half"  >
-   Digest
+<div class="row">
+<div class="span8 offset2">
+<form method="POST" enctype="multipart/form-data" action="digest.pl" ><fieldset>
+<legend>Digest Conditions</legend><br/>
+<div class="row">
+<div class="span4">
+<label>Digest</label>
     <select name="enzyme">
 ENDHTML
 
@@ -56,22 +55,19 @@ while ((my $enzyme = $enzymes->fetchrow_hashref)) {
 $enzymes->finish();
 
 print <<ENDHTML;
-    </select><br/>
-     Min Peptide Mass	    <input type="text" name="min_peptide_mass" size="5" maxlength="5" value="300"/><br/>       
-    </td>
-  <td class="half"  >
-    Max. Missed Cleavages    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="1"/><br/>
-    Max Peptide Mass	    <input type="text" name="max_peptide_mass" size="5" maxlength="5" value="4000"/><br/>
-  </td>
-</tr>
-<tr>
-  <td class="half"  style="background: white;">
-      Modifcations:
-</td><td style="background: white;"></td>
-    </tr>
-    <tr>
-  <td class="half"  >
-    Dynamic Modifications:
+    </select>
+  <label>Min Peptide Mass</label>
+  <input type="text" name="min_peptide_mass" size="5" maxlength="5" value="300"/>       
+  </div>
+  <div class="span4">
+  <label>Maximum Missed Cleavages</label>    <input type="text" name="missed_cleavages" size="2" maxlength="3" value="1"/>
+  <label>Max Peptide Mass</label>	    <input type="text" name="max_peptide_mass" size="5" maxlength="5" value="4000"/><br/>
+  </div>
+</div>
+<legend>Modifications</legend>
+<div class="row">
+<div class="span4">
+<label>Dynamic Modifications</label>
     <select style="width: 20em;" multiple="multiple" size="5"  name="dynamic_mod">
 ENDHTML
 
@@ -83,9 +79,10 @@ while ((my $mod = $mods->fetchrow_hashref)) {
 }
 print <<ENDHTML;
   </select>
-</td><td>
-    Fixed Modifications:
-    <select style="width: 20em;" multiple="multiple" size="5"  name="fixed_mod">
+</div>
+<div class="span4">
+<label>Fixed Modifications</label>
+<select style="width: 20em;" multiple="multiple" size="5"  name="fixed_mod">
 ENDHTML
 
 $mods = get_conf($dbh, 'fixed_mod');
@@ -97,11 +94,12 @@ while ((my $mod = $mods->fetchrow_hashref)) {
 $mods->finish();
 print <<ENDHTML;
   </select>
-</td>
-</tr>
- <tr>
-  <td class="half"  style="background: white;">
-    Crosslinking Reagent:<select name='crosslinker'>
+</div>
+</div>
+<legend>Crosslinking Reagent</legend>
+<div class="row">
+<div class="span4">
+<label>Crosslinking Reagent</label><select name='crosslinker'>
 ENDHTML
 
 my $crosslinkers = get_conf($dbh, 'crosslinker');
@@ -111,31 +109,25 @@ while ((my $crosslinker = $crosslinkers->fetchrow_hashref)) {
 $crosslinkers->finish();
 print "<option value='-1' selected='true'>Custom (enter below)</option></select>";
 print <<ENDHTML;
-  </td><td style="background: white;"></td>
-    </tr>
-    <tr>
-  <td class="half"  >
-      Linker mass: <input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/>Da<br/>
-      Atoms on  <select
+</div>
+</div>
+<div class="row">
+<div class="span4">
+<label>Linker mass</label>
+<input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/>Da<br/>
+<label>Isotope</label>  <select
 name="isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select>
- 
-in heavy form: <input type="text" 
+<label>Number of labelled atoms</label> <input type="text" 
 name="seperation" size="2" maxlength="5" 
 value="4"/> 
-</td><td>
- Monolink:xlink: <input type="text" name="mono_mass_diff" size="10" maxlength="21" value="114.0316942"/>Da<br/>
-    Reactive amino acid: <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/><br/>
-</td>
-</tr>
-</table>
-<table>
-<tr>
-  <td  style="background: white;">
-  Protein Sequences
-  </td>
-</tr>
-<tr>
-  <td>
+</div><div class="span4"> 
+<label> Monolink mass</label> <input type="text" name="mono_mass_diff" size="10" maxlength="21" value="114.0316942"/>Da<br/>
+<label>Reactive amino acid</label> <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/><br/>
+</div>
+</div>
+<legend>Sequence</legend>
+<div class="row">
+<div class="span8"><label>Protein Sequences</label>
  <select name="sequence">
 ENDHTML
 
@@ -147,27 +139,21 @@ $sequences->finish();
 print "<option value='-1' selected='true'>Custom (enter below in FASTA format)</option>";
 print <<ENDHTML;
     </select>
-    <textarea name="user_protein_sequence" rows="12" cols="72">
+    <textarea class="span8" name="user_protein_sequence" rows="12" cols="72">
 >PolIII
 MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGHGAGIKPIVGADFNVQCDLLGDELTHLTVLAANNTGYQNLTLLISKAYQRGYGAAGPIIDRDWLIELNEGLILLSGGRMGDVGRSLLRGNSALVDECVAFYEEHFPDRYFLELIRTGRPDEESYLHAAVELAEARGLPVVATNDVRFIDSSDFDAHEIRVAIHDGFTLDDPKRPRNYSPQQYMRSEEEMCELFADIPEALANTVEIAKRCNVTVRLGEYFLPQFPTGDMSTEDYLVKRAKEGLEERLAFLFPDEEERLKRRPEYDERLETELQVINQMGFPGYFLIVMEFIQWSKDNGVPVGPGRGSGAGSLVAYALKITDLDPLEFDLLFERFLNPERVSMPDFDVDFCMEKRDQVIEHVADMYGRDAVSQIITFGTMAAKAVIRDVGRVLGHPYGFVDRISKLIPPDPGMTLAKAFEAEPQLPEIYEADEEVKALIDMARKLEGVTRNAGKHAGGVVIAPTKITDFAPLYCDEEGKHPVTQFDKSDVEYAGLVKFDFLGLRTLTIINWALEMINKRRAKNGEPPLDIAAIPLDDKKSFDMLQRSETTAVFQLESRGMKDLIKRLQPDCFEDMIALVALFRPGPLQSGMVDNFIDRKHGREEISYPDVQWQHESLKPVLEPTYGIILYQEQVMQIAQVLSGYTLGGADMLRRAMGKKKPEEMAKQRSVFAEGAEKNGINAELAMKIFDLVEKFAGYGFNKSHSAAYALVSYQTLWLKAHYPAEFMAAVMTADMDNTEKVVGLVDECWRMGLKILPPDINSGLYHFHVNDDGEIVYGIGAIKGVGEGPIEAIIEARNKGGYFRELFDLCARTDTKKLNRRVLEKLIMSGAFDRLGPHRAALMNSLGDALKAADQHAKAEAIGQADMFGVLAEEPEQIEQSYASCQPWPEQVVLDGERETLGLYLTGHPINQYLKEIERYVGGVRLKDMHPTERGKVITAAGLVVAARVMVTKRGNRIGICTLDDRSGRLEVMLFTDALDKYQQLLEKDRILIVSGQVSFDDFSGGLKMTAREVMDIDEAREKYARGLAISLTDRQIDDQLLNRLRQSLEPHRSGTIPVHLYYQRADARARLRFGATWRVSPSDRLLNDLRGLIGSEQVELEFD 
     </textarea>
-  </td>
-</tr>
-</table>
-</td  style="background: white;">
-</tr>
-<tr><td  style="background: white;">
+ </div>
+</div>
 
-    <center><input type="submit" value="Perform Digest" /></center>
-</td>
-</tr>
+    <center><input class="btn btn-primary" type="submit" value="Perform Digest" /></center>
 
-</table>
-</form>
+</fieldset></form>
+</div></div>
 
 ENDHTML
 
 $dbh->disconnect();
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 exit;
