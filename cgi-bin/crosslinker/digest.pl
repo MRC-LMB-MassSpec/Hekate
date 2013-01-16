@@ -20,9 +20,13 @@ use Crosslinker::Proteins;
 use Crosslinker::Scoring;
 use Crosslinker::Config;
 
-print_page_top_fancy("Crosslink Digest");
+print_page_top_bootstrap("Digest");
 my $version = version();
-print_heading('Results');
+print '<div class="row">
+<div class="span8 offset2">
+   <div class="page-header">
+  <h1>Crosslinker <small>Digest</small></h1>
+</div></div></div>';
 
 # Constants
 my (
@@ -84,7 +88,7 @@ crosslink_digest(
 
 disconnect_db($dbh, $settings_dbh, $results_dbh);
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 
 exit;
 

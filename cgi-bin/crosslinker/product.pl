@@ -57,9 +57,13 @@ my @xlink_pos;
 ########################
 
 #
-print_page_top_fancy("Crosslinker Fragment");
+print_page_top_bootstrap("Fragment");
 my $version = version();
-print_heading('Product');
+print '<div class="row">
+<div class="span8 offset2">
+   <div class="page-header">
+  <h1>Crosslinker <small>Fragment</small></h1>
+</div></div></div>';
 
 my @peptides = split /-/, $sequence;
 for (my $i = 0 ; $i < @peptides ; $i++) {
@@ -95,7 +99,7 @@ for (my $i = 0 ; $i < @peptides ; $i++) {
     if   ($i == 0) { print "<h2>alpha-chain</h2>"; }
     else           { print "<h2>beta-chain</h2>"; }
     my $peptide = $peptides[$i];
-    print "<br/><br/><table border=0 cellpadding=4><tr>";
+    print "<br/><br/><table class='table table-striped' border=0 cellpadding=4><tr>";
     for (my $n = 0 ; $n < @peptides ; $n++) {
         for (my $charge = 1 ; $charge < 4 ; $charge++) {
             print "<td class='table-heading'>";
@@ -198,16 +202,7 @@ for (my $i = 0 ; $i < @peptides ; $i++) {
     print "</tr></table>";
 }
 
-print <<ENDHTML
-<!-- close main content -->
-<div id="footer">
-Last update: 19-May-2011, &copy; Andrew N Holding, <br/>LTQ Orbitrap image CC <a class="footer" href="http://www.emsl.pnl.gov/">EMSL</a>
 
-</div> <!--close footer -->
-</div> <!-- close container -->
 
-</body>
-</html>
-
-ENDHTML
-
+print_page_bottom_bootstrap;
+exit;

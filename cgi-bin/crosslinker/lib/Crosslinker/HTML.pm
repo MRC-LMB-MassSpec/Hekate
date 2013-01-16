@@ -316,7 +316,7 @@ sub crosslink_digest {
 
     my $n = 1;
     print "<h2>Crosslinks</h2>";
-    print "<table>";
+    print "<table class='table table-striped'>";
     my %line;
     foreach (sort { $xlink_fragment_masses{$a} <=> $xlink_fragment_masses{$b} } keys %xlink_fragment_masses) {
         if ($_ =~ /-/) {
@@ -381,7 +381,7 @@ sub crosslink_digest {
     $n = 1;
 
     print "<h2>Monolinks</h2>";
-    print "<table>";
+    print "<table class='table table-striped'>";
 
     foreach (sort { $xlink_fragment_masses{$a} <=> $xlink_fragment_masses{$b} } keys %xlink_fragment_masses) {
         foreach my $modification (reverse sort(keys %modifications)) {
@@ -808,6 +808,7 @@ print '              <li '; if ($page eq 'Home') {print 'class="active"' }; prin
 print '              <li '; if ($page eq 'Results') {print 'class="active"' }; print '><a href="results.pl">Results</a></li>'; 
 print '              <li '; if ($page eq 'Doublet') {print 'class="active"' }; print '><a href="doublet_search.pl">Doublet</a></li>';
 print '              <li '; if ($page eq 'Digest') {print 'class="active"' }; print '><a href="crosslink_digest.pl">Digest</a></li>';
+print '              <li '; if ($page eq 'Fragment') {print 'class="active"' }; print '><a href="crosslink_product.pl">Fragment</a></li>';
 print '              <li '; if ($page eq 'Settings') {print 'class="active"' }; print '><a href="settings.pl">Settings</a></li>'; 
 
 print <<ENDHTML;

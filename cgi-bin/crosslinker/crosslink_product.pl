@@ -25,63 +25,43 @@ my $path = installed;
 #                      #
 ########################
 
-print_page_top_fancy("Crosslink Product");
+print_page_top_bootstrap("Fragment");
 my $version = version();
 my $dbh     = connect_conf_db;
-print_heading('Crosslink Product');
+print '<div class="row">
+<div class="span8 offset2">
+   <div class="page-header">
+  <h1>Crosslinker <small>Fragment</small></h1>
+</div></div></div>';
 print <<ENDHTML;
+<div class="row">
+<div class="span8 offset2">
 <form method="POST" enctype="multipart/form-data" action="product.pl" >
-<table>
-
-<tr cellspacing="3">
-  <td  style="background: white;" > 
-  <table >
-   
-
-
- <tr>
-  <td class="half"  style="background: white;">
-    Crosslinking Reagent:
-  </td><td style="background: white;"></td>
-    </tr>
-    <tr>
-  <td class="half"  >
-      Linker mass: <input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/>Da<br/>
-     
-</td><td>
- 
-    Reactive amino acid: <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/><br/>
-</td>
-</tr>
-</table>
-<table>
-<tr>
-  <td  style="background: white;">
-  Peptide Sequences
-  </td>
-</tr>
-<tr>
-  <td>
-
-    <input type="text" name="sequence" size="20" value ="KKPEEMAK-TAPLVKK"/>
-
-  </td>
-</tr>
-</table>
-</td  style="background: white;">
-</tr>
-<tr><td  style="background: white;">
-
-    <center><input type="submit" value="Perform Fragmentation" /></center>
-</td>
-</tr>
-
-</table>
+<fieldset>
+<legend>Crosslinking Reagent</legend>
+<div class="row">
+<div class="span8"> 
+<label>Linker mass<label>
+<input type="text" name="xlinker_mass" size="10" maxlength="10" value="96.0211296"/>Da<br/>
+<label>Reactive amino acid</label>
+<input type="text" name="reactive_site" size="10" maxlength="10" value="K"/><br/>
+</div>
+</div>
+<legend>Sequence</legend>
+<div class="row">
+<div class="span8">
+<input type="text" name="sequence" size="20" value ="KKPEEMAK-TAPLVKK"/>
+<center><input class="btn btn-primary" type="submit" value="Perform Fragmentation" /></center>
+</div>
+</div>
+</fieldset>
 </form>
+</div>
+</div>
 
 ENDHTML
 
 $dbh->disconnect();
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 exit;
