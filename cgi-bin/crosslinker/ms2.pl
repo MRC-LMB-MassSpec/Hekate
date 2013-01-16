@@ -15,6 +15,7 @@ use lib 'lib';
 use Crosslinker::Constants;
 use Crosslinker::Proteins;
 use Crosslinker::Scoring;
+use Crosslinker::HTML;
 
 #loads database modules
 
@@ -73,21 +74,56 @@ $xlink_pos[1] = $query->param('best_y');    #beta chain xlink position
 ########################
 
 #
-print "Content-type: text/html\n\n";
-print <<ENDHTML;
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-"http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head>
-<title>
-ENDHTML
 
-print $sequence;
-
-my $version = version();
 print <<ENDHTML;
-</title>
-    <link href="/$path/flot/layout.css" rel="stylesheet" type="text/css"></link>
+Content-type: text/html\n\n
+<!DOCTYPE html> 
+<html lang="en"> 
+  <head> 
+    <meta charset="utf-8"> 
+    <title>Crosslinker MS/2</title> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="description" content=""> 
+    <meta name="author" content=""> 
+    <script src="/$path/java/jquery.js" type="text/javascript"></script>
+    <script src="/$path/bootstrap/js/bootstrap.js"></script> 
+    <script src="/$path/java/main.js" type="text/javascript"></script> 
+
+    <!-- Le styles --> 
+    <link href="/$path/bootstrap/css/bootstrap.css" rel="stylesheet"> 
+    <style> 
+	.green {
+	    	background-color: #50F05c;
+	}
+	.cyan {
+    		background-color: #50F0Fc;
+	}
+	#preview{
+		position:absolute;
+		border:1px solid #ccc;
+		background:#fff;
+		padding:5px;
+		display:none;
+		color:#fff;
+	}
+
+	#screenshot{
+		position:absolute;
+		border:1px solid #aaa;
+		background:#fff;
+		padding:5px;
+		display:none;
+		color:#fff;
+	}
+</style>
+    </style> 
+    <link href="/$path/bootstrap/css/bootstrap-responsive.css" rel="stylesheet"> 
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements --> 
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--> 
+ 
+ <link href="/$path/flot/layout.css" rel="stylesheet" type="text/css"></link>
     <!--[if IE]><script language="javascript" type="text/javascript" src="/$path/flot/excanvas.min.js"></script><![endif]-->
     <script language="javascript" type="text/javascript" src="/$path/flot/jquery.js"></script>
     <script language="javascript" type="text/javascript" src="/$path/flot/jquery.flot.js"></script>
@@ -122,8 +158,6 @@ function getValue(varname)
 }
 // end hide -->
 </script>
-<link rel="stylesheet" type="text/css" href="/$path/css/xlink.css" media="screen">
-<link rel="stylesheet" type="text/css" href="/$path/css/print.css" media="print">
 <style type="text/css">
 	table {
 		margin:auto;
@@ -135,41 +169,62 @@ function getValue(varname)
 	.cyan {
     		background-color: #50F0Fc;
 	}
-	td {
-    		border-color: #600;
-    		text-align: left;
-    		margin: 0;
-    		padding: 10px;   
-    		background-color:  #d0d0d0;
 	}
 	td.half {
   		width:50%;
 	}
-</style>
-</head>
-<body>
-<div id="container">
-<div id="heading">
-<h1>MS/2</h1>
-</div>
-<div id="menu">
-    <ul id="nav">
-        <li id="home"><a id="home" href="/cgi-bin/$path/index.pl">Crosslinker Full Search</a></li>
-        <li id="results"><a id="results" href="/cgi-bin/$path/results.pl">Crosslinker Results</a></li>
-   </ul>
-</div>
-<div id="banner">
-</div>
+</style>   
 
+  </head> 
+ 
+  <body> 
+ 
+    <div class="navbar navbar-inverse navbar-fixed-top"> 
+      <div class="navbar-inner"> 
+        <div class="container"> 
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> 
+            <span class="icon-bar"></span> 
+            <span class="icon-bar"></span> 
+            <span class="icon-bar"></span> 
+          </a> 
+          <a href="index.pl" class="brand inline" >Crosslinker MS/2</a> 
+          <div class="nav-collapse collapse"> 
+            <ul class="nav"> 
+ENDHTML
+
+
+print '              <li ><a href="index.pl">Search</a></li>'; 
+print '              <li ><a href="results.pl">Results</a></li>'; 
+print '              <li ><a href="doublet_search.pl">Doublet</a></li>';
+print '              <li><a href="crosslink_digest.pl">Digest</a></li>';
+print '              <li ><a href="crosslink_product.pl">Fragment</a></li>';
+print '              <li ><a href="singlescan.pl">Score</a></li>'; 
+print '              <li ><a href="settings.pl">Settings</a></li>'; 
+
+print <<ENDHTML;
+            </ul> 
+          </div><!--/.nav-collapse --> 
+        </div> 
+      </div> 
+    </div> 
+ 
+    <div class="container"> 
+
+   
 <!-- start of main content -->
-<div id="title"><h1>
+
 
 ENDHTML
 
-print $sequence;
+print "<div class='row'>
+<div class='span8 offset2'>
+   <div class='page-header'>
+  <h1>Crosslinker MS/2 <small>$sequence</small></h1>
+</div></div></div>";
+
 
 print <<ENDHTML;
-</h1></div>
+
 <div id="content">
 
 
@@ -180,7 +235,7 @@ print <<ENDHTML;
     <div id="placeholder" style="margin: auto; width:800px;height:800px"></div>
 
   <div id="overview" style="margin: auto;width:400px;height:50px"></div>
-<table><tr><td colspan="2"><span style="font-weight: bold">Key</span></td></tr>
+<table class="table table-condensed table-striped"><tr><td colspan="2"><span style="font-weight: bold">Key</span></td></tr>
 <tr><td> Yellow</td><td>Peaks in Both Spectra</td></tr>
 <tr><td>  Purple</td><td>  Shifted Peaks between Spectra</td></tr>
 <tr><td> Black dot</td><td>Matched</td></tr>
@@ -340,7 +395,7 @@ for (my $i = 0 ; $i < @peptides ; $i++) {
     if   ($i == 0) { print "<h2>alpha-chain</h2>"; }
     else           { print "<h2>beta-chain</h2>"; }
     my $peptide = $peptides[$i];
-    print "<br/><br/><table border=0 cellpadding=4><tr>";
+    print "<br/><br/><table class='table table-condensed table-striped' border=0 cellpadding=4><tr>";
     for (my $n = 0 ; $n < @peptides ; $n++) {
         for (my $charge = 1 ; $charge < 4 ; $charge++) {
             print "<td class='table-heading'>";
@@ -436,7 +491,7 @@ for (my $i = 0 ; $i < @peptides ; $i++) {
                     print ">";
                 }
                 printf "<B>%.2f</B>", $mz;
-                if ($match != 0) { printf "<br/>(%.2f)", $match; }
+                if ($match != 0) { printf " (%.2f)", $match; }
                 print "</td>";
             }
             print "</tr>\n<tr>";
@@ -564,7 +619,7 @@ for (my $i = 0 ; $i < @peptides ; $i++) {
                     print ">";
                 }
                 printf "<B>%.2f</B>", $mz;
-                if ($match != 0) { printf "<br/>(%.2f)", $match; }
+                if ($match != 0) { printf " (%.2f)", $match; }
                 print "</td>";
             }
             print "</tr>\n<tr>";
@@ -608,7 +663,7 @@ print "  var red = [";
 print $data_red;
 print "];\n";
 
-print <<ENDHTML
+print <<ENDHTML;
 
 
 
@@ -706,15 +761,10 @@ print <<ENDHTML
 </script>
 <br/><br/>
 </div>
-<!-- close main content -->
-<div id="footer">
-Last update: 19-May-2011, &copy; Andrew N Holding, <br/>LTQ Orbitrap image CC <a class="footer" href="http://www.emsl.pnl.gov/">EMSL</a>
-
-</div> <!--close footer -->
-</div> <!-- close container -->
-
-</body>
-</html>
-
 ENDHTML
+
+print_page_bottom_bootstrap;
+
+exit;
+
 
