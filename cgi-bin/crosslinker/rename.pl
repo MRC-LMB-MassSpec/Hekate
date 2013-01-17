@@ -20,7 +20,7 @@ my $new_name = $query->param('name');
 
 my $settings_dbh = DBI->connect("dbi:SQLite:dbname=db/settings", "", "", { RaiseError => 1, AutoCommit => 1 });
 
-print_page_top_fancy('Rename');
+print_page_top_bootstrap('Rename');
 
 if (defined $new_name) {
     if ($new_name eq "") { $new_name = "None" }
@@ -47,7 +47,7 @@ if (defined $new_name) {
       . $table_name->{'desc'} . "' />
        <input type='submit' value='Submit'></form></p>"
 }
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 
 exit;
 
