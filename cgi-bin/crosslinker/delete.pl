@@ -55,7 +55,6 @@ if ($data[0] != -1 && $data[0] != -4 && $data[0] != -5) {
     $drop_table->execute();
     $results_dbh->disconnect();
     unlink "db/results-$table" or die "Can't delete $table : $!";
-    warn "mooooo";
     unlink "query_data/query-$table.txt" or die "Can't delete $table : $!";
     print_heading("Deleting $table ...");
     print "<p>Sucess: Results '$table' deleted.</p>";
