@@ -163,7 +163,7 @@ if ($child) {
         if (is_ready($settings_dbh, 1) == 0 && is_ready($settings_dbh, 0) == -2) {
             $next_run = give_permission($settings_dbh);
             warn "Run ", $results_table, ": - picking up data to process from Run $next_run. \n";
-            open(OUT, '<', "query_data/query-$next_run.txt");
+            open(OUT, '<', "query_data/query-$next_run.txt") or die "could not open query_data/query-$next_run.txt" ;
             $query = CGI->new(\*OUT);
             close OUT;
 
