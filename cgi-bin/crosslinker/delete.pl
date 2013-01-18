@@ -53,7 +53,10 @@ if ($data[0] != -1 && $data[0] != -4 && $data[0] != -5) {
     $drop_table->execute($table);
     $drop_table = $results_dbh->prepare("DROP TABLE IF EXISTS results");
     $drop_table->execute();
-    unlink "db/results-$table";
+    $results_dbh->disconnect();
+    unlink "db/results-$table" or die "Can't delete $table : $!";
+    warn "mooooo";
+    unlink "query_data/query-$table.txt" or die "Can't delete $table : $!";
     print_heading("Deleting $table ...");
     print "<p>Sucess: Results '$table' deleted.</p>";
 } else {
@@ -61,7 +64,7 @@ if ($data[0] != -1 && $data[0] != -4 && $data[0] != -5) {
     #    print $data[0];
     print "<p>Are you sure you want to delete $table?</p>";
     print "<p><a class='btn btn-danger' href='delete.pl?table=$table&areyousure=yes'>Yes</a>  or <a class='btn' href='results.pl'>No</a></p>";
+    $results_dbh->disconnect();
 }
 print_page_bottom_bootstrap;
-$results_dbh->disconnect();
 exit;
