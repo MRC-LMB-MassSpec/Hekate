@@ -40,7 +40,7 @@ my $settings_dbh = DBI->connect("dbi:SQLite:dbname=db/settings", "", "", { Raise
 my $settings_sql = $settings_dbh->prepare("SELECT name FROM settings WHERE name = ?");
 $settings_sql->execute($table);
 my @data = $settings_sql->fetchrow_array();
-if (@data[0] != $table) {
+if ($data[0] != $table) {
     print "Content-Type: text/plain\n\n";
     print "Cannont find results database";
     exit;
@@ -62,6 +62,7 @@ my (
     $xlinker_mass, $decoy, $ms2_da,       $ms1_ppm,           $is_finished,   $mass_seperation
 ) = $settings->fetchrow_array;
 $settings->finish();
+$settings_sql->finish();
 $settings_dbh->disconnect();
 
 ########################
@@ -80,7 +81,7 @@ my (
 #                      #
 ########################
 
-print_page_top_fancy('All Results');
+print_page_top_bootstrap('All Results');
 
 if ($is_finished == '0') {
     print '<div style="text-align:center"><h2 style="color:red;">Warning: Data analysis not finished</h2></div>';
@@ -98,7 +99,7 @@ print_results(
               0
 );
 
-print_page_bottom_fancy;
+print_page_bottom_bootstrap;
 $top_hits->finish();
 $results_dbh->disconnect();
 exit;
