@@ -33,6 +33,12 @@ if (defined $query->param('order')) {
     $order = $query->param('order');
 }
 
+
+my $show_scan_image = 0;
+if (defined $query->param('show_scan_image')) {
+    $show_scan_image = $query->param('show_scan_image');
+}
+
 ########################
 #                      #
 # Connect to database  #
@@ -178,7 +184,7 @@ print_results_combined(
                        $mono_mass_diff,             \%mass_seperation_hash,
                        'table',                     0,
                        0,                           0,
-                       2
+                       2,			$show_scan_image
 );
 
 $SQL_query = "";
@@ -207,7 +213,7 @@ print_results_combined(
                        $mono_mass_diff,             \%mass_seperation_hash,
                        'table',                     0,
                        0,                           0,
-                       1
+                       1,			$show_scan_image
 );
 
 print_page_bottom_bootstrap;

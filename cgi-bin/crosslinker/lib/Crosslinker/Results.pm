@@ -706,7 +706,7 @@ sub print_results_combined {
         $top_hits,       $mass_of_hydrogen,    $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13,
         $cut_residues,   $protien_sequences,   $reactive_site,     $dbh,              $xlinker_mass,
         $mono_mass_diff, $mass_seperation_ref, $table,             $repeats,          $scan_repeats,
-        $no_tables,      $xlink_mono_or_all
+        $no_tables,      $xlink_mono_or_all,   $show_scan_image
     ) = @_;
 
     my %mass_seperation = %{$mass_seperation_ref};
@@ -788,7 +788,11 @@ sub print_results_combined {
                     print " - ", substr($top_hits_results->{'sequence2_name'}, 1);
                 }
                 print "</td><td>$top_hits_results->{'name'},$top_hits_results->{'fraction'}</td><td>";
-                if ($top_hits_results->{'scan'} == '-1') {
+
+		if ($show_scan_image == 1)
+		{
+	      print "<img src='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'/>";
+                }elsif ($top_hits_results->{'scan'} == '-1') {
                     print
 "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>Light Scan</a>";
                     print
