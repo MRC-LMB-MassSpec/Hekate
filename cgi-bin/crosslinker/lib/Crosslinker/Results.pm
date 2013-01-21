@@ -728,7 +728,9 @@ sub print_results_combined {
 
     if ($no_tables == 0) {
         print
-'<table class="table table-striped"><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td><td>Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>MS/2</td></tr>';
+'<table class="table table-striped"><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td><td>Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td>';
+	 if ($show_scan_image != 1) { print '<td>MS/2</td>'} ;
+	print '</tr>';
     }
 
     while ((my $top_hits_results = $top_hits->fetchrow_hashref))    #&& ($printed_hits <= 50)
@@ -755,26 +757,34 @@ sub print_results_combined {
                 push @mz_so_far,   $top_hits_results->{'mz'};
                 push @scan_so_far, $top_hits_results->{'name'} . $top_hits_results->{'scan'};
                 my $rounded = sprintf("%.3f", $top_hits_results->{'ppm'});
-                print "<tr><td>", $printed_hits + 1,
-"</td><td><a href='view_scan.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}'>$top_hits_results->{'score'}</a></td><td>$top_hits_results->{'mz'}</td><td>$top_hits_results->{'charge'}+</td><td>$rounded</td>";
+                print "<tr><td>", $printed_hits + 1,"</td><td>";
+		if ($show_scan_image != 1) { print "<a href='view_scan.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}'>";}
+		print "$top_hits_results->{'score'}";
+		if ($show_scan_image != 1) {"</a>"};
+		print "</td><td>$top_hits_results->{'mz'}</td><td>$top_hits_results->{'charge'}+</td><td>$rounded</td>";
                 my @fragments = split('-', $top_hits_results->{'fragment'});
                 my @unmodified_fragments =
                   split('-', $top_hits_results->{'unmodified_fragment'});
                 if ($top_hits_results->{'fragment'} =~ '-') {
                     $printed_hits = $printed_hits + 1;
-                    print
-"<td><a href='view_peptide.pl?table=$top_hits_results->{'name'}&peptide=$fragments[0]-$fragments[1]'>";
+                    print "<td>";
+ 		    if ($show_scan_image != 1) {print "<a href='view_peptide.pl?table=$top_hits_results->{'name'}&peptide=$fragments[0]-$fragments[1]'>";}
                     print residue_position $unmodified_fragments[0], $protien_sequences;
                     print ".", $fragments[0], "&#8209;";
                     print residue_position $unmodified_fragments[1], $protien_sequences;
                     print ".", $fragments[1] . "</td><td>", $top_hits_results->{'best_x'} + 1, "&#8209;",
-                      $top_hits_results->{'best_y'} + 1, "</a></td><td>";
+                      $top_hits_results->{'best_y'} + 1;
+ 		    if ($show_scan_image != 1) { print "</a>";}
+		    print "</td><td>";
                 } else {
                     $printed_hits = $printed_hits + 1;
-                    print "<td><a href='view_peptide.pl?table=$top_hits_results->{'name'}&peptide=$fragments[0]'>";
+                    print "<td>";
+ 		    if ($show_scan_image != 1) {print "<a href='view_peptide.pl?table=$top_hits_results->{'name'}&peptide=$fragments[0]'>";}
                     print residue_position $unmodified_fragments[0], $protien_sequences;
                     print ".", $fragments[0];
-                    print "&nbsp;</td><td>", $top_hits_results->{'best_x'} + 1, "</a></td><td>";
+                    print "&nbsp;</td><td>", $top_hits_results->{'best_x'} + 1;
+ 		    if ($show_scan_image != 1) { print "</a>";}
+		    print "</td><td>";
                 }
                 if ($top_hits_results->{'no_of_mods'} > 1) {
                     print "$top_hits_results->{'no_of_mods'} x";
@@ -808,15 +818,17 @@ sub print_results_combined {
 "      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'score'}&heavy=0'>$top_hits_results->{'scan'}</a>";
                     }
                 }
-                print "</td><td>";
-                print_ms2_link(
+
+                if ($show_scan_image != 1) {
+		print "</td><td>";
+		print_ms2_link(
                                $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'},
                                $top_hits_results->{'fragment'},   $top_hits_results->{'modification'},
                                $top_hits_results->{'best_x'},     $top_hits_results->{'best_y'},
                                $xlinker_mass,                     $mono_mass_diff,
                                $top_hits_results->{'top_10'},     $reactive_site,
                                $reactive_site,                    $top_hits_results->{'name'}
-                );
+                );}
 
                 my $varible_mod_string = '';
                 my $dynamic_mods = get_mods($top_hits_results->{'name'}, 'dynamic');
