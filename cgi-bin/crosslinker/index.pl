@@ -57,8 +57,18 @@ $enzymes->finish();
 
 print <<ENDHTML;
      </select> 
-    <br/><label class="checkbox inline" ><input type="checkbox" name="proteinase_k" value="true" >
-    No&nbsp;enzyme</label>
+    <br/>
+ENDHTML
+
+my $development = get_conf($dbh, 'development');
+my $development_setting = $development->fetchrow_hashref();
+
+if ( $development_setting->{'setting1'} == 1) {
+    print '<label class="checkbox inline" ><input type="checkbox" name="proteinase_k" value="true" >
+    No&nbsp;enzyme</label>';
+}
+
+print <<ENDHTML;
     <label>MS2 accurracy (Da)</label>
     <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/> 
     <label>Doublet Spacing Tollerance</label>
@@ -155,6 +165,10 @@ print <<ENDHTML;
  <input type="text" name="reactive_site" size="10" maxlength="10" value="K"/>
 </div>
 </div>
+ENDHTML
+
+if ( $development_setting->{'setting1'} == 1) {
+    print '
 <legend>Amber Codon Mode</legend>
 <div class="row">
 <div class="span8">
@@ -172,7 +186,9 @@ print <<ENDHTML;
     <label>Amino acid residue mass</label> <div class="input-append"><input type="text" name="amber_residue_mass" size="10" maxlength="21" value="251.0946254"/><span class="add-on">ppm</span></div><br/> 
     <label>Amber codon (Z) peptide sequence</label> <input type="text" name="amber_peptide" size="10" maxlength="20" value="FZPVINKPAK"/><br/> 
 </div>
-</div>
+</div>'};
+
+print <<ENDHTML;
 <Legend>Fragment Ions</legend>
 <div class="row">
 <div class="span3"> 
