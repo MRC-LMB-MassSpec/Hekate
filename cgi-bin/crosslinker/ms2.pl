@@ -81,7 +81,7 @@ Content-type: text/html\n\n
 <html lang="en"> 
   <head> 
     <meta charset="utf-8"> 
-    <title>Crosslinker MS/2</title> 
+    <title>Crosslinker Viewer</title> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <meta name="description" content=""> 
     <meta name="author" content=""> 
@@ -187,7 +187,7 @@ function getValue(varname)
             <span class="icon-bar"></span> 
             <span class="icon-bar"></span> 
           </a> 
-          <a href="index.pl" class="brand inline" >Crosslinker MS/2</a> 
+          <a href="index.pl" class="brand inline" >Crosslinker Viewer</a> 
           <div class="nav-collapse collapse"> 
             <ul class="nav"> 
 ENDHTML
@@ -219,7 +219,7 @@ ENDHTML
 print "<div class='row'>
 <div class='span8 offset2'>
    <div class='page-header'>
-  <h1>Crosslinker MS/2 <small>$sequence</small></h1>
+  <h1>Crosslinker Viewer <small>$sequence</small></h1>
 </div></div></div>";
 
 

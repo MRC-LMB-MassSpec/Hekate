@@ -510,7 +510,7 @@ sub print_results {
 '<table class="table table-striped"><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td>';
         if ($monolink == 1) { print '<td>Monolink Mass</td>'; }
         print
-'<td class="table table-striped">Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>MS/2</td>';
+'<td class="table table-striped">Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>View</td>';
         if ($decoy eq 'Yes') { print '<td>FDR</td>' }
         print '</tr>';
     }
@@ -729,7 +729,7 @@ sub print_results_combined {
     if ($no_tables == 0) {
         print
 '<table class="table table-striped"><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td><td>Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td>';
-	 if ($show_scan_image != 1) { print '<td>MS/2</td>'} ;
+	 if ($show_scan_image != 1) { print '<td>View</td>'} ;
 	print '</tr>';
     }
 
