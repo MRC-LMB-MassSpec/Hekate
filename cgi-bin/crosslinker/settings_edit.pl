@@ -77,11 +77,12 @@ ENDHTML
 
         while ((my $sequence = $sequences->fetchrow_hashref)) {
             print
-"<tr><td>$row_id</td><td><input type='text' name='name' size='10' maxlength='20' value='$sequence->{'name'}'/></td><td><textarea class='span6 name='setting1' rows='12' cols='80'>$sequence->{'setting1'}</textarea></td><td><input class='btn btn-primary' type='submit' value='Save' /></td></tr>";
+"<tr><td>$row_id</td><td><input type='text' name='name' size='10' maxlength='20' value='$sequence->{'name'}'/></td><td><textarea class='span6' name='setting1' rows='12' cols='80'>$sequence->{'setting1'}</textarea></td><td><input class='btn btn-primary' type='submit' value='Save' /></td></tr>";
         }
         print
 "</table><input type='hidden' name='type' value='sequence'/><input type='hidden' name='id' value='$row_id'/><input type='hidden' name='confirmed' size='10' maxlength='10' value='yes'/></form>";
     } elsif ($query->param('confirmed') eq 'yes') {
+
         my $row_id = $query->param('id');
         my $dbh    = connect_conf_db;
         update_conf($dbh, $query->param('type'), $query->param('name'), $query->param('setting1'), 0, 0, 0, 0, $row_id);
