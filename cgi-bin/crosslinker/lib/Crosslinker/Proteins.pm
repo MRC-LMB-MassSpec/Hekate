@@ -26,6 +26,7 @@ for (my $y=$min_length; $y <= $max_length; $y++)
 
 while ($sequence =~ m/(.{$x})(?=(K.{$y}))/g) {
     push @peptides, "$1$2";
+
 }
 #  @peptides = (@peptides, $sequence =~ m/.{$x}$reactive_site.{$y}/g);
 }
