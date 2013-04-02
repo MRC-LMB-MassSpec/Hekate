@@ -78,7 +78,7 @@ sub generate_page {
 	  @sequence_fragments             = @{$sequence_fragments_ref};
 	  @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
 	} else {
-	    ($sequence_fragments_ref) = no_enzyme_digest_proteins(1, 15, $reactive_site, $sequence);
+	    ($sequence_fragments_ref) = no_enzyme_digest_proteins(0, 15, $reactive_site, $sequence);
 	    @sequence_fragments             = @{$sequence_fragments_ref};
 	}
 
