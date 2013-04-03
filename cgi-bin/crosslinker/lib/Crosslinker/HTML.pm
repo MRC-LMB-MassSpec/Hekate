@@ -40,7 +40,8 @@ sub generate_page {
         $xlinker_mass,       $isotope,               $seperation,            $ms2_error,
         $state,              $ms2_fragmentation_ref, $threshold,             $n_or_c,
         $match_charge,       $match_intensity,       $no_xlink_at_cut_site,  $ms1_intensity_ratio,
-        $fast_mode,          $doublet_tolerance,     $amber_codon,	     $proteinase_k
+        $fast_mode,          $doublet_tolerance,     $amber_codon,	     $proteinase_k,
+	$no_enzyme_min,	     $no_enzyme_max
     ) = @_;
 
     #     die;
@@ -72,13 +73,14 @@ sub generate_page {
 	my @sequence_fragments;
 	my @sequence_fragments_linear_only;
 
+
         if ($proteinase_k == 0) {
 	  ($sequence_fragments_ref, $sequence_fragments_linear_only_ref) =
           digest_proteins($missed_clevages, $sequence, $cut_residues, $nocut_residues, $n_or_c);
 	  @sequence_fragments             = @{$sequence_fragments_ref};
 	  @sequence_fragments_linear_only = @{$sequence_fragments_linear_only_ref};
 	} else {
-	    ($sequence_fragments_ref) = no_enzyme_digest_proteins(0, 8, $reactive_site, $sequence);
+	    ($sequence_fragments_ref) = no_enzyme_digest_proteins($no_enzyme_min, $no_enzyme_max, $reactive_site, $sequence);
 	    @sequence_fragments             = @{$sequence_fragments_ref};
 	}
 

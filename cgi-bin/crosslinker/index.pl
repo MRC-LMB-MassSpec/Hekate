@@ -58,17 +58,7 @@ $enzymes->finish();
 print <<ENDHTML;
      </select> 
     <br/>
-ENDHTML
 
-my $development = get_conf($dbh, 'development');
-my $development_setting = $development->fetchrow_hashref();
-
-if ( $development_setting->{'setting1'} == 1) {
-    print '<label class="checkbox inline" ><input type="checkbox" name="proteinase_k" value="true" >
-    No&nbsp;enzyme</label>';
-}
-
-print <<ENDHTML;
     <label>MS2 accurracy (Da)</label>
     <input type="text" name="ms2_da" size="2" maxlength="3" value="0.8"/> 
     <label>Doublet Spacing Tollerance</label>
@@ -101,6 +91,29 @@ print <<ENDHTML;
 </div>
 </div>
 
+ENDHTML
+
+my $development = get_conf($dbh, 'development');
+my $development_setting = $development->fetchrow_hashref();
+
+if ( $development_setting->{'setting1'} == 1) {
+    print '<legend>No Enzyme</legend><div class="row">';
+    print '<div class="span4"><label class="checkbox inline" ><input type="checkbox" name="proteinase_k" value="true" >
+    No&nbsp;enzyme</label></div></div><br/>';
+print'
+<div class="row">
+<div class="span4">
+  <label>Minimum Fragment Size</label>
+  <div class="input-append"><input type="text" name="no_enzyme_min" size="5" maxlength="5" value="0"/><span class="add-on"> Residues</span></div><br/> 
+ </div>
+<div class="span4">
+ <label>Maximum Fragment Size</label>
+ <div class="input-append"><input type="text" name="no_enzyme_max" size="5" maxlength="5" value="15"/><span class="add-on"> Residues</span></div>
+</div>
+</div>';
+}
+
+print <<ENDHTML;
 <legend>Modifications</legend>
 <div class="row">
 <div class="span4">

@@ -873,7 +873,7 @@ sub print_report {
     my (
         $top_hits,       $mass_of_hydrogen,  $mass_of_deuterium, $mass_of_carbon12, $mass_of_carbon13,
         $cut_residues,   $protien_sequences, $reactive_site,     $dbh,              $xlinker_mass,
-        $mono_mass_diff, $table,             $repeats
+        $mono_mass_diff, $table,             $repeats,		 $proteinase_k
     ) = @_;
 
     my %modifications = modifications($mono_mass_diff, $xlinker_mass, $reactive_site, $table);
