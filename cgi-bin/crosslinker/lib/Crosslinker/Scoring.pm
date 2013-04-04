@@ -286,13 +286,16 @@ sub calc_score {
 ######
         my @peptides = split /-/, $sequence;
 
+	my @xlink_residues = split (',', $xlink_res);
+
+
 	if ($amber_codon == 0) {
         for (my $i = 0 ; $i < $#peptides + 1 ; $i++) {
             my $peptide = $peptides[$i];
             my @residues = split //, $peptide;
             my @tmp;
             for (my $n = 0 ; $n < @residues - $no_xlink_at_cut_site ; $n++) {
-                if ($residues[$n] eq $xlink_res) {
+                if ($residues[$n] eq $xlink_residues[$i]) {
                     push @tmp, $n
 
                       #       last;

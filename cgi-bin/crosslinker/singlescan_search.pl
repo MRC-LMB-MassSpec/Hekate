@@ -74,6 +74,10 @@ my $time = time;
 
 # Save Settings
 my $state = is_ready($settings_dbh);
+
+if ($reactive_site =~ /[^,]/) {  $reactive_site = $reactive_site . ',' . $reactive_site};
+
+
 my $results_table = save_settings(
                                   $settings_dbh,    $cut_residues, $fasta,     $reactive_site,
                                   $mono_mass_diff,  $xlinker_mass, $state,     $desc,
@@ -83,6 +87,9 @@ my $results_table = save_settings(
 );
 
 # Setup Modifications
+
+
+
 
 my %protein_residuemass = protein_residuemass($results_table, $settings_dbh);
 my %modifications = modifications($mono_mass_diff, $xlinker_mass, $reactive_site, $results_table, $settings_dbh);

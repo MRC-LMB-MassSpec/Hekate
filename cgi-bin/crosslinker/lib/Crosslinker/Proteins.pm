@@ -19,12 +19,14 @@ sub no_enzyme_digest_proteins {
 my ($min_length, $max_length, $reactive_site, $sequence) = @_;
 my @peptides;
 
+$reactive_site =~ s/,//g; 
+
 for (my $x=$min_length; $x <= $max_length; $x++)
 {
 for (my $y=$min_length; $y <= $max_length; $y++)
 {
 
-while ($sequence =~ m/(.{$x})(?=(K.{$y}))/g) {
+while ($sequence =~ m/(.{$x})(?=([$reactive_site].{$y}))/g) {
     push @peptides, "$1$2";
 
 }
@@ -122,8 +124,10 @@ my @monolink_masses = split(",", $mono_mass_diff);
  			  WHERE sequence LIKE ? and xlink = 0 and monolink = 0 and results_table = ?;
     ");
 
+  my @reactive_sites = split ( ',' , $reactive_site);
+
   foreach my $monolink_mass (@monolink_masses) {
-      $monolinks->execute($monolink_mass, $monolink_mass, "%".$reactive_site."%", $results_table);
+      $monolinks->execute($monolink_mass, $monolink_mass, "%".$reactive_sites[0]."%", $results_table);
   }
 
 
@@ -426,6 +430,13 @@ sub calculate_crosslink_peptides {
     my $xlink_fragment_mass;
     my $xlink_fragment_sources;
 
+    my $stop_duplicates = 'AND p1.rowid >= p2.rowid';
+
+
+    my @reactive_sites = split (',',$reactive_site);
+
+    if ($reactive_sites[0] ne $reactive_sites[1]) {$stop_duplicates = ''};
+
     my $peptidelist = $results_dbh->prepare("
 	  INSERT INTO peptides
 	  SELECT
@@ -441,14 +452,15 @@ sub calculate_crosslink_peptides {
 	
 			  FROM peptides p1 inner join peptides p2 on (p1.results_table = p2.results_table)
  			  WHERE p1.linear_only = '0' AND p2.linear_only = '0' AND p1.sequence LIKE ? AND p2.sequence LIKE ?
-			  AND p1.rowid >= p2.rowid
+			  $stop_duplicates
     ");
 
     my $index = $results_dbh->prepare("CREATE INDEX peptide_index ON peptides (sequence);");
     $index->execute();
 
+    $peptidelist->execute("%".$reactive_sites[0]."_%","%".$reactive_sites[1]."_%");
 
-    $peptidelist->execute("%".$reactive_site."_%","%".$reactive_site."_%");
+    warn $reactive_site, ' ' , $reactive_sites[0], ' ',$reactive_sites[1];
 
     my $correct_xlink_mass =
       $results_dbh->prepare("UPDATE peptides SET mass = mass + ? WHERE  xlink = 1 and results_table = ?;");
