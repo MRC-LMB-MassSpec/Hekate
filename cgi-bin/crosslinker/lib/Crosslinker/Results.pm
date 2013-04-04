@@ -614,8 +614,13 @@ sub print_results {
                 print "<td>";
                 if ($no_links == 0) { print "<a href='view_peptide.pl?table=$table&peptide=$fragments[0]'>" }
                 print residue_position $unmodified_fragments[0], $protien_sequences;
-                print ".",               $fragments[0];
+		if ($modifications{$top_hits_results->{'modification'}}{Name} eq 'loop link') 
+		  {                 print ".",               $unmodified_fragments[0];	}
+		else 
+		  {                 print ".",               $fragments[0];	}
                 print "&nbsp;</td><td>", $top_hits_results->{'best_x'} + 1;
+		if ($modifications{$top_hits_results->{'modification'}}{Name} eq 'loop link') 
+		  { print "&#8209;" , index ($fragments[0],'X')+1				}         
                 if ($no_links == 0) { print "</a>" }
                 print "</td><td>";
             }

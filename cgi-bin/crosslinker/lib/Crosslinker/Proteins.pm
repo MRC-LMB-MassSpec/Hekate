@@ -460,8 +460,6 @@ sub calculate_crosslink_peptides {
 
     $peptidelist->execute("%".$reactive_sites[0]."_%","%".$reactive_sites[1]."_%");
 
-    warn $reactive_site, ' ' , $reactive_sites[0], ' ',$reactive_sites[1];
-
     my $correct_xlink_mass =
       $results_dbh->prepare("UPDATE peptides SET mass = mass + ? WHERE  xlink = 1 and results_table = ?;");
     $correct_xlink_mass->execute($xlinker_mass, $results_table);

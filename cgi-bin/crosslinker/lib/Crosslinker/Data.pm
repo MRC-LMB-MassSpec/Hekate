@@ -484,6 +484,8 @@ sub import_cgi_query {
         #       warn "Generating Decoy Database....\n";
     }
 
+# 	warn $fasta;
+
     $protien_sequences =~ s/\r//g;
     my $desc = $query->param('user_desc');
     my @sequence_names = $protien_sequences =~ m/^>.*$/mg;
