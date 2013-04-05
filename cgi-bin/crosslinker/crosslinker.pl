@@ -81,7 +81,7 @@ if ($child) {
         $cut_residues, $fasta,     $reactive_site, $mono_mass_diff,  $xlinker_mass,    -6,
         $desc,         $decoy,     $ms2_error,     $match_ppm,       $mass_seperation, \@dynamic_mods,
         \@fixed_mods,  $threshold, $match_charge,  $match_intensity, $scored_ions,	$amber_codon,
-        $proteinase_k, 0, 15
+        $proteinase_k, $no_enzyme_min,	 $no_enzyme_max
     );
 
     my ($results_dbh) = connect_db_results($results_table, 0);

@@ -138,6 +138,9 @@ sub modifications {
 
     my ($mono_mass_diff, $xlinker_mass, $reactive_site, $table, $dbh) = @_;
 
+    if ($reactive_site =~ /[^,]/) {  $reactive_site = $reactive_site . ',' . $reactive_site};
+    my @reactive_sites = split (',',$reactive_site);
+
     my %modifications = (
 
         #                           MethOx => {
@@ -145,14 +148,15 @@ sub modifications {
         #                                       Location => 'M',
         #                                       Delta    => 15.994915,
         #                           },
+
         MonoLink => {
                       Name     => 'mono link',
-                      Location => $reactive_site,
+                      Location => $reactive_sites[0],
                       Delta    => $mono_mass_diff,
         },
         LoopLink => {
             Name     => 'loop link',
-            Location => $reactive_site,
+            Location => $reactive_sites[1],
             Delta    => -18.0105646
             ,    #Loop links are treated as a modified monolink (loop link on an xlink is too complicated, and wierd)
         },
