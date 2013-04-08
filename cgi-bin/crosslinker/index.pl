@@ -272,7 +272,7 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
 </div> 
 </div> 
 <legend>Files</legend>
-<div class="row">
+<div class="row" id="uploadFile_div">
 <div class="offset2 span4">
   <label>Fraction 1 <input type="file" name="mgf"/></label>
   <label>Fraction 2 <input type="file" name="mgf2"/></label>
@@ -283,6 +283,19 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
   <label>Fraction 7 <input type="file" name="mgf7"/></label>
   <label>Fraction 8 <input type="file" name="mgf8"/></label>
 </div>
+</div>
+<div class="row">
+<div class="span1 offset5">
+<script>
+function clearFileInputField(tagId) {
+    document.getElementById(tagId).innerHTML = 
+                    document.getElementById(tagId).innerHTML;
+}
+</script>
+
+<a class="btn btn-warning" onclick="clearFileInputField('uploadFile_div')" 
+                         href="javascript:noAction();">Clear</a>
+
 </div>
 </fieldset> 
 </form> 
