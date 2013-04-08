@@ -105,7 +105,7 @@ MGSSHHHHHHSSGLEVLFQGPHMSEPRFVHLRVHSDYSMIDGLAKTAPLVKKAAALGMPALAITDFTNLCGLVKFYGAGH
 
     print
 "<tr><td><input type='hidden' name='type' size='10' maxlength='10' value='crosslinker'/><input class='input-small' type='text' name='name' size='10' maxlength='20' value='Name'/></td>
-<td><input class='input-small' type='text' name='setting1' size='10' maxlength='1' value='K'/></td>
+<td><input class='input-small' type='text' name='setting1' size='10' maxlength='10' value='K'/></td>
 <td><input class='input-small' type='text' name='setting2' size='10' maxlength='10' value='96.0211296'/></td>
 <td><input class='input-small' type='text' name='setting3' size='10' maxlength='50' value='114.0316942'/></td>
 <td><select class='input-small'  name='setting4'><option>deuterium</option><option>carbon-13</option><option>none</option></select></td>

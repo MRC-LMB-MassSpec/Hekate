@@ -138,7 +138,7 @@ sub modifications {
 
     my ($mono_mass_diff, $xlinker_mass, $reactive_site, $table, $dbh) = @_;
 
-    if ($reactive_site =~ /[^,]/) {  $reactive_site = $reactive_site . ',' . $reactive_site};
+        if ($reactive_site =~ /[^,]/) {  $reactive_site = $reactive_site . ',' . $reactive_site};
     my @reactive_sites = split (',',$reactive_site);
 
     my %modifications = (
@@ -455,15 +455,24 @@ sub calculate_crosslink_peptides {
 		 0 as no_of_mods
 	
 			  FROM peptides p1 inner join peptides p2 on (p1.results_table = p2.results_table)
- 			  WHERE p1.linear_only = '0' AND p2.linear_only = '0' AND p1.sequence LIKE ? AND p2.sequence LIKE ?
+ 			  WHERE p1.linear_only = '0' AND p2.linear_only = '0' AND p1.xlink ='0' and p2.xlink = '0' AND p1.sequence LIKE ? AND p2.sequence LIKE ?
 			  $stop_duplicates
     ");
 
     my $index = $results_dbh->prepare("CREATE INDEX peptide_index ON peptides (sequence);");
     $index->execute();
 
-    $peptidelist->execute("%".$reactive_sites[0]."_%","%".$reactive_sites[1]."_%");
 
+    foreach my $reactive_site_chain_1 (split //, $reactive_sites[0]) 
+      {
+      foreach my $reactive_site_chain_2 (split //, $reactive_sites[1]) 
+	{
+	warn "%".$reactive_site_chain_1."_%","%".$reactive_site_chain_2."_%";
+ 	$peptidelist->execute("%".$reactive_site_chain_1."_%","%".$reactive_site_chain_2."_%");
+	$results_dbh->commit;
+	}
+      }
+      
     my $correct_xlink_mass =
       $results_dbh->prepare("UPDATE peptides SET mass = mass + ? WHERE  xlink = 1 and results_table = ?;");
     $correct_xlink_mass->execute($xlinker_mass, $results_table);

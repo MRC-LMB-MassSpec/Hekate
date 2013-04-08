@@ -295,7 +295,10 @@ sub calc_score {
             my @residues = split //, $peptide;
             my @tmp;
             for (my $n = 0 ; $n < @residues - $no_xlink_at_cut_site ; $n++) {
-                if ($residues[$n] eq $xlink_residues[$i]) {
+
+
+# 		warn $xlink_residues[$i], " ", $residues[$n], " ",$xlink_residues[$i] =~ /$residues[$n]/;
+                if ( $xlink_residues[$i] =~ /$residues[$n]/) {
                     push @tmp, $n
 
                       #       last;
