@@ -32,6 +32,13 @@ if (defined $query->param('order')) {
     $order = $query->param('order');
 }
 
+my $limit;
+
+if (defined $query->param('limit')) {
+    $limit = $query->param('limit');
+}
+
+
 my $short = 1;
 if (defined $query->param('more')) {
     $short = 0;
@@ -163,13 +170,13 @@ if ($short == 1) {
 my $top_hits;
 if (defined $order) {
     $top_hits = $results_dbh->prepare(
-"SELECT * FROM (SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC) ORDER BY sequence1_name, sequence2_name"
+"SELECT * FROM (SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC LIMIT ?) ORDER BY sequence1_name, sequence2_name "
     );
 } else {
-    $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score  DESC")
+    $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score  DESC LIMIT ?")
       ;    # min (best_alpha,best_beta)
 }
-$top_hits->execute($table);
+$top_hits->execute($table, $limit);
 print_results(
               $top_hits,         $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12,
               $mass_of_carbon13, $cut_residues,     $protein_sequences, $reactive_site,
@@ -186,12 +193,12 @@ if ($short == 1) {
 }
 if (defined $order) {
     $top_hits = $results_dbh->prepare(
-         "SELECT * FROM (SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC) ORDER BY sequence1_name");    
+         "SELECT * FROM (SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC LIMIT ?) ORDER BY sequence1_name");    
 } else {
-    $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC");   
+    $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC LIMIT ?");   
 }
 
-$top_hits->execute($table);
+$top_hits->execute($table, $limit);
 print_results(
               $top_hits,         $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12,
               $mass_of_carbon13, $cut_residues,     $protein_sequences, $reactive_site,
