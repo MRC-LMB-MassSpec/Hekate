@@ -36,7 +36,7 @@ my $limit;
 
 if (defined $query->param('limit')) {
     $limit = $query->param('limit');
-}
+} else {$limit = '1000'};
 
 
 my $short = 1;
