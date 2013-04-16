@@ -41,7 +41,7 @@ sub generate_page {
         $state,              $ms2_fragmentation_ref, $threshold,             $n_or_c,
         $match_charge,       $match_intensity,       $no_xlink_at_cut_site,  $ms1_intensity_ratio,
         $fast_mode,          $doublet_tolerance,     $amber_codon,	     $proteinase_k,
-	$no_enzyme_min,	     $no_enzyme_max
+	$no_enzyme_min,	     $no_enzyme_max,	     $decoy
     ) = @_;
 
     #     die;
@@ -167,6 +167,49 @@ sub generate_page {
                                     \%protein_residuemass, \%ms2_fragmentation, $threshold,
                                     $no_xlink_at_cut_site, $fast_mode,		$amber_codon
     );
+
+    warn "Run $results_table: Calculating Peptide FDR...\n";
+
+
+
+    my $results_db = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score  DESC");
+    my $update_db = $results_dbh->prepare("UPDATE results SET fdr = ? WHERE mz = ? and fragment = ? and scan = ?");
+    $results_db->execute($results_table);
+
+    my @hits_so_far;
+    my @mz_so_far;
+    my @scan_so_far;
+    my $fdr_non_decoy = 0;
+    my $fdr_decoy = 0;
+    my $fdr;
+
+
+
+    while (my $results = $results_db->fetchrow_hashref) {
+
+      if (   !(grep $_ eq $results->{'fragment'}, @hits_so_far)
+            && !(grep $_ eq $results->{'mz'},   @mz_so_far)
+            && !(grep $_ eq $results->{'scan'}, @scan_so_far)
+            && ($results->{'sequence1_name'} =~ 'decoy' || $results->{'sequence2_name'} =~ 'decoy')
+	  )
+        {
+            $fdr_decoy = $fdr_decoy + 1;
+        } elsif (   !(grep $_ eq $results->{'fragment'}, @hits_so_far)
+                 && !(grep $_ eq $results->{'mz'},   @mz_so_far)
+                 && !(grep $_ eq $results->{'scan'}, @scan_so_far))
+        {
+            $fdr_non_decoy = $fdr_non_decoy + 1;
+        }
+
+       
+            push @hits_so_far, $results->{'fragment'};
+            push @mz_so_far,   $results->{'mz'};
+            push @scan_so_far, $results->{'scan'};
+    $update_db->execute($fdr_decoy/($fdr_decoy+$fdr_non_decoy),$results->{'mz'},$results->{'fragment'},$results->{'scan'});
+    }
+
+
+
 
     #    give_permission($settings_dbh);
     if (check_state($settings_dbh, $results_table) == -4) {

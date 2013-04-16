@@ -147,7 +147,8 @@ if ($child) {
                                    $threshold,          $n_or_c,               $match_charge,
                                    $match_intensity,    $no_xlink_at_cut_site, $ms1_intensity_ratio,
                                    $fast_mode,          $doublet_tolerance,    $amber_codon,
-				   $proteinase_k,	$no_enzyme_min,	 $no_enzyme_max
+				   $proteinase_k,	$no_enzyme_min,	       $no_enzyme_max,
+			           $decoy
             );
         };
 

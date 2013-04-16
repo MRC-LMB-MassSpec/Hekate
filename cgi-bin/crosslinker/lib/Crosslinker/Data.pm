@@ -112,7 +112,8 @@ sub create_results {
 						      best_beta REAL,
 						      min_chain_score,
 						      time,
-						      precursor_scan) "
+						      precursor_scan,
+						      FDR) "
         );
     };
 

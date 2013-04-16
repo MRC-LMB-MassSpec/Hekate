@@ -32,6 +32,12 @@ if (defined $query->param('order')) {
     $order = $query->param('order');
 }
 
+my $limit;
+
+if (defined $query->param('limit')) {
+    $limit = $query->param('limit');
+} else {$limit = '0'};
+
 
 my $short = 1;
 if (defined $query->param('more')) {
@@ -164,14 +170,32 @@ if ($short == 1) {
 my $top_hits;
 if (defined $order) {
     $top_hits = $results_dbh->prepare(
-"SELECT * FROM (SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC) ORDER BY sequence1_name, sequence2_name "
+"SELECT * FROM (
+select 		 MAX(score) as max_score, scan, * from
+                 results WHERE name=? and fragment LIKE '%-%' and sequence1_name NOT LIKE
+                 '>decoy%' and sequence2_name NOT LIKE '>decoy%'  GROUP BY
+                 scan ORDER BY max_score DESC LIMIT ?, ?;
+		  )ORDER BY score DESC LIMIT ?, ?) ORDER BY sequence1_name, sequence2_name "
     );
 } else {
-    $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score  DESC")
+    $top_hits = $results_dbh->prepare("
+
+SELECT * from results INNER JOIN
+(SELECT 	 MAX(score) as max_score, scan from results 
+		 WHERE name=? and sequence1_name NOT LIKE
+                 '>decoy%' and sequence2_name NOT LIKE '>decoy%'  GROUP BY
+                 scan ORDER BY max_score DESC ) 
+AS max ON score=max_score and results.scan = max.scan WHERE fragment LIKE '%-%' LIMIT ?, ? ;
+
+");
       ;    # min (best_alpha,best_beta)
 }
-$top_hits->execute($table);
-print_results(
+
+
+
+
+$top_hits->execute($table, $limit,  10);
+print_results_paginated (
               $top_hits,         $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12,
               $mass_of_carbon13, $cut_residues,     $protein_sequences, $reactive_site,
               $results_dbh,      $xlinker_mass,     $mono_mass_diff,    $table,
@@ -180,6 +204,8 @@ print_results(
               2,                 $decoy
 );
 
+
+
 if ($short == 1) {
     print '<h4>Top Scoring Monolink Matches</h4> <a class="btn btn-primary offset10 span1" href="view_summary.pl?table=' . $name . '&more=1">View all</a><br/><br/>';
 } else {
@@ -187,13 +213,28 @@ if ($short == 1) {
 }
 if (defined $order) {
     $top_hits = $results_dbh->prepare(
-         "SELECT * FROM (SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC) ORDER BY sequence1_name");    
+         "SELECT * FROM (
+	  select 		 MAX(score) as max_score, scan, * from
+                 results WHERE name=? and fragment LIKE '%-%' and sequence1_name NOT LIKE
+                 '>decoy%' and sequence2_name NOT LIKE '>decoy%'  GROUP BY
+                 scan ORDER BY max_score DESC LIMIT ?, ?;
+	  ) ORDER BY sequence1_name");    
 } else {
-    $top_hits = $results_dbh->prepare("SELECT * FROM results WHERE name=? AND score > 0 ORDER BY score DESC");   
+    $top_hits = $results_dbh->prepare("
+
+select 		 MAX(score) as max_score, scan, * from
+                 results WHERE name=? and fragment NOT LIKE '%-%' and sequence1_name NOT LIKE
+                 '>decoy%' and sequence2_name NOT LIKE '>decoy%'  GROUP BY
+                 scan ORDER BY max_score DESC LIMIT ?, ?;
+
+
+
+
+");
 }
 
-$top_hits->execute($table);
-print_results(
+$top_hits->execute($table, $limit, $limit + 10);
+print_results_paginated(
               $top_hits,         $mass_of_hydrogen, $mass_of_deuterium, $mass_of_carbon12,
               $mass_of_carbon13, $cut_residues,     $protein_sequences, $reactive_site,
               $results_dbh,      $xlinker_mass,     $mono_mass_diff,    $table,

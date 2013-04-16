@@ -467,7 +467,7 @@ sub calculate_crosslink_peptides {
       {
       foreach my $reactive_site_chain_2 (split //, $reactive_sites[1]) 
 	{
-	warn "%".$reactive_site_chain_1."_%","%".$reactive_site_chain_2."_%";
+# 	warn "%".$reactive_site_chain_1."_%","%".$reactive_site_chain_2."_%";
  	$peptidelist->execute("%".$reactive_site_chain_1."_%","%".$reactive_site_chain_2."_%");
 	$results_dbh->commit;
 	}

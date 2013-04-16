@@ -8,7 +8,7 @@ use Crosslinker::Constants;
 use Crosslinker::Config;
 use Crosslinker::Scoring;
 use base 'Exporter';
-our @EXPORT = ('print_results', 'print_results_combined', 'print_report', 'print_pymol', 'print_results_text');
+our @EXPORT = ('print_results', 'print_results_combined', 'print_report', 'print_pymol', 'print_results_text', 'print_results_paginated');
 
 sub print_pymol {
 
@@ -242,7 +242,7 @@ sub print_results_text {
       . $finish_division
       . $finish_line;
 
-    while ((my $top_hits_results = $top_hits->fetchrow_hashref)) {
+    while (my $top_hits_results = $top_hits->fetchrow_hashref) {
 
         my $data   = $top_hits_results->{'MSn_string'};
         my $top_10 = $top_hits_results->{'top_10'};
@@ -465,6 +465,163 @@ sub print_results_text {
             push @scan_so_far, $top_hits_results->{'name'} . $top_hits_results->{'scan'};
         }
     }
+
+}
+
+sub print_results_paginated {
+
+    my (
+        $top_hits,          $mass_of_hydrogen,  $mass_of_deuterium, $mass_of_carbon12,  $mass_of_carbon13,
+        $cut_residues,      $protien_sequences, $reactive_site,     $dbh,               $xlinker_mass,
+        $mono_mass_diff,    $table,             $mass_seperation,   $repeats,           $scan_repeats,
+        $no_tables,         $max_hits,          $monolink,          $static_mod_string, $varible_mod_string,
+        $xlink_mono_or_all, $decoy,             $no_links,          $settings_dbh
+    ) = @_;
+
+    if (!defined $max_hits)          { $max_hits          = 0 }
+    if (!defined $no_links)          { $no_links          = 0 }      #Tells us we are in single scan mode.
+    if (!defined $xlink_mono_or_all) { $xlink_mono_or_all = 0 }
+    if (!$repeats)                   { $repeats           = 0 }
+    if (!$no_tables)                 { $no_tables         = 0 }
+    if (!defined $monolink)          { $monolink          = 0 }
+    if (!defined $decoy)             { $decoy             = 'No' }
+    if ($decoy eq 'true') { $decoy = 'Yes' }
+
+    # warn $decoy;
+
+    my %modifications = modifications($mono_mass_diff, $xlinker_mass, $reactive_site, $table, $settings_dbh);
+
+    my $fasta = $protien_sequences;
+    $protien_sequences =~ s/^>.*$/>/mg;
+    $protien_sequences =~ s/\n//g;
+    $protien_sequences =~ s/^.//;
+    $protien_sequences =~ s/ //g;
+
+   
+
+    
+	print '<table class="table table-striped"><tr><td></td><td>Score</td><td>MZ</td><td>Charge</td><td>PPM</td><td colspan="2">Fragment&nbsp;and&nbsp;Position</td>';
+        if ($monolink == 1) { print '<td>Monolink Mass</td>'; }
+        print '<td class="table table-striped">Modifications</td><td>Sequence&nbsp;Names</td><td>Fraction<td>Scan&nbsp;(Light)<br/>Scan&nbsp;(Heavy)</td></td></td><td>View</td>';
+        if ($decoy eq 'Yes') { print '<td>FDR</td>' }
+        print '</tr>';
+    
+    my $printed_hits = 0;
+    while ( my $top_hits_results = $top_hits->fetchrow_hashref)
+    {
+
+        my $target = "&#945";
+        my $alpha_ions = () = $top_hits_results->{'top_10'} =~ /$target/g;
+        $target = "&#946";
+        my $beta_ions = () = $top_hits_results->{'top_10'} =~ /$target/g;
+        my $min_ions = -1
+          ; #Allows for you to filter a minium number of ions for A and B chains, but is surprisingly ineffective at improving confidence.
+
+
+            my $rounded = sprintf("%.3f", $top_hits_results->{'ppm'});
+
+            print "<tr><td>", $printed_hits + 1, "</td><td>$top_hits_results->{'max_score'}</td><td>";
+            if ($no_links == 1) { print $top_hits_results->{'mz'}; }
+            else {
+                print
+	    "<a href='view_scan.pl?table=$table&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}'>$top_hits_results->{'mz'}</a>";
+            }
+
+            print "</td><td>$top_hits_results->{'charge'}+</td><td>$rounded</td>";
+
+            my @fragments = split('-', $top_hits_results->{'fragment'});
+            my @unmodified_fragments =
+              split('-', $top_hits_results->{'unmodified_fragment'});
+            if ($top_hits_results->{'fragment'} =~ '-') {
+                $printed_hits = $printed_hits + 1;
+                print "<td>";
+                if ($no_links == 0) {
+                    print "<a href='view_peptide.pl?table=$table&peptide=$fragments[0]-$fragments[1]'>";
+                }
+                print residue_position $unmodified_fragments[0], $top_hits_results->{'sequence1'};
+                print ".", $fragments[0], "&#8209;";
+                print residue_position $unmodified_fragments[1], $top_hits_results->{'sequence2'};
+                print ".", $fragments[1] . "</td><td>", $top_hits_results->{'best_x'} + 1, "&#8209;",
+                  $top_hits_results->{'best_y'} + 1;
+                if ($no_links == 0) { print "</a>" }
+                print "</td><td>";
+            } else {
+                $printed_hits = $printed_hits + 1;
+                print "<td>";
+                if ($no_links == 0) { print "<a href='view_peptide.pl?table=$table&peptide=$fragments[0]'>" }
+                print residue_position $unmodified_fragments[0], $protien_sequences;
+		if ($modifications{$top_hits_results->{'modification'}}{Name} eq 'loop link') 
+		  {                 print ".",               $unmodified_fragments[0];	}
+		else 
+		  {                 print ".",               $fragments[0];	}
+                print "&nbsp;</td><td>", $top_hits_results->{'best_x'} + 1;
+		if ($modifications{$top_hits_results->{'modification'}}{Name} eq 'loop link') 
+		  { print "&#8209;" , index ($fragments[0],'X')+1				}         
+                if ($no_links == 0) { print "</a>" }
+                print "</td><td>";
+            }
+            if ($monolink == 1) {
+                if ($top_hits_results->{'monolink_mass'} eq 0) {
+                    print 'N/A</td><td>';
+                } else {
+                    print "$top_hits_results->{'monolink_mass'}</td><td>";
+                }
+            }
+            if ($top_hits_results->{'no_of_mods'} > 1) {
+                print "$top_hits_results->{'no_of_mods'} x";
+            }
+            print " $modifications{$top_hits_results->{'modification'}}{Name}</td><td>",
+              substr($top_hits_results->{'sequence1_name'}, 1);
+            if ($top_hits_results->{'fragment'} =~ '-') {
+                print " - ", substr($top_hits_results->{'sequence2_name'}, 1);
+            }
+            print "</td><td> $top_hits_results->{'fraction'}</td><td>";
+            if ($top_hits_results->{'scan'} == '-1') {
+                if (defined $top_hits_results->{'d2_scan'}) {
+                    print
+"      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=0' class='screenshot' rel='view_thub.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=0'>Light Scan</a>";
+                    print
+" <br/><a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=1' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=1'>Heavy Scan</a>";
+                } else {
+                    print
+"      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=0'>Light Scan</a>";
+                }
+            } else {
+                if (defined $top_hits_results->{'d2_scan'}) {
+                    print
+"      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=0'>$top_hits_results->{'scan'}</a>";
+                    print
+" <br/><a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=1' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&d2_scan=$top_hits_results->{'d2_scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=1'>$top_hits_results->{'d2_scan'}</a>";
+                } else {
+                    print
+"      <a  href='view_img.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=0' class='screenshot' rel='view_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}&score=$top_hits_results->{'max_score'}&heavy=0'>$top_hits_results->{'scan'}</a>";
+                }
+            }
+            if (defined $top_hits_results->{'precursor_scan'} && $top_hits_results->{'precursor_scan'} ne '') {
+                print "<br/>(";
+                print
+"<a  href='view_precursor.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'precursor_scan'}&mass=$top_hits_results->{'mz'}'  class='screenshot'  rel='view_precursor_thumb.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'precursor_scan'}&mass=$top_hits_results->{'mz'}'>";
+                print $top_hits_results->{'precursor_scan'};
+                print "</a>)";
+            }
+            print "</td><td>";
+            print_ms2_link(
+                           $top_hits_results->{'MSn_string'}, $top_hits_results->{'d2_MSn_string'},
+                           $top_hits_results->{'fragment'},   $top_hits_results->{'modification'},
+                           $top_hits_results->{'best_x'},     $top_hits_results->{'best_y'},
+                           $xlinker_mass,                     $mono_mass_diff,
+                           $top_hits_results->{'top_10'},     $reactive_site,
+                           $table
+            );
+
+            print "</td>";
+
+            my $fdr = sprintf("%.2f", $top_hits_results->{'FDR'} * 100);
+            if ($decoy eq 'Yes') { print "<td>$fdr%</td>" }
+            print "</tr>";
+
+    }
+    print '</table>';
 
 }
 
@@ -692,7 +849,7 @@ sub print_results {
 
             print "</td>";
 
-            $fdr = sprintf("%.2f", $fdr_decoy / ($fdr_decoy + $fdr_non_decoy) * 100);
+            $fdr = sprintf("%.2f", $top_hits_results->{'FDR'} * 100);
             if ($decoy eq 'Yes') { print "<td>$fdr%</td>" }
             print "</tr>";
         } else {
