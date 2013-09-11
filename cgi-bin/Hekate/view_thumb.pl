@@ -83,6 +83,9 @@ my ($name, $desc, $cut_residues, $protein_sequences, $reactive_site, $mono_mass_
 $settings->finish();
 $settings_dbh->disconnect();
 
+
+my ( $fh, $filename ) = tempfile();
+
 ########################
 #                      #
 # Constants            #
@@ -135,7 +138,7 @@ my $chart = Chart::Gnuplot->new(
     imagesize => '320, 240',
     xtics     => { labelfmt => '', },
     ytics     => { labelfmt => '', },
-
+    output    => $filename,
 );
 
 $chart->gnuplot('/usr/bin/gnuplot');
@@ -213,6 +216,17 @@ my $impulses4 =
 binmode STDOUT;
 $chart->svg;
 $chart->plot2d($impulses, $impulses2, $impulses3, $impulses4);
+
+
+seek $fh, 0, 0;
+
+while (<$fh>) {
+   print "$_";
+}
+
+close $fh;
+
+
 $top_hits->finish();
 $results_dbh->disconnect();
 exit;

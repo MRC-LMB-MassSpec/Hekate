@@ -72,6 +72,8 @@ my ($name, $desc, $cut_residues, $protein_sequences, $reactive_site, $mono_mass_
 $settings->finish();
 $settings_dbh->disconnect();
 
+my ( $fh, $filename ) = tempfile();
+
 ########################
 #                      #
 # Constants            #
@@ -133,7 +135,8 @@ my $chart = Chart::Gnuplot->new(
     ylabel     => "relative abundance",
     tmargin    => "5",
     title      => "$title",
-    termoption => 'enhanced'
+    termoption => 'enhanced',
+    output     => $filename,
 );
 
 $chart->gnuplot('/usr/bin/gnuplot');
@@ -252,6 +255,15 @@ binmode STDOUT;
 $chart->svg;
 
 $chart->plot2d($impulses, $impulses2, $impulses3, $impulses4);
+
+seek $fh, 0, 0;
+
+while (<$fh>) {
+   print "$_";
+}
+
+close $fh;
+
 $top_hits->finish();
 $results_dbh->disconnect();
 
