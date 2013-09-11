@@ -1,7 +1,7 @@
 Hekate
 ===========
 
-Crosslinking Coupled Mass Spectroscopy Data Analysis Software based on Hekate. The projects were forked at time of publication, Hekate will receive no updates except for bug fixes. For new features refer to Hekate.
+Crosslinking Coupled Mass Spectroscopy Data Analysis Software based on Hekate. The projects were forked at time of publication, Hekate will receive no updates except for bug fixes. For new features refer to [Crosslinker](https://github.com/andrewholding/Crosslinker).
 
 (c) Andrew N Holding
 
