@@ -1347,18 +1347,19 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
     #  my $scan_data = $dbh->prepare("INSERT INTO scans (scan_num, mz, abundance ) VALUES (?, ?, ?)");
 
     while (<$file>) {
-        if ($_ =~ "BEGIN IONS") { $dataset = $dataset + 1; }
-        elsif ($_ =~ "PEPMASS") {
+        if ($_ =~ "^BEGIN IONS") { $dataset = $dataset + 1; warn "Being ions"; }
+        elsif ($_ =~ "^PEPMASS") {
             my $mystring = $_;
-            if ($mystring =~ m/=(.*?) /)      { $line{'mz'}        = $1 }
-            if ($mystring =~ m/ (.*?)[\r\n]/) { $line{'abundance'} = $1 }
-        } elsif ($_ =~ "SCANS") {
+            if ($mystring =~ m/=(.*?) /)      { $line{'mz'}        = $1;}
+	    elsif ($mystring =~ m/=(.*?)[\r\n]/) { $line{'mz'}     = $1;}
+            if ($mystring =~ m/ (.*?)[\r\n]/) { $line{'abundance'} = $1 ;}
+        } elsif ($_ =~ "^SCANS") {
             my $mystring = $_;
             if ($mystring =~ m/=(.*?)[\r\n]/) { $line{'scan_num'} = $1 }
-        } elsif ($_ =~ "CHARGE") {
+        } elsif ($_ =~ "^CHARGE") {
             my $mystring = $_;
             if ($mystring =~ m/=(.*?)\+/) { $line{'charge'} = $1 }
-        } elsif ($_ =~ "TITLE") {
+        } elsif ($_ =~ "^TITLE") {
             my $mystring = $_;
             if ($mystring =~ m/=(.*?)[\r\n]/) { $line{'title'} = $1 }
         }
@@ -1373,7 +1374,7 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
             #       $scan_data->execute($line{'scan_num'},$ms2_mz, $ms2_abundance);
         }
 
-        elsif ($_ =~ "END IONS") {
+        elsif ($_ =~ "^END IONS") {
             $line{'monoisoptic_mw'} = $line{'mz'} * $line{'charge'} - ($line{'charge'} * 1.00728);
             my $newline = $dbh->prepare(
 "INSERT INTO msdata (scan_num, fraction, title, charge, mz, abundance, monoisotopic_mw, MSn_string, msorder) VALUES (? , ?, ?, ?, ?, ?, ?,?, 2)"
