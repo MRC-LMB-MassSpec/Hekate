@@ -1347,7 +1347,10 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
     #  my $scan_data = $dbh->prepare("INSERT INTO scans (scan_num, mz, abundance ) VALUES (?, ?, ?)");
 
     while (<$file>) {
-        if ($_ =~ "^BEGIN IONS") { $dataset = $dataset + 1; warn "Being ions"; }
+        if ($_ =~ "^BEGIN IONS") { 
+		$dataset = $dataset + 1; 
+		$line{'abundance'} = 0
+		}
         elsif ($_ =~ "^PEPMASS") {
             my $mystring = $_;
             if ($mystring =~ m/=(.*?) /)      { $line{'mz'}        = $1;}
@@ -1370,7 +1373,6 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
             $MSn_string = $MSn_string . $MSn_row;
             my @MSn_split = split(/ /, $MSn_row);
             my ($ms2_mz, $ms2_abundance) = @MSn_split;
-
             #       $scan_data->execute($line{'scan_num'},$ms2_mz, $ms2_abundance);
         }
 
