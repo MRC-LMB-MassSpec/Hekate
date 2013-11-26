@@ -1364,7 +1364,8 @@ sub import_mgf    #Enters the uploaded MGF into a SQLite database
             if ($mystring =~ m/=(.*?)\+/) { $line{'charge'} = $1 }
         } elsif ($_ =~ "^TITLE") {
             my $mystring = $_;
-            if ($mystring =~ m/=(.*?)[\r\n]/) { $line{'title'} = $1 }
+            if ($mystring =~ m/=(.*?)[\r\n]/)  { $line{'title'} = $1 }
+	    if ($mystring =~ m/scan=([0-9]*)/ ne '') { $line{'scan_num'} = $1}
         }
 
         elsif ($_ =~ "^.[0-9]") {
