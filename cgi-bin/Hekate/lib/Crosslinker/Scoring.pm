@@ -220,6 +220,7 @@ sub calc_score {
 ######
 
     my $highest_mz = (sort { $b <=> $a } keys %ms2_masses)[0];
+    $highest_mz = 0 unless defined $highest_mz;
 
 ######
     #
