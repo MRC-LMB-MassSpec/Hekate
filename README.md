@@ -34,7 +34,7 @@ Make and change to directory '/srv/www'.
 
 Use Git to obtain the latest version of Hekate and download it into the current directory. 
 
-	git clone git://github.com/andrewholding/Hekate.git
+	git clone git://github.com/MRC-LMB-MassSpec/Hekate.git
 
 Change ownership of the folder to www-data with chown.
 
