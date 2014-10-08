@@ -5,6 +5,11 @@ Crosslinking Coupled Mass Spectroscopy Data Analysis Software based on Hekate. T
 
 (c) Andrew N Holding
 
+License
+---------
+
+GNU GENERAL PUBLIC LICENSE Version 3
+
 Installation
 ------------
 
