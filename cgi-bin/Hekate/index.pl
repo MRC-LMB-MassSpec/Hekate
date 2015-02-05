@@ -180,7 +180,6 @@ print <<ENDHTML;
 </div>
 ENDHTML
 
-if ( $development_setting->{'setting1'} == 1) {
     print '
 <legend>Amber Codon Mode</legend>
 <div class="row">
@@ -199,7 +198,7 @@ if ( $development_setting->{'setting1'} == 1) {
     <label>Amino acid residue mass</label> <div class="input-append"><input type="text" name="amber_residue_mass" size="10" maxlength="21" value="251.0946254"/><span class="add-on">ppm</span></div><br/> 
     <label>Amber codon (Z) peptide sequence</label> <input type="text" name="amber_peptide" size="10" maxlength="20" value="FZPVINKPAK"/><br/> 
 </div>
-</div>'};
+</div>';
 
 print <<ENDHTML;
 <Legend>Fragment Ions</legend>

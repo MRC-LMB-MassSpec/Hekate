@@ -128,7 +128,7 @@ else                                      { $decoy = "No" }
 
 print "<Table class='table table-striped'>
 <tr><td style='font-weight: bold;'>Name:</td><td>$name</td><td style='font-weight: bold;'>Description</td><td>$desc</td></tr>";
-if ($proteinase_k == 'O') { print "<tr><td style='font-weight: bold;'>Cut:</td><td>$cut_residues</td>";} else { print "<tr><td style='font-weight: bold;'>Cut:</td><td>No Enzyme</td>";}
+if ($proteinase_k == 0) { print "<tr><td style='font-weight: bold;'>Cut:</td><td>$cut_residues</td>";} else { print "<tr><td style='font-weight: bold;'>Cut:</td><td>No Enzyme</td>";}
 print " <td style='font-weight: bold;'>Xlink Site</td><td>$reactive_site</td></tr>
 <tr><td style='font-weight: bold;'>Xlinker Mass:</td><td>$xlinker_mass</td><td style='font-weight: bold;'>Monolink</td><td>$mono_mass_diff</td></tr>
 <tr><td style='font-weight: bold;'>MS1 tollerance:</td><td>$ms1_ppm PPM</td><td style='font-weight: bold;'>MS2 tollerance</td><td>$ms2_da Da</td></tr>
