@@ -922,7 +922,7 @@ sub print_results_combined {
                 print "<tr><td>", $printed_hits + 1,"</td><td>";
 		if ($show_scan_image != 1) { print "<a href='view_scan.pl?table=$top_hits_results->{'name'}&scan=$top_hits_results->{'scan'}&fraction=$top_hits_results->{'fraction'}'>";}
 		print "$top_hits_results->{'score'}";
-		if ($show_scan_image != 1) {"</a>"};
+		if ($show_scan_image != 1) {print "</a>"};
 		print "</td><td>$top_hits_results->{'mz'}</td><td>$top_hits_results->{'charge'}+</td><td>$rounded</td>";
                 my @fragments = split('-', $top_hits_results->{'fragment'});
                 my @unmodified_fragments =
