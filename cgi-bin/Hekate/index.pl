@@ -180,27 +180,6 @@ print <<ENDHTML;
 </div>
 ENDHTML
 
-    print '
-<legend>Amber Codon Mode</legend>
-<div class="row">
-<div class="span8">
-  <label class="checkbox inline span8" ><input type="checkbox" name="amber_codon"   value="1"/>Enable use of amber codon settings.</label><br/><br/>
-</div>
-<div class="span4">      
-  <label>Mass change on crosslinking</label>
-  <div class="input-append"><input type="text" name="amber_xlink" size="10" maxlength="10" value="0"/><span class="add-on">ppm</span></div><br/> 
-  <label>Isotope type</label>
-  <select name="amber_isotope"><option>deuterium</option><option>carbon-13</option><option>none</option></select> 
-  <label>Number of labelled atoms in isotopic form</label>
-  <input type="text" name="amber_seperation" size="2" maxlength="5" value="11"/> 
-</div>
-<div class="span4">  
-    <label>Amino acid residue mass</label> <div class="input-append"><input type="text" name="amber_residue_mass" size="10" maxlength="21" value="251.0946254"/><span class="add-on">ppm</span></div><br/> 
-    <label>Amber codon (Z) peptide sequence</label> <input type="text" name="amber_peptide" size="10" maxlength="20" value="FZPVINKPAK"/><br/> 
-</div>
-</div>';
-
-print <<ENDHTML;
 <Legend>Fragment Ions</legend>
 <div class="row">
 <div class="span3"> 

@@ -489,6 +489,7 @@ sub calculate_amber_crosslink_peptides {
 	$protein_residuemass_ref
     ) = @_;
 
+    
     my $xlink;
     my $xlink_fragment_mass;
     my $xlink_fragment_sources;
@@ -525,15 +526,12 @@ sub calculate_amber_crosslink_peptides {
                   $amber_peptide_mass + $protein_residuemass{$residue};   
             }
         
-#     warn $protein_residuemass{'Z'},$protein_residuemass{'K'};
-#     warn $amber_peptide_mass + $terminal_mass;
     $peptidelist->execute($amber_peptide, $amber_peptide_mass+ $terminal_mass);
 
     my $correct_xlink_mass =
       $results_dbh->prepare("UPDATE peptides SET mass = mass + ? WHERE  xlink = 1 and results_table = ?;");
     $correct_xlink_mass->execute($amber_xlink_delta, $results_table);
 
-    #Need to add xlinker mass to all xlinks with UPDATE statments.
 
 }
 1;
