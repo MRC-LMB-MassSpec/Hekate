@@ -180,6 +180,7 @@ print <<ENDHTML;
 </div>
 ENDHTML
 
+print <<ENDHTML;
 <Legend>Fragment Ions</legend>
 <div class="row">
 <div class="span3"> 
