@@ -180,7 +180,7 @@ print <<ENDHTML;
 </div>
 ENDHTML
 
- print '
+print <<ENDHTML;
 <legend>Amber Codon Mode</legend>
 <div class="row">
 <div class="span8">
@@ -198,7 +198,8 @@ ENDHTML
 <label>Amino acid residue mass</label> <div class="input-append"><input type="text" name="amber_residue_mass" size="10" maxlength="21" value="251.0946254"/><span class="add-on">ppm</span></div><br/>
 <label>Amber codon (Z) peptide sequence</label> <input type="text" name="amber_peptide" size="10" maxlength="20" value="FZPVINKPAK"/><br/>
 </div>
-</div>'
+</div>
+ENDHTML
 
 print <<ENDHTML;
 <Legend>Fragment Ions</legend>
