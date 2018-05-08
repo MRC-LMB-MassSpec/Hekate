@@ -120,10 +120,10 @@ sub generate_page {
     $results_dbh->disconnect;
     ($results_dbh) = connect_db_results($results_table, 0);
 
-    if ($reactive_site =~ /[^,]/) {  $reactive_site = $reactive_site . ',' . $reactive_site};
 
 
     if ($amber_codon == 0) {
+      if ($reactive_site =~ /[^,]/) {  $reactive_site = $reactive_site . ',' . $reactive_site};
       calculate_crosslink_peptides($results_dbh,  $results_table,   $reactive_site, $min_peptide_length,
 				   $xlinker_mass, $missed_clevages, $cut_residues);
     } else {
